@@ -39,7 +39,7 @@ class Board : public Gtk::DrawingArea {
 		void draw_bg();
 		void draw_chessman();
 		void draw_chessman(int x, int y, int chessman_type);
-		void draw_select_frame(int x, int y, bool selected = true);
+		void draw_select_frame(bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	private:
@@ -47,6 +47,7 @@ class Board : public Gtk::DrawingArea {
 		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];
 		int selected_x;
 		int selected_y;
+		int selected_chessman;
 };
 
 #endif // _MAIN_WINDOW_H_

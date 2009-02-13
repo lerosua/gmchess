@@ -35,7 +35,8 @@ enum {
 
 Board::Board() :
 	selected_x(-1),
-	selected_y(-1)
+	selected_y(-1),
+	selected_chessman(-1)
 {
 	//this->set_title("Chess");
 	//Glib::RefPtr<Gdk::Pixbuf> bg_image = Gdk::Pixbuf::create_from_file("wood.png");
@@ -117,12 +118,12 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
 		//格式化选中的位置
-		draw_select_frame(selected_x, selected_y, false);
+		draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
 		if (selected_x != -1) {
-			draw_select_frame(selected_x, selected_y, true);
+			draw_select_frame(true);
 		}
 	}
 
@@ -278,12 +279,12 @@ void Board::draw_chessman(int x, int y, int chessman_type)
 	}
 }
 
-void Board::draw_select_frame(int x, int y, bool selected)
+void Board::draw_select_frame(bool selected)
 {
-	if (x == -1 || y == -1)
+	if (selected_x == -1 || selected_y == -1)
 		return;
 
-	Gdk::Point p = get_coordinate(x, y);
+	Gdk::Point p = get_coordinate(selected_x, selected_y);
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
@@ -333,6 +334,6 @@ void Board::draw_chessman()
 	draw_chessman(6, 6, RED_PAWN);
 	draw_chessman(8, 6, RED_PAWN);
 
-	draw_select_frame(selected_x, selected_y, true);
+	draw_select_frame(true);
 }
 
