@@ -33,6 +33,8 @@ class MainWindow : public Gtk::DrawingArea {
 		bool on_button_press_event(GdkEventButton* ev);
 		void DrawBG();
 		void DrawChessman();
+		void DrawLocalize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height, int place);
+		void DrawPalace(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height );
 	private:
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		Glib::RefPtr<Gdk::Pixbuf> rp_image;

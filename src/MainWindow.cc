@@ -18,6 +18,10 @@
  */
 
 #include "MainWindow.h"
+const int border_width = 32;
+#define	PLACE_LEFT 0x01
+#define PLACE_RIGHT 0x02
+#define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
 
 MainWindow::MainWindow() 
 {
@@ -62,11 +66,96 @@ bool MainWindow::on_button_press_event(GdkEventButton* ev)
 
 void MainWindow::DrawBG()
 {
-	bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
-			Gdk::RGB_DITHER_NONE, 0, 0);
+	//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
+			//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
+			//Gdk::RGB_DITHER_NONE, 0, 0);
+	
+	int width = this->get_width();
+	int height = this->get_height();
+	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
+	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
+	this->get_window()->draw_rectangle(gc, false, border_width - 8, border_width - 8, width - border_width * 2 + 8 * 2, height - border_width * 2 + 8 * 2);
+
+	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
+	this->get_window()->draw_rectangle(gc, false, border_width, border_width, width - border_width * 2 , height - border_width * 2);
+
+	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
+	int grid_width = (width - border_width * 2) / 8;
+	int grid_height = (height - border_width * 2) / 9;
+	for (int i = 0; i < 9; i++) {
+		this->get_window()->draw_line(gc, border_width,
+			   	grid_height * i + border_width, 
+				width - border_width, 
+				grid_height * i + border_width);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		this->get_window()->draw_line(gc, grid_width * i + border_width,
+			   	border_width,
+				grid_width * i + border_width, 
+				grid_height * 4 + border_width);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		this->get_window()->draw_line(gc, grid_width * i + border_width,
+			   	grid_height * 5 + border_width,
+				grid_width * i + border_width, 
+				grid_height * 9 + border_width);
+	}
+
+	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
+
+	DrawLocalize(gc, border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_LEFT);
+	DrawLocalize(gc, grid_width * 8 + border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_RIGHT);
+
+	for (int i = 0; i < 3; i++) {
+		DrawLocalize(gc, grid_width * (i * 2 + 2)  + border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_ALL);
+	}
+
+		DrawLocalize(gc, grid_width * 1  + border_width, grid_height * 2 + border_width, grid_width, grid_height, PLACE_ALL);
+		DrawLocalize(gc, grid_width * 7  + border_width, grid_height * 2 + border_width, grid_width, grid_height, PLACE_ALL);
+
+	DrawLocalize(gc, border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_LEFT);
+	DrawLocalize(gc, grid_width * 8 + border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_RIGHT);
+
+	for (int i = 0; i < 3; i++) {
+		DrawLocalize(gc, grid_width * (i * 2 + 2)  + border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_ALL);
+	}
+
+	DrawLocalize(gc, grid_width * 1  + border_width, grid_height * 7 + border_width, grid_width, grid_height, PLACE_ALL);
+	DrawLocalize(gc, grid_width * 7  + border_width, grid_height * 7 + border_width, grid_width, grid_height, PLACE_ALL);
+
+	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
+	DrawPalace(gc, grid_width * 4 + border_width, border_width, grid_width, grid_height);
 }
 
+void MainWindow::DrawLocalize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height, int place)
+{
+	int width = grid_width / 5;
+	int height = grid_height / 5;
+	if (place & PLACE_LEFT) {
+		this->get_window()->draw_line(gc, x + 4, y - height - 4, x + 4, y - 4);
+		this->get_window()->draw_line(gc, x + 4, y - 4, x + 4 + width, y - 4);
+		this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 , y + 4 + height);
+		this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 + width , y + 4);
+	}
+
+	if (place & PLACE_RIGHT) {
+		this->get_window()->draw_line(gc, x - 4, y - height - 4, x - 4, y - 4);
+		this->get_window()->draw_line(gc, x - 4 - width, y - 4, x - 4 , y - 4);
+		this->get_window()->draw_line(gc, x - 4, y + 4, x - 4 , y + 4 + height);
+		this->get_window()->draw_line(gc, x - 4 - width, y + 4, x - 4 , y + 4);
+	}
+}
+
+void MainWindow::DrawPalace(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height )
+{
+	this->get_window()->draw_line(gc, x - grid_width, y, x + grid_width, y + grid_height * 2);
+	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 2, x + grid_width, y);
+
+	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 7, x + grid_width, y + grid_height * 9);
+	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 9, x + grid_width, y + grid_height * 7);
+}
 void MainWindow::DrawChessman()
 {
 	Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("rp_p.png");
