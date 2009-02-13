@@ -40,10 +40,27 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::get_grid_size(int& width, int& height)
+{
+	width = (get_width() - border_width * 2) / 8;
+	height = (get_height() - border_width * 2) / 9;
+}
+
+Gdk::Point MainWindow::get_coordinate(int pos_x, int pos_y)
+{
+	int grid_width;
+	int grid_height;
+	get_grid_size(grid_width, grid_height);
+	pos_x = pos_x * grid_width + border_width;
+	pos_y = pos_y * grid_height + border_width;
+
+	return Gdk::Point(pos_x, pos_y);
+}
+
 bool MainWindow::on_expose_event(GdkEventExpose* ev)
 {
-	DrawBG();
-	DrawChessman();
+	draw_bg();
+	draw_chessman();
 	return true;
 }
 
@@ -65,120 +82,141 @@ bool MainWindow::on_button_press_event(GdkEventButton* ev)
 
 }
 
-void MainWindow::DrawBG()
+void MainWindow::draw_bg()
 {
 	//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
 			//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
 			//Gdk::RGB_DITHER_NONE, 0, 0);
 	
-	int width = (this->get_width() - border_width * 2) / 8 * 8 + border_width * 2;
-	int height = (this->get_height() - border_width * 2) / 9 * 9 + border_width * 2;
+	
+	Gdk::Point p1= get_coordinate(0, 0);
+	Gdk::Point p2= get_coordinate(8, 9);
+
+	int width = p2.get_x() - p1.get_x();
+	int height = p2.get_y() - p1.get_y();
+
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
 	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	this->get_window()->draw_rectangle(gc, false, border_width - 8, border_width - 8, width - border_width * 2 + 8 * 2, height - border_width * 2 + 8 * 2);
+	get_window()->draw_rectangle(gc, false, 
+			p1.get_x() - 8, p1.get_y() - 8,
+			width + 8 * 2, height + 8 * 2);
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	this->get_window()->draw_rectangle(gc, false, border_width, border_width, width - border_width * 2 , height - border_width * 2);
+	this->get_window()->draw_rectangle(gc, false, 
+			p1.get_x(), p1.get_y(),
+			width, height);
 
 	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	int grid_width = (width - border_width * 2) / 8;
-	int grid_height = (height - border_width * 2) / 9;
+	int grid_width;
+	int grid_height;
+	get_grid_size(grid_width, grid_height);
+
 	for (int i = 0; i < 9; i++) {
-		this->get_window()->draw_line(gc, border_width,
-			   	grid_height * i + border_width, 
-				width - border_width, 
-				grid_height * i + border_width);
+		p1 = get_coordinate(0, i);
+		p2 = get_coordinate(8, i);
+		get_window()->draw_line(gc ,
+				p1.get_x(),
+				p1.get_y(),
+				p2.get_x(),
+				p2.get_y());
 	}
 
 	for (int i = 0; i < 8; i++) {
-		this->get_window()->draw_line(gc, grid_width * i + border_width,
-			   	border_width,
-				grid_width * i + border_width, 
-				grid_height * 4 + border_width);
+		p1 = get_coordinate(i, 0);
+		p2 = get_coordinate(i, 4);
+		get_window()->draw_line(gc ,
+				p1.get_x(),
+				p1.get_y(),
+				p2.get_x(),
+				p2.get_y());
 	}
 
 	for (int i = 0; i < 8; i++) {
-		this->get_window()->draw_line(gc, grid_width * i + border_width,
-			   	grid_height * 5 + border_width,
-				grid_width * i + border_width, 
-				grid_height * 9 + border_width);
+		p1 = get_coordinate(i, 5);
+		p2 = get_coordinate(i, 9);
+		get_window()->draw_line(gc ,
+				p1.get_x(),
+				p1.get_y(),
+				p2.get_x(),
+				p2.get_y());
 	}
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
 
-	DrawLocalize(gc, border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_LEFT);
-	DrawLocalize(gc, grid_width * 8 + border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_RIGHT);
+	draw_localize(gc, 0, 3, PLACE_LEFT);
+	draw_localize(gc, 8, 3, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		DrawLocalize(gc, grid_width * (i * 2 + 2)  + border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_ALL);
+		draw_localize(gc, i * 2 + 2, 3, PLACE_ALL);
 	}
 
-		DrawLocalize(gc, grid_width * 1  + border_width, grid_height * 2 + border_width, grid_width, grid_height, PLACE_ALL);
-		DrawLocalize(gc, grid_width * 7  + border_width, grid_height * 2 + border_width, grid_width, grid_height, PLACE_ALL);
+	draw_localize(gc, 1, 2, PLACE_ALL);
+	draw_localize(gc, 7, 2, PLACE_ALL);
 
-	DrawLocalize(gc, border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_LEFT);
-	DrawLocalize(gc, grid_width * 8 + border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_RIGHT);
+	draw_localize(gc, 0, 6, PLACE_LEFT);
+	draw_localize(gc, 8, 6, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		DrawLocalize(gc, grid_width * (i * 2 + 2)  + border_width, grid_height * 6 + border_width, grid_width, grid_height, PLACE_ALL);
+		draw_localize(gc,  i * 2 + 2, 6, PLACE_ALL);
 	}
 
-	DrawLocalize(gc, grid_width * 1  + border_width, grid_height * 7 + border_width, grid_width, grid_height, PLACE_ALL);
-	DrawLocalize(gc, grid_width * 7  + border_width, grid_height * 7 + border_width, grid_width, grid_height, PLACE_ALL);
+	draw_localize(gc, 1, 7, PLACE_ALL);
+	draw_localize(gc, 7, 7, PLACE_ALL);
 
 	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
-	DrawPalace(gc, grid_width * 4 + border_width, border_width, grid_width, grid_height);
+	draw_palace(gc, 4, 1); 
+	draw_palace(gc, 4, 8); 
 }
 
-void MainWindow::DrawLocalize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height, int place)
+void MainWindow::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
 {
-	int width = grid_width / 5;
-	int height = grid_height / 5;
-	if (place & PLACE_LEFT) {
-		std::vector<Gdk::Point> pos;
-		pos.push_back(Gdk::Point(x + 5, y - height - 4));
-		pos.push_back(Gdk::Point(x + 5, y - 4));
-		pos.push_back(Gdk::Point(x + 5 + width, y - 4));
-		this->get_window()->draw_lines(gc, pos);
-		//this->get_window()->draw_line(gc, x + 4, y - height - 4, x + 4, y - 4);
-		//this->get_window()->draw_line(gc, x + 4, y - 4, x + 4 + width, y - 4);
+	int width;
+	int height;
+	get_grid_size(width, height);
+	width /= 5;
+	height /= 5;
 
-		pos.clear();
-		pos.push_back(Gdk::Point(x + 5 + width, y + 5));
-		pos.push_back(Gdk::Point(x + 5, y + 5));
-		pos.push_back(Gdk::Point(x + 5 , y + 5 + height));
-		this->get_window()->draw_lines(gc, pos);
-		//this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 , y + 4 + height);
-		//this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 + width , y + 4);
+	Gdk::Point p = get_coordinate(x, y);
+
+	if (place & PLACE_LEFT) {
+		std::vector<Gdk::Point> poss;
+		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - height - 4));
+		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - 4));
+		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() - 4));
+		this->get_window()->draw_lines(gc, poss);
+
+		poss.clear();
+		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() + 5));
+		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() + 5));
+		poss.push_back(Gdk::Point(p.get_x() + 5 , p.get_y() + 5 + height));
+		this->get_window()->draw_lines(gc, poss);
 	}
 
 	if (place & PLACE_RIGHT) {
-		std::vector<Gdk::Point> pos;
-		pos.push_back(Gdk::Point(x - 4 - width, y - 4));
-		pos.push_back(Gdk::Point(x - 4 , y - 4));
-		pos.push_back(Gdk::Point(x - 4 , y - 4 - height));
-		this->get_window()->draw_lines(gc, pos);
-		//this->get_window()->draw_line(gc, x - 4, y - height - 4, x - 4, y - 4);
-		//this->get_window()->draw_line(gc, x - 4 - width, y - 4, x - 4 , y - 4);
-		pos.clear();
-		pos.push_back(Gdk::Point(x - 4 - width, y + 5));
-		pos.push_back(Gdk::Point(x - 4 , y + 5));
-		pos.push_back(Gdk::Point(x - 4 , y + 5 + height));
-		this->get_window()->draw_lines(gc, pos);
-		//this->get_window()->draw_line(gc, x - 4, y + 4, x - 4 , y + 4 + height);
-		//this->get_window()->draw_line(gc, x - 4 - width, y + 4, x - 4 , y + 4);
+		std::vector<Gdk::Point> poss;
+		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() - 4));
+		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4));
+		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4 - height));
+		this->get_window()->draw_lines(gc, poss);
+		poss.clear();
+		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() + 5));
+		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5));
+		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5 + height));
+		this->get_window()->draw_lines(gc, poss);
 	}
 }
 
-void MainWindow::DrawPalace(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height )
+void MainWindow::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 {
-	this->get_window()->draw_line(gc, x - grid_width, y, x + grid_width, y + grid_height * 2);
-	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 2, x + grid_width, y);
+	int width;
+	int height;
+	get_grid_size(width, height);
+	Gdk::Point p = get_coordinate(x, y);
 
-	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 7, x + grid_width, y + grid_height * 9);
-	this->get_window()->draw_line(gc, x - grid_width, y + grid_height * 9, x + grid_width, y + grid_height * 7);
+	get_window()->draw_line(gc, p.get_x() - width, p.get_y() - height, p.get_x() + width, p.get_y() + height);
+	get_window()->draw_line(gc, p.get_x() + width, p.get_y() - height, p.get_x() - width, p.get_y() + height);
 }
-void MainWindow::DrawChessman()
+void MainWindow::draw_chessman()
 {
 	Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("rp_p.png");
 	image->render_to_drawable(get_window(), get_style()->get_black_gc(),

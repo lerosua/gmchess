@@ -31,10 +31,14 @@ class MainWindow : public Gtk::DrawingArea {
 	protected:
 		bool on_expose_event(GdkEventExpose* ev);
 		bool on_button_press_event(GdkEventButton* ev);
-		void DrawBG();
-		void DrawChessman();
-		void DrawLocalize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height, int place);
-		void DrawPalace(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_width, int grid_height );
+
+		Gdk::Point get_coordinate(int pos_x, int pos_y);
+		void get_grid_size(int& width, int& height);
+
+		void draw_bg();
+		void draw_chessman();
+		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
+		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	private:
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		Glib::RefPtr<Gdk::Pixbuf> rp_image;
