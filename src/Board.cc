@@ -97,9 +97,8 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	pos_y += grid_height / 2;
 	int offset_x = pos_x % grid_width;
 	int offset_y = pos_y % grid_height;
-	if ((offset_x > grid_width - 5) || (offset_y > grid_height - 5))
+	if ((offset_x > grid_width / 5 * 4 ) || (offset_y > grid_height / 5 * 4))
 		return Gdk::Point(-1, -1);
-	std::cout << offset_x << ',' << offset_y << std::endl;
 	pos_x = pos_x / grid_width;
 	pos_y = pos_y / grid_height;
 	return Gdk::Point(pos_x, pos_y);
@@ -334,6 +333,6 @@ void Board::draw_chessman()
 	draw_chessman(6, 6, RED_PAWN);
 	draw_chessman(8, 6, RED_PAWN);
 
-	draw_chessman(selected_x, selected_y, true);
+	draw_select_frame(selected_x, selected_y, true);
 }
 
