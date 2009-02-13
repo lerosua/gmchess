@@ -1,14 +1,14 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * MainWindow.h
+ * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
  * 
- * MainWindow.h is free software: you can redistribute it and/or modify it
+ * Board.h is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * MainWindow.h is distributed in the hope that it will be useful, but
+ * Board.h is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -17,14 +17,14 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MainWindow.h"
+#include "Board.h"
 #include <vector>
 const int border_width = 32;
 #define	PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
 
-MainWindow::MainWindow() 
+Board::Board() 
 {
 	//this->set_title("Chess");
 	//Glib::RefPtr<Gdk::Pixbuf> bg_image = Gdk::Pixbuf::create_from_file("wood.png");
@@ -36,17 +36,17 @@ MainWindow::MainWindow()
 
 }
 
-MainWindow::~MainWindow()
+Board::~Board()
 {
 }
 
-void MainWindow::get_grid_size(int& width, int& height)
+void Board::get_grid_size(int& width, int& height)
 {
 	width = (get_width() - border_width * 2) / 8;
 	height = (get_height() - border_width * 2) / 9;
 }
 
-Gdk::Point MainWindow::get_coordinate(int pos_x, int pos_y)
+Gdk::Point Board::get_coordinate(int pos_x, int pos_y)
 {
 	int grid_width;
 	int grid_height;
@@ -57,7 +57,7 @@ Gdk::Point MainWindow::get_coordinate(int pos_x, int pos_y)
 	return Gdk::Point(pos_x, pos_y);
 }
 
-bool MainWindow::on_expose_event(GdkEventExpose* ev)
+bool Board::on_expose_event(GdkEventExpose* ev)
 {
 	draw_bg();
 	draw_chessman();
@@ -65,7 +65,7 @@ bool MainWindow::on_expose_event(GdkEventExpose* ev)
 }
 
 /**处理点击事件*/
-bool MainWindow::on_button_press_event(GdkEventButton* ev)
+bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
@@ -82,7 +82,7 @@ bool MainWindow::on_button_press_event(GdkEventButton* ev)
 
 }
 
-void MainWindow::draw_bg()
+void Board::draw_bg()
 {
 	//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
 			//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
@@ -168,7 +168,7 @@ void MainWindow::draw_bg()
 	draw_palace(gc, 4, 8); 
 }
 
-void MainWindow::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
+void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
 {
 	int width;
 	int height;
@@ -206,7 +206,7 @@ void MainWindow::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int plac
 	}
 }
 
-void MainWindow::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
+void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 {
 	int width;
 	int height;
@@ -216,7 +216,7 @@ void MainWindow::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 	get_window()->draw_line(gc, p.get_x() - width, p.get_y() - height, p.get_x() + width, p.get_y() + height);
 	get_window()->draw_line(gc, p.get_x() + width, p.get_y() - height, p.get_x() - width, p.get_y() + height);
 }
-void MainWindow::draw_chessman()
+void Board::draw_chessman()
 {
 	Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("rp_p.png");
 	image->render_to_drawable(get_window(), get_style()->get_black_gc(),

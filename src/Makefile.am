@@ -19,7 +19,7 @@ bin_PROGRAMS = chess
 
 chess_SOURCES = \
 	main.cc	\
-	MainWindow.cc
+	Board.cc
 
 chess_LDFLAGS = 
 

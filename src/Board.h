@@ -1,14 +1,14 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * MainWindow.h
+ * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
  * 
- * MainWindow.h is free software: you can redistribute it and/or modify it
+ * Board.h is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * MainWindow.h is distributed in the hope that it will be useful, but
+ * Board.h is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -24,10 +24,10 @@
 #include <iostream>
 #include <gtkmm/drawingarea.h>
 
-class MainWindow : public Gtk::DrawingArea {
+class Board : public Gtk::DrawingArea {
 	public:
-		MainWindow();
-		~MainWindow();
+		Board();
+		~Board();
 	protected:
 		bool on_expose_event(GdkEventExpose* ev);
 		bool on_button_press_event(GdkEventButton* ev);

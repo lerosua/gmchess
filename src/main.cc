@@ -27,13 +27,13 @@
 #ifdef ENABLE_NLS
 #  include <libintl.h>
 #endif
-#include "MainWindow.h"
+#include "Board.h"
 
 int main (int argc, char *argv[])
 {
 	Gtk::Main kit(argc, argv);
 	Gtk::Window win;
-	MainWindow draw_area;
+	Board draw_area;
 	win.add(draw_area);
 	kit.run(win);
 	return 0;
