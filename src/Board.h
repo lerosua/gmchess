@@ -33,16 +33,20 @@ class Board : public Gtk::DrawingArea {
 		bool on_button_press_event(GdkEventButton* ev);
 
 		Gdk::Point get_coordinate(int pos_x, int pos_y);
+		Gdk::Point get_position(int pos_x, int pos_y);
 		void get_grid_size(int& width, int& height);
 
 		void draw_bg();
 		void draw_chessman();
-		void draw_chessman(int x, int y, int chessman_type, bool selected);
+		void draw_chessman(int x, int y, int chessman_type);
+		void draw_select_frame(int x, int y, bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	private:
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];
+		int selected_x;
+		int selected_y;
 };
 
 #endif // _MAIN_WINDOW_H_

@@ -33,7 +33,9 @@ enum {
 	NULL_CHESSMAN, SELECTED_CHESSMAN
 };
 
-Board::Board() 
+Board::Board() :
+	selected_x(-1),
+	selected_y(-1)
 {
 	//this->set_title("Chess");
 	//Glib::RefPtr<Gdk::Pixbuf> bg_image = Gdk::Pixbuf::create_from_file("wood.png");
@@ -83,6 +85,26 @@ Gdk::Point Board::get_coordinate(int pos_x, int pos_y)
 	return Gdk::Point(pos_x, pos_y);
 }
 
+
+Gdk::Point Board::get_position(int pos_x, int pos_y)
+{
+	int grid_width;
+	int grid_height;
+	get_grid_size(grid_width, grid_height);
+	pos_x -= border_width;
+	pos_y -= border_width;
+	pos_x += grid_width / 2;
+	pos_y += grid_height / 2;
+	int offset_x = pos_x % grid_width;
+	int offset_y = pos_y % grid_height;
+	if ((offset_x > grid_width - 5) || (offset_y > grid_height - 5))
+		return Gdk::Point(-1, -1);
+	std::cout << offset_x << ',' << offset_y << std::endl;
+	pos_x = pos_x / grid_width;
+	pos_y = pos_y / grid_height;
+	return Gdk::Point(pos_x, pos_y);
+}
+
 bool Board::on_expose_event(GdkEventExpose* ev)
 {
 	draw_bg();
@@ -95,26 +117,26 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
-		printf("button press\n");
-	Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("oos.png");
-	//格式化选中的位置
-	int x = (int((ev->x-5)/57))*57+5;
-	int y = (int ((ev->y-5)/57))*57+5;
-	image->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			0, 0, x, y, image->get_width(), image->get_height(), 
-			Gdk::RGB_DITHER_NONE, 0, 0);
+		//格式化选中的位置
+		draw_select_frame(selected_x, selected_y, false);
+		Gdk::Point p = get_position(ev->x, ev->y);
+		selected_x = p.get_x();
+		selected_y = p.get_y();
+		if (selected_x != -1) {
+			draw_select_frame(selected_x, selected_y, true);
+		}
 	}
 
-
+	return true;
 }
 
 void Board::draw_bg()
 {
 	//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
-			//Gdk::RGB_DITHER_NONE, 0, 0);
-	
-	
+	//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
+	//Gdk::RGB_DITHER_NONE, 0, 0);
+
+
 	Gdk::Point p1= get_coordinate(0, 0);
 	Gdk::Point p2= get_coordinate(8, 9);
 
@@ -244,55 +266,74 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 }
 
 
-void Board::draw_chessman(int x, int y, int chessman_type, bool selected)
+void Board::draw_chessman(int x, int y, int chessman_type)
 {
+	if (chessman_type <  NULL_CHESSMAN) {
+		Gdk::Point p = get_coordinate(x, y);
+		int px = p.get_x() - 57 / 2;
+		int py = p.get_y() - 57 / 2;
+
+		chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+				0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
+				Gdk::RGB_DITHER_NONE, 0, 0);
+	}
+}
+
+void Board::draw_select_frame(int x, int y, bool selected)
+{
+	if (x == -1 || y == -1)
+		return;
+
 	Gdk::Point p = get_coordinate(x, y);
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
-	chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
-			Gdk::RGB_DITHER_NONE, 0, 0);
 	if (selected)
 		chessmans[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
 				0, 0, px, py, chessmans[SELECTED_CHESSMAN]->get_width(), chessmans[SELECTED_CHESSMAN]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
-
+	else
+		chessmans[NULL_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+				0, 0, px, py, chessmans[NULL_CHESSMAN]->get_width(), chessmans[NULL_CHESSMAN]->get_height(), 
+				Gdk::RGB_DITHER_NONE, 0, 0);
 }
 
 void Board::draw_chessman()
 {
-	draw_chessman(0, 0, BLACK_ROOT, false);
-	draw_chessman(1, 0, BLACK_KNIGHT, false);
-	draw_chessman(2, 0, BLACK_BISHOP, false);
-	draw_chessman(3, 0, BLACK_ADVISOR, false);
-	draw_chessman(4, 0, BLACK_KING, false);
-	draw_chessman(5, 0, BLACK_ADVISOR, false);
-	draw_chessman(6, 0, BLACK_BISHOP, false);
-	draw_chessman(7, 0, BLACK_KNIGHT, false);
-	draw_chessman(8, 0, BLACK_ROOT, false);
-	draw_chessman(1, 2, BLACK_CANNON, false);
-	draw_chessman(7, 2, BLACK_CANNON, false);
-	draw_chessman(0, 3, BLACK_PAWN, false);
-	draw_chessman(2, 3, BLACK_PAWN, false);
-	draw_chessman(4, 3, BLACK_PAWN, false);
-	draw_chessman(6, 3, BLACK_PAWN, false);
-	draw_chessman(8, 3, BLACK_PAWN, false);
+	draw_chessman(0, 0, BLACK_ROOT);
+	draw_chessman(1, 0, BLACK_KNIGHT);
+	draw_chessman(2, 0, BLACK_BISHOP);
+	draw_chessman(3, 0, BLACK_ADVISOR);
+	draw_chessman(4, 0, BLACK_KING);
+	draw_chessman(5, 0, BLACK_ADVISOR);
+	draw_chessman(6, 0, BLACK_BISHOP);
+	draw_chessman(7, 0, BLACK_KNIGHT);
+	draw_chessman(8, 0, BLACK_ROOT);
+	draw_chessman(1, 2, BLACK_CANNON);
+	draw_chessman(7, 2, BLACK_CANNON);
+	draw_chessman(0, 3, BLACK_PAWN);
+	draw_chessman(2, 3, BLACK_PAWN);
+	draw_chessman(4, 3, BLACK_PAWN);
+	draw_chessman(6, 3, BLACK_PAWN);
+	draw_chessman(8, 3, BLACK_PAWN);
 
-	draw_chessman(0, 9, RED_ROOT, false);
-	draw_chessman(1, 9, RED_KNIGHT, false);
-	draw_chessman(2, 9, RED_BISHOP, false);
-	draw_chessman(3, 9, RED_ADVISOR, false);
-	draw_chessman(4, 9, RED_KING, false);
-	draw_chessman(5, 9, RED_ADVISOR, false);
-	draw_chessman(6, 9, RED_BISHOP, false);
-	draw_chessman(7, 9, RED_KNIGHT, false);
-	draw_chessman(8, 9, RED_ROOT, false);
-	draw_chessman(1, 7, RED_CANNON, false);
-	draw_chessman(7, 7, RED_CANNON, false);
-	draw_chessman(0, 6, RED_PAWN, false);
-	draw_chessman(2, 6, RED_PAWN, false);
-	draw_chessman(4, 6, RED_PAWN, false);
-	draw_chessman(6, 6, RED_PAWN, false);
-	draw_chessman(8, 6, RED_PAWN, false);
+	draw_chessman(0, 9, RED_ROOT);
+	draw_chessman(1, 9, RED_KNIGHT);
+	draw_chessman(2, 9, RED_BISHOP);
+	draw_chessman(3, 9, RED_ADVISOR);
+	draw_chessman(4, 9, RED_KING);
+	draw_chessman(5, 9, RED_ADVISOR);
+	draw_chessman(6, 9, RED_BISHOP);
+	draw_chessman(7, 9, RED_KNIGHT);
+	draw_chessman(8, 9, RED_ROOT);
+	draw_chessman(1, 7, RED_CANNON);
+	draw_chessman(7, 7, RED_CANNON);
+	draw_chessman(0, 6, RED_PAWN);
+	draw_chessman(2, 6, RED_PAWN);
+	draw_chessman(4, 6, RED_PAWN);
+	draw_chessman(6, 6, RED_PAWN);
+	draw_chessman(8, 6, RED_PAWN);
+
+	draw_chessman(selected_x, selected_y, true);
 }
+
