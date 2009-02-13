@@ -18,6 +18,7 @@
  */
 
 #include "MainWindow.h"
+#include <vector>
 const int border_width = 32;
 #define	PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
@@ -70,8 +71,8 @@ void MainWindow::DrawBG()
 			//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
 			//Gdk::RGB_DITHER_NONE, 0, 0);
 	
-	int width = this->get_width();
-	int height = this->get_height();
+	int width = (this->get_width() - border_width * 2) / 8 * 8 + border_width * 2;
+	int height = (this->get_height() - border_width * 2) / 9 * 9 + border_width * 2;
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
 	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
 	this->get_window()->draw_rectangle(gc, false, border_width - 8, border_width - 8, width - border_width * 2 + 8 * 2, height - border_width * 2 + 8 * 2);
@@ -103,7 +104,7 @@ void MainWindow::DrawBG()
 				grid_height * 9 + border_width);
 	}
 
-	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
+	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
 
 	DrawLocalize(gc, border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_LEFT);
 	DrawLocalize(gc, grid_width * 8 + border_width, grid_height * 3 + border_width, grid_width, grid_height, PLACE_RIGHT);
@@ -134,17 +135,38 @@ void MainWindow::DrawLocalize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int grid_
 	int width = grid_width / 5;
 	int height = grid_height / 5;
 	if (place & PLACE_LEFT) {
-		this->get_window()->draw_line(gc, x + 4, y - height - 4, x + 4, y - 4);
-		this->get_window()->draw_line(gc, x + 4, y - 4, x + 4 + width, y - 4);
-		this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 , y + 4 + height);
-		this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 + width , y + 4);
+		std::vector<Gdk::Point> pos;
+		pos.push_back(Gdk::Point(x + 5, y - height - 4));
+		pos.push_back(Gdk::Point(x + 5, y - 4));
+		pos.push_back(Gdk::Point(x + 5 + width, y - 4));
+		this->get_window()->draw_lines(gc, pos);
+		//this->get_window()->draw_line(gc, x + 4, y - height - 4, x + 4, y - 4);
+		//this->get_window()->draw_line(gc, x + 4, y - 4, x + 4 + width, y - 4);
+
+		pos.clear();
+		pos.push_back(Gdk::Point(x + 5 + width, y + 5));
+		pos.push_back(Gdk::Point(x + 5, y + 5));
+		pos.push_back(Gdk::Point(x + 5 , y + 5 + height));
+		this->get_window()->draw_lines(gc, pos);
+		//this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 , y + 4 + height);
+		//this->get_window()->draw_line(gc, x + 4, y + 4, x + 4 + width , y + 4);
 	}
 
 	if (place & PLACE_RIGHT) {
-		this->get_window()->draw_line(gc, x - 4, y - height - 4, x - 4, y - 4);
-		this->get_window()->draw_line(gc, x - 4 - width, y - 4, x - 4 , y - 4);
-		this->get_window()->draw_line(gc, x - 4, y + 4, x - 4 , y + 4 + height);
-		this->get_window()->draw_line(gc, x - 4 - width, y + 4, x - 4 , y + 4);
+		std::vector<Gdk::Point> pos;
+		pos.push_back(Gdk::Point(x - 4 - width, y - 4));
+		pos.push_back(Gdk::Point(x - 4 , y - 4));
+		pos.push_back(Gdk::Point(x - 4 , y - 4 - height));
+		this->get_window()->draw_lines(gc, pos);
+		//this->get_window()->draw_line(gc, x - 4, y - height - 4, x - 4, y - 4);
+		//this->get_window()->draw_line(gc, x - 4 - width, y - 4, x - 4 , y - 4);
+		pos.clear();
+		pos.push_back(Gdk::Point(x - 4 - width, y + 5));
+		pos.push_back(Gdk::Point(x - 4 , y + 5));
+		pos.push_back(Gdk::Point(x - 4 , y + 5 + height));
+		this->get_window()->draw_lines(gc, pos);
+		//this->get_window()->draw_line(gc, x - 4, y + 4, x - 4 , y + 4 + height);
+		//this->get_window()->draw_line(gc, x - 4 - width, y + 4, x - 4 , y + 4);
 	}
 }
 
