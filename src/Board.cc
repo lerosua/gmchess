@@ -39,7 +39,6 @@ Board::Board() :
 	selected_y(-1),
 	selected_chessman(-1)
 {
-	//this->set_title("Chess");
 	//Glib::RefPtr<Gdk::Pixbuf> bg_image = Gdk::Pixbuf::create_from_file("wood.png");
 	this->set_size_request(521,577);
 	chessmans[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");

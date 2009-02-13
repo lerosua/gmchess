@@ -33,8 +33,8 @@ int main (int argc, char *argv[])
 {
 	Gtk::Main kit(argc, argv);
 	Gtk::Window win;
-	Board draw_area;
-	win.add(draw_area);
+	Board board;
+	win.add(board);
 	kit.run(win);
 	return 0;
 }
