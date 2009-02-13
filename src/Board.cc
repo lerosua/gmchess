@@ -20,6 +20,7 @@
 #include "Board.h"
 #include <vector>
 const int border_width = 32;
+const int chessman_width = 57;
 #define	PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
@@ -96,13 +97,14 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	pos_y -= border_width;
 	pos_x += grid_width / 2;
 	pos_y += grid_height / 2;
-	int offset_x = pos_x % grid_width;
-	int offset_y = pos_y % grid_height;
-	if ((offset_x > grid_width / 5 * 4 ) || (offset_y > grid_height / 5 * 4))
+	int x = pos_x / grid_width;
+	int y = pos_y / grid_height;
+	int offset_x = abs(pos_x - x * grid_width - grid_width / 2);
+	int offset_y = abs(pos_y - y * grid_height - grid_height / 2);
+	std::cout << offset_x << ',' << offset_y << std::endl;
+	if ((offset_x > chessman_width / 2) || (offset_y > chessman_width / 2))
 		return Gdk::Point(-1, -1);
-	pos_x = pos_x / grid_width;
-	pos_y = pos_y / grid_height;
-	return Gdk::Point(pos_x, pos_y);
+	return Gdk::Point(x, y);
 }
 
 bool Board::on_expose_event(GdkEventExpose* ev)
