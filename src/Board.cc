@@ -39,7 +39,7 @@ Board::Board() :
 	selected_y(-1),
 	selected_chessman(-1)
 {
-	//Glib::RefPtr<Gdk::Pixbuf> bg_image = Gdk::Pixbuf::create_from_file("wood.png");
+	bg_image = Gdk::Pixbuf::create_from_file("wood.png");
 	this->set_size_request(521,577);
 	chessmans[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");
 	chessmans[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_bishop.png");
@@ -132,16 +132,25 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 
 void Board::draw_bg()
 {
-	//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
-	//0, 0, 0, 0, bg_image->get_width(), bg_image->get_height(), 
-	//Gdk::RGB_DITHER_NONE, 0, 0);
-
-
 	Gdk::Point p1= get_coordinate(0, 0);
 	Gdk::Point p2= get_coordinate(8, 9);
 
 	int width = p2.get_x() - p1.get_x();
 	int height = p2.get_y() - p1.get_y();
+
+	int bg_width = bg_image->get_width();
+	int bg_height = bg_image->get_height();
+
+	int count_w = get_width() / bg_width + 1;
+	int count_h = get_height() / bg_height + 1;
+	for (int i = 0; i < count_w; i++) {
+		for (int j = 0; j < count_h; j++) {
+			bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
+					0, 0, i * bg_width, j * bg_height, bg_width, bg_height, 
+					Gdk::RGB_DITHER_NONE, 0, 0);
+		}
+	}
+
 
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
 	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
