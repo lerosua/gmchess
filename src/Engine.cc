@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  test.c
+ *       Filename:  Engine.cc
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  2009年02月14日 00时25分44秒 CST
+ *        Created:  2009年02月14日 16时58分36秒 CST
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,125 +16,28 @@
  * =====================================================================================
  */
 
-#include <stdio.h>
+#include "Engine.h"
+Engine::Engine()
+{
+	memset(Square,0,256);
+	memset(Pieces,0,48);
+	sdPlayer = 0;
+	count=0;
 
 
-// 每种子力的开始序号和结束序号
- const int KING_FROM = 0;
- const int ADVISOR_FROM = 1;
- const int ADVISOR_TO = 2;
- const int BISHOP_FROM = 3;
- const int BISHOP_TO = 4;
- const int KNIGHT_FROM = 5;
- const int KNIGHT_TO = 6;
- const int ROOK_FROM = 7;
- const int ROOK_TO = 8;
- const int CANNON_FROM = 9;
- const int CANNON_TO = 10;
- const int PAWN_FROM = 11;
- const int PAWN_TO = 15;
-
-const int RANK_TOP = 3;
-const int RANK_BOTTOM = 12;
-const int FILE_LEFT = 3;
-const int FILE_CENTER = 7;
-const int FILE_RIGHT = 11;
-
-
-
-
-//初始化的FEN串
-const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
-
-// 棋子类型对应的棋子符号
-const char *const cszPieceBytes = "KABNRCP";
-
-const int cnPieceTypes[48] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
-  //0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
-};
-
-// 判断棋子是否在棋盘中的数组
-static const char ccInBoard[256] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-static int Square[256]={0};
-static int Pieces[48]={0};
-
-// FEN串中棋子标识，注意这个函数只能识别大写字母，因此用小写字母时，首先必须转换为大写
-int FenPiece(int nArg) {
-  switch (nArg) {
-  case 'K':
-    return 0;
-  case 'A':
-    return 1;
-  case 'B':
-  case 'E':
-    return 2;
-  case 'N':
-  case 'H':
-    return 3;
-  case 'R':
-    return 4;
-  case 'C':
-    return 5;
-  case 'P':
-    return 6;
-  default:
-    return 7;
-  }
-}
-//由x，y位置获得棋盘数组的位置
-inline int COORD_XY(int x,int y){ return x+(y<<4);};
-//获取y坐标
-inline int RANK_Y(int sq) {
-	  return sq >> 4;
-}
-//获取x坐标
-inline int FILE_X(int sq) {
-	  return sq & 15;
 }
 
-inline int SIDE_TAG(int sd) {
-	  int pc = 16 + (sd << 4);
-	    return pc;
-}
-inline char PIECE_BYTE(int pt) {
-	  return cszPieceBytes[pt];
-}
-inline int PIECE_TYPE(int pc) {
-	  return cnPieceTypes[pc];
-}
+Engine::~Engine()
+{}
 
 
-
-//sq是棋盘数组的位置，pc是棋子种类
-void AddPiece(int sq,int pc)
+void Engine::AddPiece(int sq,int pc)
 {
 	Square[sq]=pc;
 	Pieces[pc]=sq;
-
 }
 
-void FromFen(const char *szFen) {
+void Engine::FromFen(const char *szFen) {
   int i, j, k;
   int pcWhite[7];
   int pcBlack[7];
@@ -214,14 +117,14 @@ void FromFen(const char *szFen) {
   }
   lpFen ++;
   // 3. 确定轮到哪方走
-//  if (this->sdPlayer == (*lpFen == 'b' ? 0 : 1)) {
-//    ChangeSide();
-//  }
+  if (this->sdPlayer == (*lpFen == 'b' ? 0 : 1)) {
+    ChangeSide();
+  }
 //  // 4. 把局面设成“不可逆”
 //  SetIrrev();
 }
 
-void ToFen(char *szFen)  {
+void Engine::ToFen(char *szFen)  {
   int i, j, k, pc;
   char *lpFen;
 
@@ -256,33 +159,3 @@ void ToFen(char *szFen)  {
 }
 
 
-
-
-int main(int argc,char *argv[])
-{
- 
-	int i,j,k;
-	char str[256];
-
-	FromFen(cszStartFen );
-
-	for(i=0;i<16;i++)
-	{
-		for(j=0;j<16;j++)
-			printf(" %2d ",Square[i*16+j]);
-		printf("\n");
-	}
-		printf("\n\n\n");
-	for(i=0;i<3;i++)
-	{
-		for(j=0;j<16;j++)
-			printf(" %x ",Pieces[i*16 + j]);
-		printf("\n");
-	}
-	ToFen(str);
-	printf("ToFen = %s\n",str);
-
-	
-
-	    return 0;
-}

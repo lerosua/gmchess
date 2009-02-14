@@ -24,6 +24,8 @@
 #include <iostream>
 #include <gtkmm/drawingarea.h>
 
+extern const int PieceTypes[48];
+
 class Board : public Gtk::DrawingArea {
 	public:
 		Board();
@@ -48,9 +50,39 @@ class Board : public Gtk::DrawingArea {
 		 * @param chessman_type 棋子的类型
 		 */
 		void draw_chessman(int x, int y, int chessman_type);
+		/**
+		 * @brief 根据棋盘数组画出对局
+		 * @param square 对局状态中的棋盘数组
+		 */
+		void draw_board(const int square[]);
+		/**
+		 * @brief 根据棋子数组画出对局
+		 * @param pieces 棋子数组，由16->47,0表示被吃掉了
+		 */
+		void draw_pieces(const int pieces[]);
 		void draw_select_frame(bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
+	public:
+
+		/** 返回棋子的类型 */
+		inline int PIECE_TYPE(int pc) {
+			  return PieceTypes[pc];
+		}
+		/** 由x，y位置获得棋盘数组的位置*/
+		inline int COORD_XY(int x,int y){ return x+(y<<4);};
+		/** 获取y坐标*/
+		inline int RANK_Y(int sq) {	  return (sq >> 4)-3;};
+
+		/**获取x坐标*/
+		inline int RANK_X(int sq) {
+			  return (sq & 15)-3;
+		}
+
+		/** 读谱状态下走下一步棋*/
+		void nextMove();
+		/** 读谱状态下走上一步棋*/
+		void backMove();
 	private:
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];

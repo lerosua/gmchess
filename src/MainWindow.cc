@@ -31,3 +31,5 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::onNextMove(){}
+void MainWindow::onBackMove(){}

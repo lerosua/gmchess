@@ -29,6 +29,8 @@ class MainWindow:public Gtk::Window
 	public:
 		MainWindow();
 		~MainWindow();
+		void onNextMove();
+		void onBackMove();
 	private:
 		Board* board;
 };
