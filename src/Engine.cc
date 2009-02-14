@@ -105,12 +105,12 @@ void Engine::FromFen(const char *szFen) {
       }
     } else if (*lpFen >= 'a' && *lpFen <= 'z') {
       if (j <= FILE_RIGHT) {
-        k = FenPiece(*lpFen + 'A' - 'a');
-        if (k < 7) {
-          if (pcBlack[k] < 48) {
+        k = FenPiece(*lpFen);
+        if (6<k < 14) {
+          if (pcBlack[k-7] < 48) {
             //if (this->ucsqPieces[pcBlack[k]] == 0) {
-              AddPiece(COORD_XY(j, i), pcBlack[k]);
-              pcBlack[k] ++;
+              AddPiece(COORD_XY(j, i), pcBlack[k-7]);
+              pcBlack[k-7] ++;
             //}
           }
         }
@@ -147,8 +147,7 @@ void Engine::ToFen(char *szFen)  {
           lpFen ++;
           k = 0;
         }
-        *lpFen = PIECE_BYTE(PIECE_TYPE(pc));
-        //*lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
+        *lpFen = PieceFen(PIECE_TYPE(pc));
         lpFen ++;
       } else {
         k ++;
@@ -168,13 +167,57 @@ void Engine::ToFen(char *szFen)  {
 }
 
 
-int getPieces(int x,int y)
+int Engine::getPieces(int x,int y)
 {
 	int site=0;
 	site = COORD_XY(x,y);
 	//没有棋子，返回
 	if(Square[site] == 0)
 		return -1;
-	return PIECE_TYPE(site);
+	return PIECE_TYPE(Square[site]);
 
+}
+
+
+/** 
+ * FEN串中棋子标识  */
+int Engine::FenPiece(int nArg) {
+  switch (nArg) {
+  case 'K':
+    return 0;
+  case 'G':
+  case 'A':
+    return 1;
+  case 'B':
+  case 'E':
+    return 2;
+  case 'N':
+  case 'H':
+    return 3;
+  case 'R':
+    return 4;
+  case 'C':
+    return 5;
+  case 'P':
+    return 6;
+    case 'k':
+        return 7;
+    case 'g':
+    case 'a':
+        return 8;
+    case 'b':
+    case 'e':
+        return 9;
+    case 'h':
+    case 'n':
+        return 10;
+    case 'r':
+        return 11;
+    case 'c':
+        return 12;
+    case 'p':
+        return 13;
+  default:
+    return 14;
+  }
 }

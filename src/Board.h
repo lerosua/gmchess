@@ -24,6 +24,7 @@
 #include <iostream>
 #include <gtkmm/drawingarea.h>
 #include "gmchess.h"
+#include "Engine.h"
 
 
 /**
@@ -88,6 +89,8 @@ class Board : public Gtk::DrawingArea {
 		/** 读谱状态下走上一步棋*/
 		void backMove();
 	private:
+		Engine* m_engine;
+
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		/** 棋子图像 */

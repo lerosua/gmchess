@@ -22,46 +22,6 @@
 #include <stdio.h>
 #include "gmchess.h"
 
-#if 0
-//保存的最大历史局面数
-const int MAX_COUNT=512;
-
-// 每种子力的开始序号和结束序号
- const int KING_FROM = 0;
- const int ADVISOR_FROM = 1;
- const int ADVISOR_TO = 2;
- const int BISHOP_FROM = 3;
- const int BISHOP_TO = 4;
- const int KNIGHT_FROM = 5;
- const int KNIGHT_TO = 6;
- const int ROOK_FROM = 7;
- const int ROOK_TO = 8;
- const int CANNON_FROM = 9;
- const int CANNON_TO = 10;
- const int PAWN_FROM = 11;
- const int PAWN_TO = 15;
-
-const int RANK_TOP = 3;
-const int RANK_BOTTOM = 12;
-const int FILE_LEFT = 3;
-const int FILE_CENTER = 7;
-const int FILE_RIGHT = 11;
-
-
-//初始化的FEN串
-const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
-
-// 棋子类型对应的棋子符号
-const char *const cszPieceBytes = "KABNRCP";
-
-const int PieceTypes[48] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
-};
-
-#endif
-
 
 /**
  * @brief 处理棋盘数据结构
@@ -91,13 +51,13 @@ class Engine
 		 */
 		void AddPiece(int sq, int pc);
 		/**
-		 * @brief FEN串转成棋子标识，此函数只识别大写字母
+		 * @brief FEN串转成棋子标识，
 		 * @param nArg FEN串字母
 		 * @return 返回棋子标识
 		 */
 		int FenPiece(int nArg);
 		/** 由x，y位置获得棋盘数组的位置*/
-		inline int COORD_XY(int x,int y){ return x+(y<<4);};
+		int COORD_XY(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
 		inline int RANK_Y(int sq) {	  return sq >> 4;};
 
@@ -110,7 +70,7 @@ class Engine
 			  int pc = 16 + (sd << 4);
 			    return pc;
 		}
-		inline char PIECE_BYTE(int pt) {
+		inline char PieceFen(int pt) {
 			  return cszPieceBytes[pt];
 		}
 		/** 返回棋子的类型 */

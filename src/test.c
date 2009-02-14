@@ -47,14 +47,12 @@ const int FILE_RIGHT = 11;
 const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
 
 // 棋子类型对应的棋子符号
-//const char *const cszPieceBytes = "KABNRCP";
 const char *const cszPieceBytes = "KABNRCPkabnrcp";
 
 const int cnPieceTypes[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
   7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 13, 13, 13
-  //0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
 };
 
 // 判断棋子是否在棋盘中的数组
@@ -85,6 +83,7 @@ int FenPiece(int nArg) {
   switch (nArg) {
   case 'K':
     return 0;
+  case 'G':
   case 'A':
     return 1;
   case 'B':
@@ -99,8 +98,25 @@ int FenPiece(int nArg) {
     return 5;
   case 'P':
     return 6;
+    case 'k':
+        return 7;
+    case 'g':
+    case 'a':
+        return 8;
+    case 'b':
+    case 'e':
+        return 9;
+    case 'h':
+    case 'n':
+        return 10;
+    case 'r':
+        return 11;
+    case 'c':
+        return 12;
+    case 'p':
+        return 13;
   default:
-    return 7;
+    return 14;
   }
 }
 //由x，y位置获得棋盘数组的位置
@@ -195,12 +211,13 @@ void FromFen(const char *szFen) {
       }
     } else if (*lpFen >= 'a' && *lpFen <= 'z') {
       if (j <= FILE_RIGHT) {
-        k = FenPiece(*lpFen + 'A' - 'a');
-        if (k < 7) {
-          if (pcBlack[k] < 48) {
+        //k = FenPiece(*lpFen + 'A' - 'a');
+        k = FenPiece(*lpFen);
+        if (6<k < 14) {
+          if (pcBlack[k-7] < 48) {
             //if (this->ucsqPieces[pcBlack[k]] == 0) {
-              AddPiece(COORD_XY(j, i), pcBlack[k]);
-              pcBlack[k] ++;
+              AddPiece(COORD_XY(j, i), pcBlack[k-7]);
+              pcBlack[k-7] ++;
             //}
           }
         }

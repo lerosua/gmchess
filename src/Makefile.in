@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(gladedir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_chess_OBJECTS = main.$(OBJEXT) Board.$(OBJEXT) MainWindow.$(OBJEXT)
+am_chess_OBJECTS = main.$(OBJEXT) Engine.$(OBJEXT) Board.$(OBJEXT) MainWindow.$(OBJEXT)
 chess_OBJECTS = $(am_chess_OBJECTS)
 am__DEPENDENCIES_1 =
 chess_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -254,6 +254,7 @@ AM_CFLAGS = \
 chess_SOURCES = \
 	main.cc	\
 	Board.cc \
+	Engine.cc \
 	MainWindow.cc
 
 chess_LDFLAGS = 
@@ -331,6 +332,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Board.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Engine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MainWindow.Po@am__quote@
 

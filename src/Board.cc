@@ -56,6 +56,7 @@ Board::Board() :
 	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
+	m_engine = new Engine();
 
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
@@ -63,6 +64,7 @@ Board::Board() :
 
 Board::~Board()
 {
+	delete m_engine;
 }
 
 void Board::get_grid_size(int& width, int& height)
@@ -294,6 +296,7 @@ void Board::draw_select_frame(bool selected)
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
+
 	if (selected)
 		chessmans[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
 				0, 0, px, py, chessmans[SELECTED_CHESSMAN]->get_width(), chessmans[SELECTED_CHESSMAN]->get_height(), 
@@ -321,6 +324,7 @@ void Board::draw_pieces(const int pieces[])
 			continue;
 		draw_chessman(RANK_X(sq),RANK_Y(sq),PIECE_TYPE(i));
 	}
+	draw_select_frame(true);
 
 
 }
