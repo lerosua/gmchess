@@ -17,6 +17,7 @@
  */
 
 #include "Engine.h"
+#include <string.h>
 Engine::Engine()
 {
 	memset(Square,0,256);
@@ -30,6 +31,13 @@ Engine::Engine()
 Engine::~Engine()
 {}
 
+void Engine::reset()
+{
+	memset(Square,0,256);
+	memset(Pieces,0,48);
+	sdPlayer = 0;
+	count=0;
+}
 
 void Engine::AddPiece(int sq,int pc)
 {
@@ -139,7 +147,8 @@ void Engine::ToFen(char *szFen)  {
           lpFen ++;
           k = 0;
         }
-        *lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
+        *lpFen = PIECE_BYTE(PIECE_TYPE(pc));
+        //*lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
         lpFen ++;
       } else {
         k ++;
@@ -153,9 +162,19 @@ void Engine::ToFen(char *szFen)  {
     lpFen ++;
   }
   *(lpFen - 1) = ' '; // 把最后一个'/'替换成' '
-  *lpFen = 'w';//(this->sdPlayer == 0 ? 'w' : 'b');
+  *lpFen = (this->sdPlayer == 0 ? 'w' : 'b');
   lpFen ++;
   *lpFen = '\0';
 }
 
 
+int getPieces(int x,int y)
+{
+	int site=0;
+	site = COORD_XY(x,y);
+	//没有棋子，返回
+	if(Square[site] == 0)
+		return -1;
+	return PIECE_TYPE(site);
+
+}

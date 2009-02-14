@@ -47,12 +47,13 @@ const int FILE_RIGHT = 11;
 const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
 
 // 棋子类型对应的棋子符号
-const char *const cszPieceBytes = "KABNRCP";
+//const char *const cszPieceBytes = "KABNRCP";
+const char *const cszPieceBytes = "KABNRCPkabnrcp";
 
 const int cnPieceTypes[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
+  7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 13, 13, 13
   //0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
 };
 
@@ -236,7 +237,8 @@ void ToFen(char *szFen)  {
           lpFen ++;
           k = 0;
         }
-        *lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
+        *lpFen = PIECE_BYTE(PIECE_TYPE(pc)) ;
+        //*lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
         lpFen ++;
       } else {
         k ++;

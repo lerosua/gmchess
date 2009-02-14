@@ -23,6 +23,7 @@ chess_SOURCES = \
 	MainWindow.cc
 noinst_HEADERS = \
 		 Board.h \
+		 gmchess.h \
 		 MainWindow.h
 
 chess_LDFLAGS = 

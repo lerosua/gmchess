@@ -23,9 +23,13 @@
 #include <gtkmm.h>
 #include <iostream>
 #include <gtkmm/drawingarea.h>
+#include "gmchess.h"
 
-extern const int PieceTypes[48];
 
+/**
+ * @brief 棋盘类 
+ * 负责棋盘和棋子的绘画
+ */
 class Board : public Gtk::DrawingArea {
 	public:
 		Board();
@@ -84,7 +88,9 @@ class Board : public Gtk::DrawingArea {
 		/** 读谱状态下走上一步棋*/
 		void backMove();
 	private:
+		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
+		/** 棋子图像 */
 		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];
 		int selected_x;
 		int selected_y;

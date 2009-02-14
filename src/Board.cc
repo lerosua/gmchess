@@ -30,35 +30,6 @@ const int chessman_width = 57;
 #define DATA_DIR "../wood/"
 
 
-
-/*
-enum {
-	BLACK_ADVISOR, BLACK_BISHOP, BLACK_CANNON, BLACK_KING,
-	BLACK_KING_DIE, BLACK_KNIGHT, BLACK_PAWN, BLACK_ROOT,
-	RED_ADVISOR, RED_BISHOP, RED_CANNON, RED_KING,
-	RED_KING_DIE, RED_KNIGHT, RED_PAWN, RED_ROOT,
-	NULL_CHESSMAN, SELECTED_CHESSMAN
-};
-*/
-
-//与下面对应的棋子类型
-const int PieceTypes[48] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
-  7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 13, 13, 13
-};
-enum {  
-	RED_KING=0,RED_ADVISOR,RED_BISHOP,RED_KNIGHT,RED_ROOT,RED_CANNON,RED_PAWN,
-	BLACK_KING,BLACK_ADVISOR,BLACK_BISHOP,BLACK_KNIGHT,BLACK_ROOT,BLACK_CANNON,BLACK_PAWN,
-	RED_KING_DIE,BLACK_KING_DIE,
-	NULL_CHESSMAN,SELECTED_CHESSMAN,
-};
-const int PieceExample[48] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0xc7, 0xc6, 0xc8, 0xc5, 0xc9, 0xc4, 0xca, 0xc3, 0xcb, 0xa4,0xaa,0x93,0x95,0x97,0x99,0x9b,
-  0x37,  0x36,  0x38,  0x35,  0x39, 0x34,  0x3a,  0x33,  0x3b,  0x54,  0x5a,  0x63,  0x65,  0x67,  0x69,0x6b
-};
-
 Board::Board() :
 	selected_x(-1),
 	selected_y(-1),

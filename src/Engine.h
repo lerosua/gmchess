@@ -54,7 +54,7 @@ const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1
 // 棋子类型对应的棋子符号
 const char *const cszPieceBytes = "KABNRCP";
 
-const int cnPieceTypes[48] = {
+const int PieceTypes[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
   0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
@@ -115,11 +115,19 @@ class Engine
 		}
 		/** 返回棋子的类型 */
 		inline int PIECE_TYPE(int pc) {
-			  return cnPieceTypes[pc];
+			  return PieceTypes[pc];
 		}
 		
 		/** 交换走棋方*/
 		void ChangeSide(){ sdPlayer = ~sdPlayer;};
+		/** 引擎重置 */
+		void reset();
+		/** @brief 返回x，y位置上的棋子
+		 *  @param x x 坐标
+		 *  @param y y 坐标
+		 *  @return 返回棋子类型，如果-1表示没有棋子
+		 */
+		int getPieces(int x,int y);
 
 
 	private:
