@@ -39,7 +39,7 @@ Board::Board() :
 	selected_y(-1),
 	selected_chessman(-1)
 {
-	bg_image = Gdk::Pixbuf::create_from_file("wood.png");
+	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"wood.png");
 	this->set_size_request(521,577);
 	chessmans[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");
 	chessmans[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_bishop.png");

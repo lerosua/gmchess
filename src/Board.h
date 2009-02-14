@@ -36,8 +36,17 @@ class Board : public Gtk::DrawingArea {
 		Gdk::Point get_position(int pos_x, int pos_y);
 		void get_grid_size(int& width, int& height);
 
+		/**
+		 * @brief 画棋盘背景
+		 */
 		void draw_bg();
 		void draw_chessman();
+		/**
+		 * @brief 画棋子
+		 * @param x x坐标
+		 * @param y y坐标
+		 * @param chessman_type 棋子的类型
+		 */
 		void draw_chessman(int x, int y, int chessman_type);
 		void draw_select_frame(bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);

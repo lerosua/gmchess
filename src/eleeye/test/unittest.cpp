@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 const int MAX_CHAR = 1024;
 
-int main(char argc, char **argv) {
+int main(int argc, char **argv) {
   char szLineStr[MAX_CHAR];
   MoveStruct mvs[MAX_GEN_MOVES];
   PositionStruct pos;
