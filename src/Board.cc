@@ -98,10 +98,9 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	pos_y += grid_height / 2;
 	int x = pos_x / grid_width;
 	int y = pos_y / grid_height;
-	int offset_x = abs(pos_x - x * grid_width - grid_width / 2);
-	int offset_y = abs(pos_y - y * grid_height - grid_height / 2);
-	std::cout << offset_x << ',' << offset_y << std::endl;
-	if ((offset_x > chessman_width / 2) || (offset_y > chessman_width / 2))
+	int offset_x = pos_x - x * grid_width;
+	int offset_y = pos_y - y * grid_width;
+	if ((offset_x > chessman_width ) || (offset_y > chessman_width ))
 		return Gdk::Point(-1, -1);
 	return Gdk::Point(x, y);
 }

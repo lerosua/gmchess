@@ -19,7 +19,7 @@
 
 MainWindow::MainWindow()
 {
-	board= new Board();
+	board= Gtk::manage(new Board());
 	this->add(*board);
 
 	this->set_title("GMChess");
