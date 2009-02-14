@@ -17,8 +17,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MAIN_WINDOW_H_
-#define _MAIN_WINDOW_H_
+#ifndef _BOARD_H_
+#define _BOARD_H_
 
 #include <gtkmm.h>
 #include <iostream>
@@ -50,5 +50,5 @@ class Board : public Gtk::DrawingArea {
 		int selected_chessman;
 };
 
-#endif // _MAIN_WINDOW_H_
+#endif // _BOARD_H_
 

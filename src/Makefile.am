@@ -19,7 +19,11 @@ bin_PROGRAMS = chess
 
 chess_SOURCES = \
 	main.cc	\
-	Board.cc
+	Board.cc \
+	MainWindow.cc
+noinst_HEADERS = \
+		 Board.h \
+		 MainWindow.h
 
 chess_LDFLAGS = 
 

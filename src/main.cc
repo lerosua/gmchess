@@ -20,21 +20,21 @@
 #include <libglademm/xml.h>
 #include <iostream>
 #include <gtkmm.h>
-#include <gtkmm/window.h>
+//#include <gtkmm/window.h>
 #include <gtkmm/main.h>
+#include "MainWindow.h"
 
 
 #ifdef ENABLE_NLS
 #  include <libintl.h>
 #endif
-#include "Board.h"
 
 int main (int argc, char *argv[])
 {
 	Gtk::Main kit(argc, argv);
-	Gtk::Window win;
-	Board board;
-	win.add(board);
+	MainWindow win;
+	//Board board;
+	//win.add(board);
 	kit.run(win);
 	return 0;
 }
