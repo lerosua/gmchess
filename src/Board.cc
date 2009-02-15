@@ -19,6 +19,8 @@
 
 #include "Board.h"
 #include <vector>
+#include "Engine.h"
+
 const int border_width = 32;
 const int chessman_width = 57;
 
@@ -56,15 +58,13 @@ Board::Board() :
 	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-	m_engine = new Engine();
-
+	m_engine.from_fen(cszStartFen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
 }
 
 Board::~Board()
 {
-	delete m_engine;
 }
 
 void Board::get_grid_size(int& width, int& height)
@@ -106,8 +106,8 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 bool Board::on_expose_event(GdkEventExpose* ev)
 {
 	draw_bg();
-	//draw_chessman();
-	draw_pieces(PieceExample);
+	draw_chessman();
+	//draw_pieces(PieceExample);
 	return true;
 }
 
@@ -121,6 +121,8 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
+		selected_chessman = m_engine.get_piece(selected_x, selected_y);
+		std::cout << selected_x << ',' << selected_y << ',' << selected_chessman << std::endl;
 		if (selected_x != -1) {
 			draw_select_frame(true);
 		}
@@ -167,35 +169,37 @@ void Board::draw_bg()
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 
+	GdkSegment seg[9];
+
 	for (int i = 0; i < 9; i++) {
 		p1 = get_coordinate(0, i);
 		p2 = get_coordinate(8, i);
-		get_window()->draw_line(gc ,
-				p1.get_x(),
-				p1.get_y(),
-				p2.get_x(),
-				p2.get_y());
+		seg[i].x1 = p1.get_x();
+		seg[i].y1 = p1.get_y();
+		seg[i].x2 = p2.get_x();
+		seg[i].y2 = p2.get_y();
 	}
+	get_window()->draw_segments(gc, seg, 9);
 
 	for (int i = 0; i < 8; i++) {
 		p1 = get_coordinate(i, 0);
 		p2 = get_coordinate(i, 4);
-		get_window()->draw_line(gc ,
-				p1.get_x(),
-				p1.get_y(),
-				p2.get_x(),
-				p2.get_y());
+		seg[i].x1 = p1.get_x();
+		seg[i].y1 = p1.get_y();
+		seg[i].x2 = p2.get_x();
+		seg[i].y2 = p2.get_y();
 	}
+	get_window()->draw_segments(gc, seg, 8);
 
 	for (int i = 0; i < 8; i++) {
 		p1 = get_coordinate(i, 5);
 		p2 = get_coordinate(i, 9);
-		get_window()->draw_line(gc ,
-				p1.get_x(),
-				p1.get_y(),
-				p2.get_x(),
-				p2.get_y());
+		seg[i].x1 = p1.get_x();
+		seg[i].y1 = p1.get_y();
+		seg[i].x2 = p2.get_x();
+		seg[i].y2 = p2.get_y();
 	}
+	get_window()->draw_segments(gc, seg, 8);
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
 
@@ -274,22 +278,26 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 }
 
 
-void Board::draw_chessman(int x, int y, int chessman_type)
+void Board::draw_chessman(int x, int y, int chessman)
 {
-	if (chessman_type <  NULL_CHESSMAN) {
-		Gdk::Point p = get_coordinate(x, y);
-		int px = p.get_x() - 57 / 2;
-		int py = p.get_y() - 57 / 2;
+	std::cout << chessman << std::endl;
+	int chessman_type = PIECE_TYPE(chessman);	
+	chessman_type--;
+	if (chessman_type < 0 )
+		return;
 
-		chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-				0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
-				Gdk::RGB_DITHER_NONE, 0, 0);
-	}
+	Gdk::Point p = get_coordinate(x, y);
+	int px = p.get_x() - 57 / 2;
+	int py = p.get_y() - 57 / 2;
+
+	chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+			0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
+			Gdk::RGB_DITHER_NONE, 0, 0);
 }
 
 void Board::draw_select_frame(bool selected)
 {
-	if (selected_x == -1 || selected_y == -1)
+	if (selected_chessman == 0 || selected_x == -1 || selected_y == -1)
 		return;
 
 	Gdk::Point p = get_coordinate(selected_x, selected_y);
@@ -301,10 +309,15 @@ void Board::draw_select_frame(bool selected)
 		chessmans[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
 				0, 0, px, py, chessmans[SELECTED_CHESSMAN]->get_width(), chessmans[SELECTED_CHESSMAN]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
-	else
-		chessmans[NULL_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-				0, 0, px, py, chessmans[NULL_CHESSMAN]->get_width(), chessmans[NULL_CHESSMAN]->get_height(), 
+	else {
+		int chessman_type = PIECE_TYPE(selected_chessman);
+		chessman_type--;
+		if (chessman_type < 0 )
+			return;
+		chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+				0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
+	}
 }
 
 void Board::draw_board(const int square[])
@@ -325,50 +338,19 @@ void Board::draw_pieces(const int pieces[])
 		draw_chessman(RANK_X(sq),RANK_Y(sq),PIECE_TYPE(i));
 	}
 	draw_select_frame(true);
-
-
 }
 
 void Board::draw_chessman()
 {
-	draw_chessman(0, 0, BLACK_ROOT);
-	draw_chessman(1, 0, BLACK_KNIGHT);
-	draw_chessman(2, 0, BLACK_BISHOP);
-	draw_chessman(3, 0, BLACK_ADVISOR);
-	draw_chessman(4, 0, BLACK_KING);
-	draw_chessman(5, 0, BLACK_ADVISOR);
-	draw_chessman(6, 0, BLACK_BISHOP);
-	draw_chessman(7, 0, BLACK_KNIGHT);
-	draw_chessman(8, 0, BLACK_ROOT);
-	draw_chessman(1, 2, BLACK_CANNON);
-	draw_chessman(7, 2, BLACK_CANNON);
-	draw_chessman(0, 3, BLACK_PAWN);
-	draw_chessman(2, 3, BLACK_PAWN);
-	draw_chessman(4, 3, BLACK_PAWN);
-	draw_chessman(6, 3, BLACK_PAWN);
-	draw_chessman(8, 3, BLACK_PAWN);
-
-	draw_chessman(0, 9, RED_ROOT);
-	draw_chessman(1, 9, RED_KNIGHT);
-	draw_chessman(2, 9, RED_BISHOP);
-	draw_chessman(3, 9, RED_ADVISOR);
-	draw_chessman(4, 9, RED_KING);
-	draw_chessman(5, 9, RED_ADVISOR);
-	draw_chessman(6, 9, RED_BISHOP);
-	draw_chessman(7, 9, RED_KNIGHT);
-	draw_chessman(8, 9, RED_ROOT);
-	draw_chessman(1, 7, RED_CANNON);
-	draw_chessman(7, 7, RED_CANNON);
-	draw_chessman(0, 6, RED_PAWN);
-	draw_chessman(2, 6, RED_PAWN);
-	draw_chessman(4, 6, RED_PAWN);
-	draw_chessman(6, 6, RED_PAWN);
-	draw_chessman(8, 6, RED_PAWN);
-
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 9; j++) {
+			draw_chessman(i, j, m_engine.get_piece(i, j));
+		}
+	}
 	draw_select_frame(true);
 }
 
-void Board::nextMove()
+void Board::next_move()
 {}
 void Board::back_move()
 {}

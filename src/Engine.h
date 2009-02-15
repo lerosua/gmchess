@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include "gmchess.h"
 #include <vector>
+#include <string>
 
 
 /**
@@ -29,8 +30,7 @@
  * 暂时来说是保存FEN串为历史局面，把当前局面保存到棋盘数组并输出
  *
  */
-class Engine
-{
+class Engine {
 	public:
 		Engine();
 		~Engine();

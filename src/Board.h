@@ -54,7 +54,7 @@ class Board : public Gtk::DrawingArea {
 		 * @param y y坐标
 		 * @param chessman_type 棋子的类型
 		 */
-		void draw_chessman(int x, int y, int chessman_type);
+		void draw_chessman(int x, int y, int chessman);
 		/**
 		 * @brief 根据棋盘数组画出对局
 		 * @param square 对局状态中的棋盘数组
@@ -89,7 +89,7 @@ class Board : public Gtk::DrawingArea {
 		/** 读谱状态下走上一步棋*/
 		void back_move();
 	private:
-		Engine* m_engine;
+		Engine m_engine;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
