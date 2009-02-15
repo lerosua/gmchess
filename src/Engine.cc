@@ -173,9 +173,9 @@ int Engine::get_piece(int x,int y)
 	int site=0;
 	site = COORD_XY(x,y);
 	//没有棋子，返回
-	if(Square[site] == 0)
-		return -1;
-	return PIECE_TYPE(Square[site]);
+//	if(Square[site] == 0)
+//		return -1;
+	return Square[site];
 
 }
 
