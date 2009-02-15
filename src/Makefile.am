@@ -1,10 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-## Created by Anjuta
-
-gladedir = $(datadir)/chess/glade
-glade_DATA = chess.glade
-
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
