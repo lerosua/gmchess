@@ -85,9 +85,9 @@ class Board : public Gtk::DrawingArea {
 		}
 
 		/** 读谱状态下走下一步棋*/
-		void nextMove();
+		void next_move();
 		/** 读谱状态下走上一步棋*/
-		void backMove();
+		void back_move();
 	private:
 		Engine* m_engine;
 

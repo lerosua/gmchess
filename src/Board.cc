@@ -370,6 +370,6 @@ void Board::draw_chessman()
 
 void Board::nextMove()
 {}
-void Board::backMove()
+void Board::back_move()
 {}
 

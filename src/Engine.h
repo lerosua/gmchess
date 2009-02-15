@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include "gmchess.h"
+#include <vector>
 
 
 /**
@@ -38,24 +39,24 @@ class Engine
 		 * @brief 从Fen串生成棋盘数组
 		 * @param szFen Fen串
 		 */
-		void FromFen(const char *szFen);
+		void from_fen(const char *szFen);
 		/**
 		 * @brief 棋盘数组生成Fen串
 		 * @param szFen 生成的Fen串
 		 */
-		void ToFen(char* szFen);
+		void to_fen(char* szFen);
 		/**
 		 * @brief 添加棋子信息
 		 * @param sq 棋盘数组的序号
 		 * @param pc 棋子的类型
 		 */
-		void AddPiece(int sq, int pc);
+		void add_piece(int sq, int pc);
 		/**
-		 * @brief FEN串转成棋子标识，
+		 * @brief FEN串转成棋子标识数字，
 		 * @param nArg FEN串字母
 		 * @return 返回棋子标识
 		 */
-		int FenPiece(int nArg);
+		int fen_to_piece(int nArg);
 		/** 由x，y位置获得棋盘数组的位置*/
 		int COORD_XY(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
@@ -70,7 +71,8 @@ class Engine
 			  int pc = 16 + (sd << 4);
 			    return pc;
 		}
-		inline char PieceFen(int pt) {
+		/** 棋子代号转成FEN串字符 */
+		inline char piece_to_fen(int pt) {
 			  return cszPieceBytes[pt];
 		}
 		/** 返回棋子的类型 */
@@ -79,7 +81,7 @@ class Engine
 		}
 		
 		/** 交换走棋方*/
-		void ChangeSide(){ sdPlayer = ~sdPlayer;};
+		void change_side(){ sdPlayer = ~sdPlayer;};
 		/** 引擎重置 */
 		void reset();
 		/** @brief 返回x，y位置上的棋子
@@ -87,7 +89,7 @@ class Engine
 		 *  @param y y 坐标
 		 *  @return 返回棋子类型，如果-1表示没有棋子
 		 */
-		int getPieces(int x,int y);
+		int get_piece(int x,int y);
 
 
 	private:
@@ -96,7 +98,8 @@ class Engine
 		/** 当前局面的棋子数组，相应棋子的值为棋盘上的坐标,0表示被吃了*/
 		int Pieces[48];
 		/** 用于保存所有历史局面的FEN串数组*/
-		char* FenLogList[MAX_COUNT];
+		//char* FenLogList[MAX_COUNT];
+		std::vector<std::string> FenList;
 		/** 
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走

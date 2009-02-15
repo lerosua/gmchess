@@ -37,15 +37,16 @@ void Engine::reset()
 	memset(Pieces,0,48);
 	sdPlayer = 0;
 	count=0;
+	FenList.clear();
 }
 
-void Engine::AddPiece(int sq,int pc)
+void Engine::add_piece(int sq,int pc)
 {
 	Square[sq]=pc;
 	Pieces[pc]=sq;
 }
 
-void Engine::FromFen(const char *szFen) {
+void Engine::from_fen(const char *szFen) {
   int i, j, k;
   int pcWhite[7];
   int pcBlack[7];
@@ -92,11 +93,11 @@ void Engine::FromFen(const char *szFen) {
       }
     } else if (*lpFen >= 'A' && *lpFen <= 'Z') {
       if (j <= FILE_RIGHT) {
-        k = FenPiece(*lpFen);
+        k = fen_to_piece(*lpFen);
         if (k < 7) {
           if (pcWhite[k] < 32) {
             //if (this->ucsqPieces[pcWhite[k]] == 0) {
-              AddPiece(COORD_XY(j, i), pcWhite[k]);
+              add_piece(COORD_XY(j, i), pcWhite[k]);
               pcWhite[k] ++;
             //}
           }
@@ -105,11 +106,11 @@ void Engine::FromFen(const char *szFen) {
       }
     } else if (*lpFen >= 'a' && *lpFen <= 'z') {
       if (j <= FILE_RIGHT) {
-        k = FenPiece(*lpFen);
+        k = fen_to_piece(*lpFen);
         if (6<k < 14) {
           if (pcBlack[k-7] < 48) {
             //if (this->ucsqPieces[pcBlack[k]] == 0) {
-              AddPiece(COORD_XY(j, i), pcBlack[k-7]);
+              add_piece(COORD_XY(j, i), pcBlack[k-7]);
               pcBlack[k-7] ++;
             //}
           }
@@ -126,13 +127,13 @@ void Engine::FromFen(const char *szFen) {
   lpFen ++;
   // 3. 确定轮到哪方走
   if (this->sdPlayer == (*lpFen == 'b' ? 0 : 1)) {
-    ChangeSide();
+    change_side();
   }
 //  // 4. 把局面设成“不可逆”
 //  SetIrrev();
 }
 
-void Engine::ToFen(char *szFen)  {
+void Engine::to_fen(char *szFen)  {
   int i, j, k, pc;
   char *lpFen;
 
@@ -147,7 +148,7 @@ void Engine::ToFen(char *szFen)  {
           lpFen ++;
           k = 0;
         }
-        *lpFen = PieceFen(PIECE_TYPE(pc));
+        *lpFen = piece_to_fen(PIECE_TYPE(pc));
         lpFen ++;
       } else {
         k ++;
@@ -167,7 +168,7 @@ void Engine::ToFen(char *szFen)  {
 }
 
 
-int Engine::getPieces(int x,int y)
+int Engine::get_piece(int x,int y)
 {
 	int site=0;
 	site = COORD_XY(x,y);
@@ -181,7 +182,7 @@ int Engine::getPieces(int x,int y)
 
 /** 
  * FEN串中棋子标识  */
-int Engine::FenPiece(int nArg) {
+int Engine::fen_to_piece(int nArg) {
   switch (nArg) {
   case 'K':
     return 0;
