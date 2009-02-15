@@ -97,7 +97,7 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	int x = pos_x / grid_width;
 	int y = pos_y / grid_height;
 	int offset_x = pos_x - x * grid_width;
-	int offset_y = pos_y - y * grid_width;
+	int offset_y = pos_y - y * grid_height;
 	if ((offset_x > chessman_width ) || (offset_y > chessman_width ))
 		return Gdk::Point(-1, -1);
 	return Gdk::Point(x, y);
@@ -105,8 +105,8 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 
 void Board::on_map()
 {
+	Gtk::DrawingArea::on_map();
 	selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_NORMAL, get_window()->get_visual(), chessman_width, chessman_width);
-	return Gtk::DrawingArea::on_map();
 }
 
 bool Board::on_expose_event(GdkEventExpose* ev)
