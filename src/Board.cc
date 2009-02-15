@@ -58,7 +58,6 @@ Board::Board() :
 	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-
 	m_engine.from_fen(cszStartFen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
@@ -102,6 +101,12 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	if ((offset_x > chessman_width ) || (offset_y > chessman_width ))
 		return Gdk::Point(-1, -1);
 	return Gdk::Point(x, y);
+}
+
+void Board::on_map()
+{
+	selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_NORMAL, get_window()->get_visual(), chessman_width, chessman_width);
+	return Gtk::DrawingArea::on_map();
 }
 
 bool Board::on_expose_event(GdkEventExpose* ev)
@@ -307,18 +312,13 @@ void Board::draw_select_frame(bool selected)
 	int py = p.get_y() - 57 / 2;
 
 
-	if (selected)
+	if (selected) {
+		get_window()->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
 		chessmans[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
 				0, 0, px, py, chessmans[SELECTED_CHESSMAN]->get_width(), chessmans[SELECTED_CHESSMAN]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
-	else {
-		int chessman_type = PIECE_TYPE(selected_chessman);
-		//chessman_type--;
-		//if (chessman_type < 0 )
-		//	return;
-		chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-				0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
-				Gdk::RGB_DITHER_NONE, 0, 0);
+	} else {
+		get_window()->draw_image (get_style()->get_black_gc(), selected_chessman_image, 0, 0, px, py, -1, -1);
 	}
 }
 

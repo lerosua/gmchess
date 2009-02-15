@@ -36,6 +36,7 @@ class Board : public Gtk::DrawingArea {
 		Board();
 		~Board();
 	protected:
+		void on_map();
 		bool on_expose_event(GdkEventExpose* ev);
 		bool on_button_press_event(GdkEventButton* ev);
 
@@ -95,6 +96,7 @@ class Board : public Gtk::DrawingArea {
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		/** 棋子图像 */
 		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];
+		Glib::RefPtr<Gdk::Image> selected_chessman_image;
 		int selected_x;
 		int selected_y;
 		int selected_chessman;
