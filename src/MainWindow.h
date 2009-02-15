@@ -21,7 +21,11 @@
 
 #include <gtkmm.h>
 #include <gtkmm/window.h>
+#include <libglademm/xml.h>
 #include "Board.h"
+#define main_ui  "../data/gmchess.glade"
+typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
+
 class Board;
 
 class MainWindow:public Gtk::Window
@@ -33,6 +37,7 @@ class MainWindow:public Gtk::Window
 		void onBackMove();
 	private:
 		Board* board;
+		GlademmXML  ui_xml;
 };
 
 #endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */

@@ -27,7 +27,7 @@ const int chessman_width = 57;
 #define PIECE_START 16  //棋子开始数字
 #define PIECE_END   48  //棋子结束数字
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
-#define DATA_DIR "../wood/"
+#define DATA_DIR "../data/wood/"
 
 
 Board::Board() :
@@ -35,7 +35,7 @@ Board::Board() :
 	selected_y(-1),
 	selected_chessman(-1)
 {
-	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"wood.png");
+	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"bg.png");
 	this->set_size_request(521,577);
 	chessmans[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");
 	chessmans[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_bishop.png");

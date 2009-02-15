@@ -16,12 +16,22 @@
  * =====================================================================================
  */
 #include "MainWindow.h"
+#include <glib/gi18n.h>
 
 MainWindow::MainWindow()
 {
-	board= Gtk::manage(new Board());
-	this->add(*board);
+	ui_xml = Gnome::Glade::Xml::create(main_ui,"main_window");
+	if(!ui_xml)
+		exit(271);
+	Gtk::VBox* main_window = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("main_window"));
 
+	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
+
+	board= Gtk::manage(new Board());
+	//this->add(*board);
+	box_board->add(*board);
+
+	this->add(*main_window);
 	this->set_title("GMChess");
 
 
