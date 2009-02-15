@@ -122,7 +122,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		selected_x = p.get_x();
 		selected_y = p.get_y();
 		selected_chessman = m_engine.get_piece(selected_x, selected_y);
-		std::cout << selected_x << ',' << selected_y << ',' << selected_chessman << std::endl;
 		if (selected_x != -1) {
 			draw_select_frame(true);
 		}
@@ -280,7 +279,6 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-	std::cout << chessman << std::endl;
 	int chessman_type = PIECE_TYPE(chessman);	
 	chessman_type--;
 	if (chessman_type < 0 )
@@ -342,8 +340,8 @@ void Board::draw_pieces(const int pieces[])
 
 void Board::draw_chessman()
 {
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 9; j++) {
+	for (int i = 0; i < 9; i++) {
+		for (int j = 0; j < 12; j++) {
 			draw_chessman(i, j, m_engine.get_piece(i, j));
 		}
 	}

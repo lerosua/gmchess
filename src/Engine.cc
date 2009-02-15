@@ -171,7 +171,7 @@ void Engine::to_fen(char *szFen)  {
 int Engine::get_piece(int x,int y)
 {
 	int site=0;
-	site = COORD_XY(x,y);
+	site = COORD_XY(x + 3,y + 3);
 	//没有棋子，返回
 //	if(Square[site] == 0)
 //		return -1;
