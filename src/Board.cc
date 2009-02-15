@@ -106,7 +106,7 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 void Board::on_map()
 {
 	Gtk::DrawingArea::on_map();
-	selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_NORMAL, get_window()->get_visual(), chessman_width, chessman_width);
+	selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_SHARED, get_window()->get_visual(), chessman_width, chessman_width);
 }
 
 bool Board::on_expose_event(GdkEventExpose* ev)
