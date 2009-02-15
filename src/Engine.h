@@ -36,12 +36,22 @@ class Engine {
 		~Engine();
 
 		/**
+		 * @brief 添加棋局快照，即是保存当前的局面
+		 * @param fen FEN串
+		 */
+		void add_snapshot(const char* fen);
+		/**
+		 * @brief 得到某步时的快照
+		 * @param num 某一步时
+		 */
+		void get_snapshot(int num);
+		/**
 		 * @brief 从Fen串生成棋盘数组
 		 * @param szFen Fen串
 		 */
 		void from_fen(const char *szFen);
 		/**
-		 * @brief 棋盘数组生成Fen串
+		 * @brief 棋盘数组生成Fen串 内部使用
 		 * @param szFen 生成的Fen串
 		 */
 		void to_fen(char* szFen);
@@ -81,7 +91,7 @@ class Engine {
 		}
 		
 		/** 交换走棋方*/
-		void change_side(){ sdPlayer = ~sdPlayer;};
+		void change_side(){ now_player = ~now_player;};
 		/** 引擎重置 */
 		void reset();
 		/** @brief 返回x，y位置上的棋子
@@ -98,13 +108,12 @@ class Engine {
 		/** 当前局面的棋子数组，相应棋子的值为棋盘上的坐标,0表示被吃了*/
 		int Pieces[48];
 		/** 用于保存所有历史局面的FEN串数组*/
-		//char* FenLogList[MAX_COUNT];
-		std::vector<std::string> FenList;
+		std::vector<std::string> fen_snapshots;
 		/** 
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走
 		 */
-		bool sdPlayer;
+		bool now_player;
 		/** 走棋计数*/
 		int count;
 

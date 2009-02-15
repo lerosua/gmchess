@@ -58,6 +58,7 @@ Board::Board() :
 	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
+
 	m_engine.from_fen(cszStartFen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
@@ -70,7 +71,7 @@ Board::~Board()
 void Board::get_grid_size(int& width, int& height)
 {
 	width = (get_width() - border_width * 2) / 8;
-	height = (get_height() - border_width * 2) / 11;
+	height = (get_height() - border_width * 2) / 9;
 }
 
 Gdk::Point Board::get_coordinate(int pos_x, int pos_y)
@@ -133,7 +134,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 void Board::draw_bg()
 {
 	Gdk::Point p1= get_coordinate(0, 0);
-	Gdk::Point p2= get_coordinate(8, 11);
+	Gdk::Point p2= get_coordinate(8, 9);
 
 	int width = p2.get_x() - p1.get_x();
 	int height = p2.get_y() - p1.get_y();
@@ -168,9 +169,9 @@ void Board::draw_bg()
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 
-	GdkSegment seg[11];
+	GdkSegment seg[9];
 
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < 9; i++) {
 		p1 = get_coordinate(0, i);
 		p2 = get_coordinate(8, i);
 		seg[i].x1 = p1.get_x();
@@ -178,11 +179,11 @@ void Board::draw_bg()
 		seg[i].x2 = p2.get_x();
 		seg[i].y2 = p2.get_y();
 	}
-	get_window()->draw_segments(gc, seg, 11);
+	get_window()->draw_segments(gc, seg, 9);
 
 	for (int i = 0; i < 8; i++) {
 		p1 = get_coordinate(i, 0);
-		p2 = get_coordinate(i, 5);
+		p2 = get_coordinate(i, 4);
 		seg[i].x1 = p1.get_x();
 		seg[i].y1 = p1.get_y();
 		seg[i].x2 = p2.get_x();
@@ -191,8 +192,8 @@ void Board::draw_bg()
 	get_window()->draw_segments(gc, seg, 8);
 
 	for (int i = 0; i < 8; i++) {
-		p1 = get_coordinate(i, 6);
-		p2 = get_coordinate(i, 11);
+		p1 = get_coordinate(i, 5);
+		p2 = get_coordinate(i, 9);
 		seg[i].x1 = p1.get_x();
 		seg[i].y1 = p1.get_y();
 		seg[i].x2 = p2.get_x();
@@ -202,29 +203,29 @@ void Board::draw_bg()
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
 
-	draw_localize(gc, 0, 4, PLACE_LEFT);
-	draw_localize(gc, 8, 4, PLACE_RIGHT);
+	draw_localize(gc, 0, 3, PLACE_LEFT);
+	draw_localize(gc, 8, 3, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		draw_localize(gc, i * 2 + 2, 4, PLACE_ALL);
+		draw_localize(gc, i * 2 + 2, 3, PLACE_ALL);
 	}
 
-	draw_localize(gc, 1, 3, PLACE_ALL);
-	draw_localize(gc, 7, 3, PLACE_ALL);
+	draw_localize(gc, 1, 2, PLACE_ALL);
+	draw_localize(gc, 7, 2, PLACE_ALL);
 
-	draw_localize(gc, 0, 7, PLACE_LEFT);
-	draw_localize(gc, 8, 7, PLACE_RIGHT);
+	draw_localize(gc, 0, 6, PLACE_LEFT);
+	draw_localize(gc, 8, 6, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		draw_localize(gc,  i * 2 + 2, 7, PLACE_ALL);
+		draw_localize(gc,  i * 2 + 2, 6, PLACE_ALL);
 	}
 
-	draw_localize(gc, 1, 8, PLACE_ALL);
-	draw_localize(gc, 7, 8, PLACE_ALL);
+	draw_localize(gc, 1, 7, PLACE_ALL);
+	draw_localize(gc, 7, 7, PLACE_ALL);
 
 	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
 	draw_palace(gc, 4, 1); 
-	draw_palace(gc, 4, 10); 
+	draw_palace(gc, 4, 8); 
 }
 
 void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
@@ -279,10 +280,13 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-	int chessman_type = PIECE_TYPE(chessman);	
-	chessman_type--;
-	if (chessman_type < 0 )
+	//std::cout << chessman << "  ";
+	if(chessman<16)
 		return;
+	int chessman_type = PIECE_TYPE(chessman);	
+	//chessman_type--;
+	//if (chessman_type < 0 )
+	//	return;
 
 	Gdk::Point p = get_coordinate(x, y);
 	int px = p.get_x() - 57 / 2;
@@ -309,9 +313,9 @@ void Board::draw_select_frame(bool selected)
 				Gdk::RGB_DITHER_NONE, 0, 0);
 	else {
 		int chessman_type = PIECE_TYPE(selected_chessman);
-		chessman_type--;
-		if (chessman_type < 0 )
-			return;
+		//chessman_type--;
+		//if (chessman_type < 0 )
+		//	return;
 		chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
 				0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
@@ -341,7 +345,7 @@ void Board::draw_pieces(const int pieces[])
 void Board::draw_chessman()
 {
 	for (int i = 0; i < 9; i++) {
-		for (int j = 0; j < 12; j++) {
+		for (int j = 0; j < 10; j++) {
 			draw_chessman(i, j, m_engine.get_piece(i, j));
 		}
 	}

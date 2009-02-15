@@ -22,7 +22,7 @@ Engine::Engine()
 {
 	memset(Square,0,256);
 	memset(Pieces,0,48);
-	sdPlayer = 0;
+	now_player = 0;
 	count=0;
 
 
@@ -35,9 +35,9 @@ void Engine::reset()
 {
 	memset(Square,0,256);
 	memset(Pieces,0,48);
-	sdPlayer = 0;
+	now_player = 0;
 	count=0;
-	FenList.clear();
+	fen_snapshots.clear();
 }
 
 void Engine::add_piece(int sq,int pc)
@@ -126,7 +126,7 @@ void Engine::from_fen(const char *szFen) {
   }
   lpFen ++;
   // 3. 确定轮到哪方走
-  if (this->sdPlayer == (*lpFen == 'b' ? 0 : 1)) {
+  if (this->now_player == (*lpFen == 'b' ? 0 : 1)) {
     change_side();
   }
 //  // 4. 把局面设成“不可逆”
@@ -162,16 +162,26 @@ void Engine::to_fen(char *szFen)  {
     lpFen ++;
   }
   *(lpFen - 1) = ' '; // 把最后一个'/'替换成' '
-  *lpFen = (this->sdPlayer == 0 ? 'w' : 'b');
+  *lpFen = (this->now_player == 0 ? 'w' : 'b');
   lpFen ++;
   *lpFen = '\0';
 }
 
+void Engine::add_snapshot(const char* fen)
+{
+	from_fen(fen);
+	fen_snapshots.push_back(std::string(fen));
+}
 
+void Engine::get_snapshot(int num)
+{
+
+}
 int Engine::get_piece(int x,int y)
 {
 	int site=0;
 	site = COORD_XY(x + 3,y + 3);
+	//site = 	 (x+3)+((y+3)<<4);
 	//没有棋子，返回
 //	if(Square[site] == 0)
 //		return -1;
