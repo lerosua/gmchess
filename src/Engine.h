@@ -79,13 +79,14 @@ class Engine {
 		}
 		/** 棋子代号转成FEN串字符 */
 		inline char piece_to_fen(int pt) {
-			  return cszPieceBytes[pt];
+			  return chessman_bytes[pt];
 		}
-		/** 返回棋子的类型 */
+		/** 由棋子代号转成棋子的类型 */
 		inline int PIECE_TYPE(int pc) {
 			  return PieceTypes[pc];
 		}
-		
+		/** 测试位置sq是否在棋盘内 */
+		bool in_board(int sq) {return  chessInBoard[sq] ; }
 		/** 交换走棋方*/
 		void change_side(){ now_player = ~now_player;};
 		/** 引擎重置 */
@@ -97,7 +98,7 @@ class Engine {
 		 */
 		int get_piece(int rx,int ry);
 		
-		//着法中的位置坐标全是在棋盘数组里的位置，0x33-0xcb以内
+		/**着法中的位置坐标全是在棋盘数组里的位置，0x33-0xcb以内*/
 		/**
 		 * @brief 由起点和终点生成着法
 		 * @param p_src 棋子的起点

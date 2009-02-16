@@ -53,9 +53,9 @@ class Board : public Gtk::DrawingArea {
 		 * @brief 画棋子
 		 * @param x x坐标
 		 * @param y y坐标
-		 * @param chessman_type 棋子的类型
+		 * @param chess_type 棋子的类型
 		 */
-		void draw_chessman(int x, int y, int chessman);
+		void draw_chessman(int x, int y, int chess_type);
 		/**
 		 * @brief 根据棋盘数组画出对局
 		 */
@@ -71,7 +71,7 @@ class Board : public Gtk::DrawingArea {
 	public:
 
 		/** 返回棋子的类型 */
-		inline int PIECE_TYPE(int pc) {
+		inline int chessman_type(int pc) {
 			  return PieceTypes[pc];
 		}
 #if 0
@@ -96,7 +96,7 @@ class Board : public Gtk::DrawingArea {
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
 		/** 棋子图像 */
-		Glib::RefPtr<Gdk::Pixbuf> chessmans[18];
+		Glib::RefPtr<Gdk::Pixbuf> chessman_images[18];
 		Glib::RefPtr<Gdk::Image> selected_chessman_image;
 		int selected_x;
 		int selected_y;

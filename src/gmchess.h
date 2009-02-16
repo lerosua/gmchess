@@ -20,6 +20,7 @@
 #define  GMCHESS_FILE_HEADER_INC
 
 #include <stdio.h>
+#include "define.h"
 //保存的最大历史局面数
 const int MAX_COUNT=512;
 
@@ -46,10 +47,10 @@ const int FILE_RIGHT = 11;
 
 
 //初始化的FEN串
-const char *const cszStartFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
+const char *const start_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
 
-// 棋子类型对应的棋子符号
-const char *const cszPieceBytes = "KABNRCPkabnrcp";
+/** 棋子类型对应的棋子符号*/
+const char *const chessman_bytes = "KABNRCPkabnrcp";
 
 const int PieceTypes[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -57,6 +58,12 @@ const int PieceTypes[48] = {
   7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 13, 13, 13
 };
 
+/**
+ * 棋子的类型
+ *0-6 是红方棋子，分别是 帅仕相马车炮兵
+ *7-13是黑方棋子，分别是 将士象马车炮卒
+ *		英文字符是K A B N R C P
+ */
 enum {  
 	RED_KING=0,RED_ADVISOR,RED_BISHOP,RED_KNIGHT,RED_ROOT,RED_CANNON,RED_PAWN,
 	BLACK_KING,BLACK_ADVISOR,BLACK_BISHOP,BLACK_KNIGHT,BLACK_ROOT,BLACK_CANNON,BLACK_PAWN,
@@ -71,59 +78,26 @@ const int PieceExample[48] = {
   0x37,  0x36,  0x38,  0x35,  0x39, 0x34,  0x3a,  0x33,  0x3b,  0x54,  0x5a,  0x63,  0x65,  0x67,  0x69,0x6b
 };
 
-#ifdef __DEBUG_D
+/** 棋盘区域表 */
+const bool chessInBoard[256] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
 
-#define DLOG(fmt, ...) \
-    { \
-        char buffer[36] = {0}; \
-        time_t t = time(NULL); \
-        strftime(buffer, 36, "%F %T ", localtime(&t)); \
-        fprintf(stderr, "%s %s|%d| " fmt, \
-                buffer, __FILE__, __LINE__, ##__VA_ARGS__); \
-    }
-
-#define RLOG(fmt, ...) \
-    { \
-        char buffer[36] = {0}; \
-        time_t t = time(NULL); \
-        strftime(buffer, 36, "%F %T ", localtime(&t)); \
-        fprintf(stderr, "%s %s|%d| " fmt, \
-                buffer, __FILE__, __LINE__, ##__VA_ARGS__); \
-    }
-
-#elif __RELEASE_D
-
-#define DLOG(fmt, ...) \
-        ;
-
-#define RLOG(fmt, ...) \
-    { \
-        char buffer[36] = {0}; \
-        time_t t = time(NULL); \
-        strftime(buffer, 36, "%F %T ", localtime(&t)); \
-        fprintf(stdout, "%s " fmt, buffer, ##__VA_ARGS__); \
-    }
-
-#else // by default: __RELEASE_D and __DEBUG_D are not present in compilation
-
-#define DLOG(fmt, ...) \
-    { \
-        char buffer[36] = {0}; \
-        time_t t = time(NULL); \
-        strftime(buffer, 36, "%F %T ", localtime(&t)); \
-        fprintf(stderr, "%s %s|%d| " fmt, \
-                buffer, __FILE__, __LINE__, ##__VA_ARGS__); \
-    }
-
-#define RLOG(fmt, ...) \
-    { \
-        char buffer[36] = {0}; \
-        time_t t = time(NULL); \
-        strftime(buffer, 36, "%F %T ", localtime(&t)); \
-        fprintf(stdout, "%s " fmt, buffer, ##__VA_ARGS__); \
-    }
-
-#endif
 
 
 

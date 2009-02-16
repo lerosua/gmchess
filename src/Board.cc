@@ -39,27 +39,27 @@ Board::Board() :
 {
 	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"bg.png");
 	this->set_size_request(521,577);
-	chessmans[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");
-	chessmans[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_bishop.png");
-	chessmans[BLACK_CANNON] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_cannon.png");
-	chessmans[BLACK_KING] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_king.png");
-	chessmans[BLACK_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_king_die.png");
-	chessmans[BLACK_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_knight.png");
-	chessmans[BLACK_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_pawn.png");
-	chessmans[BLACK_ROOT] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_root.png");
-	chessmans[RED_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_advisor.png");
-	chessmans[RED_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_bishop.png");
-	chessmans[RED_CANNON] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_cannon.png");
-	chessmans[RED_KING] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_king.png");
-	chessmans[RED_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_king_die.png");
-	chessmans[RED_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_knight.png");
-	chessmans[RED_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_pawn.png");
-	chessmans[RED_ROOT] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_root.png");
-	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
-	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
+	chessman_images[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_advisor.png");
+	chessman_images[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_bishop.png");
+	chessman_images[BLACK_CANNON] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_cannon.png");
+	chessman_images[BLACK_KING] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_king.png");
+	chessman_images[BLACK_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_king_die.png");
+	chessman_images[BLACK_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_knight.png");
+	chessman_images[BLACK_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_pawn.png");
+	chessman_images[BLACK_ROOT] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_root.png");
+	chessman_images[RED_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_advisor.png");
+	chessman_images[RED_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_bishop.png");
+	chessman_images[RED_CANNON] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_cannon.png");
+	chessman_images[RED_KING] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_king.png");
+	chessman_images[RED_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_king_die.png");
+	chessman_images[RED_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_knight.png");
+	chessman_images[RED_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_pawn.png");
+	chessman_images[RED_ROOT] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_root.png");
+	chessman_images[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
+	chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-	m_engine.add_snapshot(cszStartFen);
-	//m_engine.from_fen(cszStartFen);
+	m_engine.add_snapshot(start_fen);
+	//m_engine.from_fen(start_fen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
 }
@@ -289,17 +289,17 @@ void Board::draw_chessman(int x, int y, int chessman)
 	//std::cout << chessman << "  ";
 	if(chessman<16)
 		return;
-	int chessman_type = PIECE_TYPE(chessman);	
-	//chessman_type--;
-	//if (chessman_type < 0 )
+	int chess_type = chessman_type(chessman);	
+	//chess_type--;
+	//if (chess_type < 0 )
 	//	return;
 
 	Gdk::Point p = get_coordinate(x, y);
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
-	chessmans[chessman_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			0, 0, px, py, chessmans[chessman_type]->get_width(), chessmans[chessman_type]->get_height(), 
+	chessman_images[chess_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+			0, 0, px, py, chessman_images[chess_type]->get_width(), chessman_images[chess_type]->get_height(), 
 			Gdk::RGB_DITHER_NONE, 0, 0);
 }
 
@@ -315,8 +315,8 @@ void Board::draw_select_frame(bool selected)
 
 	if (selected) {
 		get_window()->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
-		chessmans[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-				0, 0, px, py, chessmans[SELECTED_CHESSMAN]->get_width(), chessmans[SELECTED_CHESSMAN]->get_height(), 
+		chessman_images[SELECTED_CHESSMAN]->render_to_drawable(get_window(), get_style()->get_black_gc(),
+				0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
 	} else {
 		get_window()->draw_image (get_style()->get_black_gc(), selected_chessman_image, 0, 0, px, py, -1, -1);
@@ -333,7 +333,7 @@ void Board::draw_pieces(const int pieces[])
 		int sq = pieces[i];
 		if(sq == 0||sq<0x33||sq>0xcb)
 			continue;
-		draw_chessman(RANK_X(sq),RANK_Y(sq),PIECE_TYPE(i));
+		draw_chessman(RANK_X(sq),RANK_Y(sq),chessman_type(i));
 	}
 	draw_select_frame(true);
 #endif
