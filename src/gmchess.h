@@ -20,6 +20,7 @@
 #define  GMCHESS_FILE_HEADER_INC
 
 #include <stdio.h>
+#include <stdint.h>
 #include "define.h"
 //保存的最大历史局面数
 const int MAX_COUNT=512;
@@ -98,7 +99,10 @@ const bool chessInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-
+union hanzi{
+		char word[4];
+		uint32_t digit;
+	};
 
 
 #endif   /* ----- #ifndef GMCHESS_FILE_HEADER_INC  ----- */

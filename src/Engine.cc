@@ -97,7 +97,7 @@ void Engine::from_fen(const char *szFen) {
         if (k < 7) {
           if (pcWhite[k] < 32) {
             //if (this->ucsqchessmans[pcWhite[k]] == 0) {
-              add_piece(COORD_XY(j, i), pcWhite[k]);
+              add_piece(get_coord(j, i), pcWhite[k]);
               pcWhite[k] ++;
             //}
           }
@@ -110,7 +110,7 @@ void Engine::from_fen(const char *szFen) {
         if (6<k < 14) {
           if (pcBlack[k-7] < 48) {
             //if (this->ucsqchessmans[pcBlack[k]] == 0) {
-              add_piece(COORD_XY(j, i), pcBlack[k-7]);
+              add_piece(get_coord(j, i), pcBlack[k-7]);
               pcBlack[k-7] ++;
             //}
           }
@@ -141,14 +141,14 @@ void Engine::to_fen(char *szFen)  {
   for (i = RANK_TOP; i <= RANK_BOTTOM; i ++) {
     k = 0;
     for (j = FILE_LEFT; j <= FILE_RIGHT; j ++) {
-      pc = chessboard[COORD_XY(j, i)];
+      pc = chessboard[get_coord(j, i)];
       if (pc != 0) {
         if (k > 0) {
           *lpFen = k + '0';
           lpFen ++;
           k = 0;
         }
-        *lpFen = piece_to_fen(PIECE_TYPE(pc));
+        *lpFen = piece_to_fen(get_chessman_type(pc));
         lpFen ++;
       } else {
         k ++;
@@ -180,7 +180,7 @@ void Engine::get_snapshot(int num)
 int Engine::get_piece(int rx,int ry)
 {
 	int site=0;
-	site = COORD_XY(rx + 3,ry + 3);
+	site = get_coord(rx + 3,ry + 3);
 	return chessboard[site];
 
 }
@@ -230,44 +230,97 @@ int Engine::fen_to_piece(int nArg) {
 }
 
 /**
+ * @brief 
  * 执行了mv着法，将生成的棋盘数组转成FEN串添加到FEN快照里
  * 界面棋盘将根据棋盘数组更新
  * 另外生成着法的中文字符/ICCS 表示
+ * @param mv 着法
+ * @return 被吃的棋子
  */
 int Engine::do_move(int mv)
 {
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
+	int eated = chessboard[dst];
 
-	//如果dst的位置上有棋子，即是出现被吃子现象，
-	//则要将这个棋子的位置值置0,表示不再出现在棋盘上
-	if(chessboard[dst] !=0)
-	{
+	/**
+	 * 如果dst的位置上有棋子，即是出现被吃子现象，
+	 * 则要将这个棋子的位置值置0,表示被吃掉，不再出现在棋盘上
+	 */
+	if(eated !=0){
 		DLOG(" %d has been eat\n",chessboard[dst]);
-		chessmans[chessboard[dst]]=0;
+		chessmans[eated]=0;
 	}
 	chessboard[dst] = chessboard[src];
 	chessboard[src] = 0;
-	//被移动的棋子的位置值变成目标地点
+	/** 被移动的棋子的位置值变成目标地点 */
 	chessmans[chessboard[dst]] = dst ;
 
+	/** 交换走子方 */
+	change_side();
+
+	return eated;
+}
+
+void Engine::undo_move(int mv , int eated)
+{
+	int src = get_move_src(mv);
+	int dst = get_move_dst(mv);
+
+	chessboard[src] = chessboard[dst];
+	chessboard[dst] = eated;
+
+	chessmans[chessboard[src]]=src;
+	chessmans[eated]=dst ;
+
+	/** 交换走子方 */
+	change_side();
+
+
+
+}
+uint32_t Engine::move_to_iccs(int mv)
+{
+	union{
+		char c[4];
+		uint32_t dw;
+	}Ret;
+	Ret.c[0] = RANK_X(get_move_src(mv)) - FILE_LEFT +'a';
+	Ret.c[1] = '9' - RANK_Y(get_move_src(mv)) - RANK_TOP;
+	Ret.c[2] = RANK_X(get_move_dst(mv)) - FILE_LEFT + 'a';
+	Ret.c[3] = '0' - RANK_Y(get_move_dst(mv)) - RANK_TOP;
+
+	return Ret.dw;
+
+}
+int Engine::iccs_to_move(uint32_t iccs)
+{
+	int src,dst;
+	char *p;
+	p = (char*)&iccs;
+	src = get_coord( p[0] - 'a' + FILE_LEFT, '9'-p[1] +RANK_TOP);
+	dst = get_coord( p[2] - 'a' + FILE_LEFT, '9'-p[3] +RANK_TOP);
+
+	return (in_board(src) && in_board(dst) ? get_move(src,dst):0);
+}
+
+
+
+uint64_t Engine::iccs_to_hanzi(uint32_t iccs)
+{
+	int pos;
+	uint16_t *arg;
+
+
+
 
 }
 
-unsigned int Engine::move_to_iccs(int mv)
+uint32_t Engine::hanzi_to_iccs(uint64_t hanzi)
 {
 
 
+
+
+
 }
-int Engine::iccs_to_move(unsigned int iccs)
-{
-
-}
-
-
-
-std::string Engine::iccs_to_hanzi(unsigned int iccs)
-{}
-
-unsigned int Engine::hanzi_to_iccs(const std::string& hanzi)
-{}

@@ -71,7 +71,7 @@ class Board : public Gtk::DrawingArea {
 	public:
 
 		/** 返回棋子的类型 */
-		inline int chessman_type(int pc) {
+		inline int get_chessman_type(int pc) {
 			  return PieceTypes[pc];
 		}
 #if 0

@@ -64,7 +64,7 @@ class Engine {
 		 */
 		int fen_to_piece(int nArg);
 		/** 由x，y位置获得棋盘数组的位置*/
-		int COORD_XY(int x,int y){ return x+(y<<4);};
+		int get_coord(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
 		inline int RANK_Y(int sq) {	  return sq >> 4;};
 
@@ -82,7 +82,7 @@ class Engine {
 			  return chessman_bytes[pt];
 		}
 		/** 由棋子代号转成棋子的类型 */
-		inline int PIECE_TYPE(int pc) {
+		inline int get_chessman_type(int pc) {
 			  return PieceTypes[pc];
 		}
 		/** 测试位置sq是否在棋盘内 */
@@ -105,21 +105,27 @@ class Engine {
 		 * @param p_dst 棋子的终点
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
-		int move_from(int p_src,int p_dst){ return p_src + (p_dst<<8);}
+		int get_move(int p_src,int p_dst){ return p_src + (p_dst<<8);}
 		/** 得到着法的起点 */
 		int get_move_src(int mv){ return mv & 255 ;}
 		/** 得到着法的终点 */
 		int get_move_dst(int mv){ return mv >>8 ; }
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
-		unsigned int move_to_iccs(int mv);
+		uint32_t move_to_iccs(int mv);
 		/** 把ICCS坐标格式转成着法*/
-		int iccs_to_move(unsigned int iccs);
+		int iccs_to_move(uint32_t iccs);
 
 		/** ICCS坐标格式转成中文纵线表达方式 */
-		std::string iccs_to_hanzi(unsigned int iccs);
-		unsigned int hanzi_to_iccs(const std::string& hanzi);
+		uint64_t iccs_to_hanzi(uint32_t iccs);
+		uint32_t hanzi_to_iccs(uint64_t hanzi);
 		/** 执行着法 */
 		int do_move(int mv);
+		/** 
+		 * @brief 撤消此着法 
+		 * @param mv 着法
+		 * @param eated 为被吃子
+		 * */
+		void undo_move(int mv,int eated);
 
 	private:
 		/**

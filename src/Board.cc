@@ -289,7 +289,7 @@ void Board::draw_chessman(int x, int y, int chessman)
 	//std::cout << chessman << "  ";
 	if(chessman<16)
 		return;
-	int chess_type = chessman_type(chessman);	
+	int chess_type = get_chessman_type(chessman);	
 	//chess_type--;
 	//if (chess_type < 0 )
 	//	return;
@@ -333,7 +333,7 @@ void Board::draw_pieces(const int pieces[])
 		int sq = pieces[i];
 		if(sq == 0||sq<0x33||sq>0xcb)
 			continue;
-		draw_chessman(RANK_X(sq),RANK_Y(sq),chessman_type(i));
+		draw_chessman(RANK_X(sq),RANK_Y(sq),get_chessman_type(i));
 	}
 	draw_select_frame(true);
 #endif
