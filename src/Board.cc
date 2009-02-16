@@ -58,7 +58,8 @@ Board::Board() :
 	chessmans[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessmans[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-	m_engine.from_fen(cszStartFen);
+	m_engine.add_snapshot(cszStartFen);
+	//m_engine.from_fen(cszStartFen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
 }
@@ -112,7 +113,7 @@ void Board::on_map()
 bool Board::on_expose_event(GdkEventExpose* ev)
 {
 	draw_bg();
-	draw_chessman();
+	draw_board();
 	//draw_pieces(PieceExample);
 	return true;
 }
@@ -322,14 +323,9 @@ void Board::draw_select_frame(bool selected)
 	}
 }
 
-void Board::draw_board(const int square[])
-{
-	int i,j;
-
-}
-
 void Board::draw_pieces(const int pieces[])
 {
+#if 0
 	int i,j;
 	i = PIECE_START;
 	for(;i<PIECE_END;i++)
@@ -340,9 +336,10 @@ void Board::draw_pieces(const int pieces[])
 		draw_chessman(RANK_X(sq),RANK_Y(sq),PIECE_TYPE(i));
 	}
 	draw_select_frame(true);
+#endif
 }
 
-void Board::draw_chessman()
+void Board::draw_board()
 {
 	for (int i = 0; i < 9; i++) {
 		for (int j = 0; j < 10; j++) {

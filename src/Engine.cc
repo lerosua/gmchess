@@ -20,8 +20,8 @@
 #include <string.h>
 Engine::Engine()
 {
-	memset(Square,0,256);
-	memset(Pieces,0,48);
+	memset(chessboard,0,256);
+	memset(chessmans,0,48);
 	now_player = 0;
 	count=0;
 
@@ -33,8 +33,8 @@ Engine::~Engine()
 
 void Engine::reset()
 {
-	memset(Square,0,256);
-	memset(Pieces,0,48);
+	memset(chessboard,0,256);
+	memset(chessmans,0,48);
 	now_player = 0;
 	count=0;
 	fen_snapshots.clear();
@@ -42,8 +42,8 @@ void Engine::reset()
 
 void Engine::add_piece(int sq,int pc)
 {
-	Square[sq]=pc;
-	Pieces[pc]=sq;
+	chessboard[sq]=pc;
+	chessmans[pc]=sq;
 }
 
 void Engine::from_fen(const char *szFen) {
@@ -96,7 +96,7 @@ void Engine::from_fen(const char *szFen) {
         k = fen_to_piece(*lpFen);
         if (k < 7) {
           if (pcWhite[k] < 32) {
-            //if (this->ucsqPieces[pcWhite[k]] == 0) {
+            //if (this->ucsqchessmans[pcWhite[k]] == 0) {
               add_piece(COORD_XY(j, i), pcWhite[k]);
               pcWhite[k] ++;
             //}
@@ -109,7 +109,7 @@ void Engine::from_fen(const char *szFen) {
         k = fen_to_piece(*lpFen);
         if (6<k < 14) {
           if (pcBlack[k-7] < 48) {
-            //if (this->ucsqPieces[pcBlack[k]] == 0) {
+            //if (this->ucsqchessmans[pcBlack[k]] == 0) {
               add_piece(COORD_XY(j, i), pcBlack[k-7]);
               pcBlack[k-7] ++;
             //}
@@ -141,7 +141,7 @@ void Engine::to_fen(char *szFen)  {
   for (i = RANK_TOP; i <= RANK_BOTTOM; i ++) {
     k = 0;
     for (j = FILE_LEFT; j <= FILE_RIGHT; j ++) {
-      pc = Square[COORD_XY(j, i)];
+      pc = chessboard[COORD_XY(j, i)];
       if (pc != 0) {
         if (k > 0) {
           *lpFen = k + '0';
@@ -177,15 +177,11 @@ void Engine::get_snapshot(int num)
 {
 
 }
-int Engine::get_piece(int x,int y)
+int Engine::get_piece(int rx,int ry)
 {
 	int site=0;
-	site = COORD_XY(x + 3,y + 3);
-	//site = 	 (x+3)+((y+3)<<4);
-	//没有棋子，返回
-//	if(Square[site] == 0)
-//		return -1;
-	return Square[site];
+	site = COORD_XY(rx + 3,ry + 3);
+	return chessboard[site];
 
 }
 
@@ -231,4 +227,29 @@ int Engine::fen_to_piece(int nArg) {
   default:
     return 14;
   }
+}
+
+/**
+ * 执行了mv着法，将生成的棋盘数组转成FEN串添加到FEN快照里
+ * 界面棋盘将根据棋盘数组更新
+ * 另外生成着法的中文字符/ICCS 表示
+ */
+int Engine::do_move(int mv)
+{
+	int src = get_move_src(mv);
+	int dst = get_move_dst(mv);
+
+	//如果dst的位置上有棋子，即是出现被吃子现象，
+	//则要将这个棋子的位置值置0,表示不再出现在棋盘上
+	if(chessboard[dst] !=0)
+	{
+		DLOG(" %d has been eat\n",chessboard[dst]);
+		chessmans[chessboard[dst]]=0;
+	}
+	chessboard[dst] = chessboard[src];
+	chessboard[src] = 0;
+	//被移动的棋子的位置值变成目标地点
+	chessmans[chessboard[dst]] = dst ;
+
+
 }

@@ -48,7 +48,7 @@ class Board : public Gtk::DrawingArea {
 		 * @brief 画棋盘背景
 		 */
 		void draw_bg();
-		void draw_chessman();
+		//void draw_chessman();
 		/**
 		 * @brief 画棋子
 		 * @param x x坐标
@@ -58,9 +58,8 @@ class Board : public Gtk::DrawingArea {
 		void draw_chessman(int x, int y, int chessman);
 		/**
 		 * @brief 根据棋盘数组画出对局
-		 * @param square 对局状态中的棋盘数组
 		 */
-		void draw_board(const int square[]);
+		void draw_board();
 		/**
 		 * @brief 根据棋子数组画出对局
 		 * @param pieces 棋子数组，由16->47,0表示被吃掉了
@@ -75,6 +74,7 @@ class Board : public Gtk::DrawingArea {
 		inline int PIECE_TYPE(int pc) {
 			  return PieceTypes[pc];
 		}
+#if 0
 		/** 由x，y位置获得棋盘数组的位置*/
 		inline int COORD_XY(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
@@ -84,6 +84,7 @@ class Board : public Gtk::DrawingArea {
 		inline int RANK_X(int sq) {
 			  return (sq & 15)-3;
 		}
+#endif
 
 		/** 读谱状态下走下一步棋*/
 		void next_move();

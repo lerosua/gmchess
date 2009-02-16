@@ -45,13 +45,9 @@ class Engine {
 		 * @param num 某一步时
 		 */
 		void get_snapshot(int num);
+		
 		/**
-		 * @brief 从Fen串生成棋盘数组
-		 * @param szFen Fen串
-		 */
-		void from_fen(const char *szFen);
-		/**
-		 * @brief 棋盘数组生成Fen串 内部使用
+		 * @brief 棋盘数组生成Fen串 
 		 * @param szFen 生成的Fen串
 		 */
 		void to_fen(char* szFen);
@@ -94,19 +90,42 @@ class Engine {
 		void change_side(){ now_player = ~now_player;};
 		/** 引擎重置 */
 		void reset();
-		/** @brief 返回x，y位置上的棋子
-		 *  @param x x 坐标
-		 *  @param y y 坐标
-		 *  @return 返回棋子类型，如果-1表示没有棋子
+		/** @brief 返回x，y位置上的棋子 为真实棋盘的坐标，
+		 *  @param rx x 坐标
+		 *  @param ry y 坐标
+		 *  @return 返回棋子代号，如果0表示没有棋子
 		 */
-		int get_piece(int x,int y);
+		int get_piece(int rx,int ry);
+		
+		//着法中的位置坐标全是在棋盘数组里的位置，0x33-0xcb以内
+		/**
+		 * @brief 由起点和终点生成着法
+		 * @param p_src 棋子的起点
+		 * @param p_dst 棋子的终点
+		 * @return 返回着法，着法表示：高位是终点，低位是起点
+		 */
+		int move_from(int p_src,int p_dst){ return p_src + (p_dst<<8);}
+		/** 得到着法的起点 */
+		int get_move_src(int mv){ return mv & 255 ;}
+		/** 得到着法的终点 */
+		int get_move_dst(int mv){ return mv >>8 ; }
+		/** 执行着法 */
+		int do_move(int mv);
 
+	private:
+		/**
+		 * @brief 从Fen串生成棋盘数组
+		 * @param szFen Fen串
+		 */
+		void from_fen(const char *szFen);
 
 	private:
 		/** 当前局面的棋盘数组*/
-		int Square[256];
-		/** 当前局面的棋子数组，相应棋子的值为棋盘上的坐标,0表示被吃了*/
-		int Pieces[48];
+		int chessboard[256];
+		/** 当前局面的棋子数组，相应棋子的值为棋盘上的坐标,0表示被吃了
+		 * 16-31表示红方棋子  32-47 表示黑方棋子
+		 **/
+		int chessmans[48];
 		/** 用于保存所有历史局面的FEN串数组*/
 		std::vector<std::string> fen_snapshots;
 		/** 
