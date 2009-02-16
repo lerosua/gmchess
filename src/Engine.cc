@@ -253,3 +253,21 @@ int Engine::do_move(int mv)
 
 
 }
+
+unsigned int Engine::move_to_iccs(int mv)
+{
+
+
+}
+int Engine::iccs_to_move(unsigned int iccs)
+{
+
+}
+
+
+
+std::string Engine::iccs_to_hanzi(unsigned int iccs)
+{}
+
+unsigned int Engine::hanzi_to_iccs(const std::string& hanzi)
+{}

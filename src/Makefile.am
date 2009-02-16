@@ -21,6 +21,7 @@ noinst_HEADERS = \
 		 Board.h \
 		 gmchess.h \
 		 Engine.h \
+		 define.h \
 		 MainWindow.h
 
 chess_LDFLAGS = 

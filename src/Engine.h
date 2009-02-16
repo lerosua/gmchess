@@ -110,6 +110,14 @@ class Engine {
 		int get_move_src(int mv){ return mv & 255 ;}
 		/** 得到着法的终点 */
 		int get_move_dst(int mv){ return mv >>8 ; }
+		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
+		unsigned int move_to_iccs(int mv);
+		/** 把ICCS坐标格式转成着法*/
+		int iccs_to_move(unsigned int iccs);
+
+		/** ICCS坐标格式转成中文纵线表达方式 */
+		std::string iccs_to_hanzi(unsigned int iccs);
+		unsigned int hanzi_to_iccs(const std::string& hanzi);
 		/** 执行着法 */
 		int do_move(int mv);
 
