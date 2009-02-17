@@ -109,7 +109,7 @@ class Engine {
 		/** 得到着法的起点 */
 		int get_move_src(int mv){ return mv & 255 ;}
 		/** 得到着法的终点 */
-		int get_move_dst(int mv){ return mv >>8 ; }
+		int get_move_dst(int mv){ return (mv >>8)&225 ; }
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
 		uint32_t move_to_iccs(int mv);
 		/** 把ICCS坐标格式转成着法*/
@@ -122,10 +122,17 @@ class Engine {
 		int do_move(int mv);
 		/** 
 		 * @brief 撤消此着法 
-		 * @param mv 着法
-		 * @param eated 为被吃子
+		 * @param mv 着法,已包含了被吃子信息
 		 * */
-		void undo_move(int mv,int eated);
+		void undo_move(int mv);
+		/**
+		 * @brief 获取被吃的棋子
+		 * @param mv 着法
+		 * @return 棋子代号
+		 */
+		int get_move_eat(int mv){ return mv >>24;  }
+		/** 给着法加入被吃子信息*/
+		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;
 
 	private:
 		/**
@@ -143,6 +150,8 @@ class Engine {
 		int chessmans[48];
 		/** 用于保存所有历史局面的FEN串数组*/
 		std::vector<std::string> fen_snapshots;
+		/** 用于保存所有的着法 */
+		std::vector<int> move_snapshots;
 		/** 
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走

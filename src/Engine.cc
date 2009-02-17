@@ -38,6 +38,7 @@ void Engine::reset()
 	now_player = 0;
 	count=0;
 	fen_snapshots.clear();
+	move_snapshots.clear();
 }
 
 void Engine::add_piece(int sq,int pc)
@@ -235,7 +236,7 @@ int Engine::fen_to_piece(int nArg) {
  * 界面棋盘将根据棋盘数组更新
  * 另外生成着法的中文字符/ICCS 表示
  * @param mv 着法
- * @return 被吃的棋子
+ * @return 加入了被吃子的着法
  */
 int Engine::do_move(int mv)
 {
@@ -259,13 +260,19 @@ int Engine::do_move(int mv)
 	/** 交换走子方 */
 	change_side();
 
-	return eated;
+	//int move = mv + (eated <<24) ;
+	int move = set_move_eat(mv ,eated) ;
+	/** 着法添加进快照 */
+	move_snapshots.push_back(move);
+	
+	return move;
 }
 
-void Engine::undo_move(int mv , int eated)
+void Engine::undo_move(int mv)
 {
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
+	int eated = get_move_eat(mv);
 
 	chessboard[src] = chessboard[dst];
 	chessboard[dst] = eated;
