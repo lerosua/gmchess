@@ -18,13 +18,10 @@
 
 #include "Engine.h"
 #include <string.h>
-Engine::Engine()
+Engine::Engine():count(0),now_player(0)
 {
 	memset(chessboard,0,256);
 	memset(chessmans,0,48);
-	now_player = 0;
-	count=0;
-
 
 }
 
@@ -47,7 +44,7 @@ void Engine::add_piece(int sq,int pc)
 	chessmans[pc]=sq;
 }
 
-void Engine::from_fen(const char *szFen) {
+void Engine::from_fens(const char *szFen) {
   int i, j, k;
   int pcWhite[7];
   int pcBlack[7];
@@ -134,7 +131,7 @@ void Engine::from_fen(const char *szFen) {
 //  SetIrrev();
 }
 
-void Engine::to_fen(char *szFen)  {
+void Engine::to_fens(char *szFen)  {
   int i, j, k, pc;
   char *lpFen;
 
@@ -168,14 +165,18 @@ void Engine::to_fen(char *szFen)  {
   *lpFen = '\0';
 }
 
-void Engine::add_snapshot(const char* fen)
+void Engine::init_snapshot(const char* fen)
 {
-	from_fen(fen);
+	from_fens(fen);
 	fen_snapshots.push_back(std::string(fen));
+	move_snapshots.push_back(0);
 }
 
 void Engine::get_snapshot(int num)
 {
+	std::string fens = fen_snapshots[num];
+	from_fens(fens.c_str());
+	count = num;
 
 }
 int Engine::get_piece(int rx,int ry)
@@ -236,14 +237,17 @@ int Engine::fen_to_piece(int nArg) {
  * 界面棋盘将根据棋盘数组更新
  * 另外生成着法的中文字符/ICCS 表示
  * @param mv 着法
- * @return 加入了被吃子的着法
+ * @return 0表示执行，-1表示执行失败
  */
 int Engine::do_move(int mv)
 {
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
-	int eated = chessboard[dst];
+	int eated = get_move_eat(mv);
+	//int eated = chessboard[dst];
 
+	if(eated != chessboard[dst])
+		return -1;
 	/**
 	 * 如果dst的位置上有棋子，即是出现被吃子现象，
 	 * 则要将这个棋子的位置值置0,表示被吃掉，不再出现在棋盘上
@@ -260,12 +264,14 @@ int Engine::do_move(int mv)
 	/** 交换走子方 */
 	change_side();
 
-	//int move = mv + (eated <<24) ;
-	int move = set_move_eat(mv ,eated) ;
 	/** 着法添加进快照 */
-	move_snapshots.push_back(move);
+	move_snapshots.push_back(mv);
+	char str_fen[128];
+	to_fens(str_fen);
+	fen_snapshots.push_back(std::string(str_fen));
+
 	
-	return move;
+	return 0;
 }
 
 void Engine::undo_move(int mv)

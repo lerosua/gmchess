@@ -58,8 +58,7 @@ Board::Board() :
 	chessman_images[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-	m_engine.add_snapshot(start_fen);
-	//m_engine.from_fen(start_fen);
+	m_engine.init_snapshot(start_fen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK);
 	this->show_all();
 }

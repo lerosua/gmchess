@@ -36,10 +36,10 @@ class Engine {
 		~Engine();
 
 		/**
-		 * @brief 添加棋局快照，即是保存当前的局面
-		 * @param fen FEN串
+		 * @brief 初始化棋局快照，设置开始的局面
+		 * @param fen 局面FEN串
 		 */
-		void add_snapshot(const char* fen);
+		void init_snapshot(const char* fen);
 		/**
 		 * @brief 得到某步时的快照
 		 * @param num 某一步时
@@ -50,7 +50,7 @@ class Engine {
 		 * @brief 棋盘数组生成Fen串 
 		 * @param szFen 生成的Fen串
 		 */
-		void to_fen(char* szFen);
+		void to_fens(char* szFen);
 		/**
 		 * @brief 添加棋子信息
 		 * @param sq 棋盘数组的序号
@@ -105,7 +105,7 @@ class Engine {
 		 * @param p_dst 棋子的终点
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
-		int get_move(int p_src,int p_dst){ return p_src + (p_dst<<8);}
+		int get_move(int p_src,int p_dst){ return p_src + (p_dst<<8)+ (chessmans[p_dst] <<24);}
 		/** 得到着法的起点 */
 		int get_move_src(int mv){ return mv & 255 ;}
 		/** 得到着法的终点 */
@@ -132,14 +132,14 @@ class Engine {
 		 */
 		int get_move_eat(int mv){ return mv >>24;  }
 		/** 给着法加入被吃子信息*/
-		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;
+		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;}
 
 	private:
 		/**
 		 * @brief 从Fen串生成棋盘数组
 		 * @param szFen Fen串
 		 */
-		void from_fen(const char *szFen);
+		void from_fens(const char *szFen);
 
 	private:
 		/** 当前局面的棋盘数组*/
