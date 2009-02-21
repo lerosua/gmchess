@@ -105,7 +105,7 @@ class Engine {
 		 * @param p_dst 棋子的终点
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
-		int get_move(int p_src,int p_dst){ return  p_src + (p_dst<<8)+ (chessmans[p_dst] <<24);}
+		int get_move(int p_src,int p_dst){ return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<24);}
 		int get_dst_xy(int rx, int ry);
 		int get_src_xy(int f_chess){return chessmans[f_chess] ; }
 
@@ -133,7 +133,7 @@ class Engine {
 		 * @param mv 着法
 		 * @return 棋子代号
 		 */
-		int get_move_eat(int mv){ return mv >>24;  }
+		int get_move_eat(int mv){ return (mv >>24)&255;  }
 		/** 给着法加入被吃子信息*/
 		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;}
 

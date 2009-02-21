@@ -256,7 +256,7 @@ int Engine::do_move(int mv)
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
 	int eated = get_move_eat(mv);
-	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d",src,dst,mv,chessboard[src],chessboard[dst]);
+	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
 	if(eated != chessboard[dst])
 		return -1;
