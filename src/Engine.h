@@ -106,8 +106,10 @@ class Engine {
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
 		int get_move(int p_src,int p_dst){ return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<24);}
+		/** 从真实棋盘坐标(rx,ry)返回棋盘数组里的坐标 */
 		int get_dst_xy(int rx, int ry);
-		int get_src_xy(int f_chess){return chessmans[f_chess] ; }
+		/** 返回棋子所在棋盘数组里的坐标 */
+		int get_chessman_xy(int f_chess){return chessmans[f_chess] ; }
 
 		/** 得到着法的起点 */
 		int get_move_src(int mv){ return (int)mv & 255 ;}

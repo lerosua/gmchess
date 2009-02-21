@@ -115,15 +115,12 @@ bool Board::on_configure_event(GdkEventConfigure* ev)
 	//if(ui_pixmap)
 	//	return true;
 	ui_pixmap = Gdk::Pixmap::create(this->get_window(),get_width(),get_height());
-	//ui_pixmap->draw_rectangle(this->get_style()->get_black_gc(),
-	//		true,0,0,get_width(),get_height());
 
 	redraw();
 
 }
 bool Board::on_expose_event(GdkEventExpose* ev)
 {
-	//redraw();
 	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
 			ev->area.x,ev->area.y,
 			ev->area.x,ev->area.y,
@@ -159,6 +156,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			draw_select_frame(true);
 		}
 #endif
+		draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
@@ -177,7 +175,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			}
 		}
 		else{
-			/** 之前已经选中棋子，现在是生成减法或取消*/
+			/** 之前已经选中棋子，现在是生成着法或取消*/
 			int dst_chessman = m_engine.get_piece(selected_x,selected_y);
 			if( (dst_chessman!=0) && ((selected_chessman &16)==(dst_chessman&16))){
 				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
@@ -201,7 +199,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 
 		}
 	}
-	//redraw();
 
 	return true;
 }
@@ -221,8 +218,6 @@ void Board::draw_bg()
 	int count_h = get_height() / bg_height + 1;
 	for (int i = 0; i < count_w; i++) {
 		for (int j = 0; j < count_h; j++) {
-			//bg_image->render_to_drawable(get_window(), get_style()->get_black_gc(),
-			//this->get_window()->draw_pixbuf(get_style()->get_black_gc(), bg_image,
 			ui_pixmap->draw_pixbuf(get_style()->get_black_gc(), bg_image,
 					0, 0, i * bg_width, j * bg_height, bg_width, bg_height, 
 					Gdk::RGB_DITHER_NONE, 0, 0);
@@ -232,13 +227,11 @@ void Board::draw_bg()
 
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
 	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	//get_window()->draw_rectangle(gc, false, 
 	ui_pixmap->draw_rectangle(gc, false, 
 			p1.get_x() - 8, p1.get_y() - 8,
 			width + 8 * 2, height + 8 * 2);
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	//this->get_window()->draw_rectangle(gc, false, 
 	ui_pixmap->draw_rectangle(gc, false, 
 			p1.get_x(), p1.get_y(),
 			width, height);
@@ -258,7 +251,6 @@ void Board::draw_bg()
 		seg[i].x2 = p2.get_x();
 		seg[i].y2 = p2.get_y();
 	}
-	//get_window()->draw_segments(gc, seg, 9);
 	ui_pixmap->draw_segments(gc, seg, 9);
 
 	for (int i = 0; i < 8; i++) {
@@ -269,7 +261,6 @@ void Board::draw_bg()
 		seg[i].x2 = p2.get_x();
 		seg[i].y2 = p2.get_y();
 	}
-	//get_window()->draw_segments(gc, seg, 8);
 	ui_pixmap->draw_segments(gc, seg, 8);
 
 	for (int i = 0; i < 8; i++) {
@@ -280,7 +271,6 @@ void Board::draw_bg()
 		seg[i].x2 = p2.get_x();
 		seg[i].y2 = p2.get_y();
 	}
-	//get_window()->draw_segments(gc, seg, 8);
 	ui_pixmap->draw_segments(gc, seg, 8);
 
 	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
@@ -325,14 +315,12 @@ void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
 		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - height - 4));
 		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - 4));
 		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() - 4));
-		//this->get_window()->draw_lines(gc, poss);
 		ui_pixmap->draw_lines(gc, poss);
 
 		poss.clear();
 		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() + 5));
 		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() + 5));
 		poss.push_back(Gdk::Point(p.get_x() + 5 , p.get_y() + 5 + height));
-		//this->get_window()->draw_lines(gc, poss);
 		ui_pixmap->draw_lines(gc, poss);
 	}
 
@@ -341,13 +329,11 @@ void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
 		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() - 4));
 		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4));
 		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4 - height));
-		//this->get_window()->draw_lines(gc, poss);
 		ui_pixmap->draw_lines(gc, poss);
 		poss.clear();
 		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() + 5));
 		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5));
 		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5 + height));
-		//this->get_window()->draw_lines(gc, poss);
 		ui_pixmap->draw_lines(gc, poss);
 	}
 }
@@ -359,29 +345,21 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 	get_grid_size(width, height);
 	Gdk::Point p = get_coordinate(x, y);
 
-	//get_window()->draw_line(gc, p.get_x() - width, p.get_y() - height, p.get_x() + width, p.get_y() + height);
 	ui_pixmap->draw_line(gc, p.get_x() - width, p.get_y() - height, p.get_x() + width, p.get_y() + height);
-	//get_window()->draw_line(gc, p.get_x() + width, p.get_y() - height, p.get_x() - width, p.get_y() + height);
 	ui_pixmap->draw_line(gc, p.get_x() + width, p.get_y() - height, p.get_x() - width, p.get_y() + height);
 }
 
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-	//std::cout << chessman << "  ";
 	if(chessman<16)
 		return;
 	int chess_type = get_chessman_type(chessman);	
-	//chess_type--;
-	//if (chess_type < 0 )
-	//	return;
 
 	Gdk::Point p = get_coordinate(x, y);
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
-	//chessman_images[chess_type]->render_to_drawable(get_window(), get_style()->get_black_gc(),
-	//this->get_window()->draw_pixbuf(get_style()->get_black_gc(),chessman_images[chess_type],
 	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[chess_type],
 			0, 0, px, py, chessman_images[chess_type]->get_width(), chessman_images[chess_type]->get_height(), 
 			Gdk::RGB_DITHER_NONE, 0, 0);
@@ -389,7 +367,7 @@ void Board::draw_chessman(int x, int y, int chessman)
 
 void Board::draw_select_frame(bool selected)
 {
-	if (selected_chessman == 0 || selected_x == -1 || selected_y == -1)
+	if (selected_chessman < 0 || selected_x == -1 || selected_y == -1)
 		return;
 
 	Gdk::Point p = get_coordinate(selected_x, selected_y);
@@ -416,7 +394,7 @@ void Board::draw_select_frame(bool selected)
 
 }
 
-void Board::draw_pieces(const int pieces[])
+void Board::draw_pieces()
 {
 #if 0
 	int i,j;
@@ -439,7 +417,6 @@ void Board::draw_board()
 			draw_chessman(i, j, m_engine.get_piece(i, j));
 		}
 	}
-	//draw_select_frame(true);
 }
 
 void Board::next_move()
@@ -450,7 +427,7 @@ void Board::back_move()
 void Board::gen_move(int dst_x,int dst_y)
 {
 	int dst = m_engine.get_dst_xy(dst_x,dst_y);
-	int src = m_engine.get_src_xy(selected_chessman);
+	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
 	printf("Board:: src = %x dst = %x mv = %d\n",src,dst,mv);
 	m_engine.do_move(mv);

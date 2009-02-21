@@ -49,7 +49,6 @@ class Board : public Gtk::DrawingArea {
 		 * @brief 画棋盘背景
 		 */
 		void draw_bg();
-		//void draw_chessman();
 		/**
 		 * @brief 画棋子
 		 * @param x x坐标
@@ -57,15 +56,17 @@ class Board : public Gtk::DrawingArea {
 		 * @param chess_type 棋子的类型
 		 */
 		void draw_chessman(int x, int y, int chess_type);
+		//void redraw_drawarea();
 		/**
 		 * @brief 根据棋盘数组画出对局
 		 */
 		void draw_board();
 		/**
 		 * @brief 根据棋子数组画出对局
-		 * @param pieces 棋子数组，由16->47,0表示被吃掉了
+		 * 棋子数组，由16->47,0表示被吃掉了
 		 */
-		void draw_pieces(const int pieces[]);
+		void draw_pieces();
+		/** 画选择棋子边框 */
 		void draw_select_frame(bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);

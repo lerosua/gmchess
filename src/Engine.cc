@@ -348,8 +348,15 @@ uint64_t Engine::iccs_to_hanzi(uint32_t iccs)
 
 }
 
-uint32_t Engine::hanzi_to_iccs(uint64_t hanzi)
+uint32_t Engine::hanzi_to_iccs(uint64_t f_hanzi)
 {
+
+	union Hanzi c_hanzi;
+
+
+	/** 前面已经把中文表示转化成符号表示，比如炮二平三, C2.3 */
+
+
 
 
 

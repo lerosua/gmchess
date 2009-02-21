@@ -99,7 +99,7 @@ const bool chessInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-union hanzi{
+union Hanzi{
 		char word[4];
 		uint32_t digit;
 	};
