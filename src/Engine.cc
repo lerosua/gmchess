@@ -20,9 +20,14 @@
 #include <string.h>
 Engine::Engine():count(0),now_player(0)
 {
-	memset(chessboard,0,256);
-	memset(chessmans,0,48);
+	int i,j;
+	for(i=0;i<16;i++)
+		for(j=0;j<16;j++)
+			chessboard[i*16+j] =0;
 
+	for(i=0;i<3;i++)
+		for(j=0;j<16;j++)
+			chessmans[i*16 + j]=0;
 }
 
 Engine::~Engine()
@@ -30,8 +35,19 @@ Engine::~Engine()
 
 void Engine::reset()
 {
-	memset(chessboard,0,256);
-	memset(chessmans,0,48);
+	//memset(chessboard,0,256);
+	//memset(chessmans,0,48);
+
+	int i,j;
+	for(i=0;i<16;i++)
+		for(j=0;j<16;j++)
+			chessboard[i*16+j] =0;
+
+	for(i=0;i<3;i++)
+		for(j=0;j<16;j++)
+			chessmans[i*16 + j]=0;
+
+
 	now_player = 0;
 	count=0;
 	fen_snapshots.clear();
@@ -105,12 +121,13 @@ void Engine::from_fens(const char *szFen) {
     } else if (*lpFen >= 'a' && *lpFen <= 'z') {
       if (j <= FILE_RIGHT) {
         k = fen_to_piece(*lpFen);
-        if (6<k < 14) {
+        if ((k>6)&&(k < 14)) {
           if (pcBlack[k-7] < 48) {
-            //if (this->ucsqchessmans[pcBlack[k]] == 0) {
+		  //printf("pcBlack[%d-7] = %d \n",k,pcBlack[k-7]);
+            if (chessmans[pcBlack[k-7]] == 0) {
               add_piece(get_coord(j, i), pcBlack[k-7]);
               pcBlack[k-7] ++;
-            //}
+            }
           }
         }
         j ++;
@@ -170,6 +187,16 @@ void Engine::init_snapshot(const char* fen)
 	from_fens(fen);
 	fen_snapshots.push_back(std::string(fen));
 	move_snapshots.push_back(0);
+
+
+
+	int i,j;
+	for(i=0;i<16;i++)
+	{
+		for(j=0;j<16;j++)
+			printf(" %2d ",chessboard[i*16+j]);
+		printf("\n");
+	}
 }
 
 void Engine::get_snapshot(int num)
@@ -246,17 +273,19 @@ int Engine::fen_to_piece(int nArg) {
 int Engine::do_move(int mv)
 {
 	int i,j;
+	/*
 	for(i=0;i<16;i++)
 	{
 		for(j=0;j<16;j++)
 			printf(" %2d ",chessboard[i*16+j]);
 		printf("\n");
 	}
+	*/
 
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
 	int eated = get_move_eat(mv);
-	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d",src,dst,mv,chessboard[src],chessboard[dst],eated);
+	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
 	if(eated != chessboard[dst])
 		return -1;
