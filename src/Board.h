@@ -38,6 +38,7 @@ class Board : public Gtk::DrawingArea {
 	protected:
 		void on_map();
 		bool on_expose_event(GdkEventExpose* ev);
+		bool on_configure_event(GdkEventConfigure* ev);
 		bool on_button_press_event(GdkEventButton* ev);
 
 		Gdk::Point get_coordinate(int pos_x, int pos_y);
@@ -90,11 +91,15 @@ class Board : public Gtk::DrawingArea {
 		void next_move();
 		/** 读谱状态下走上一步棋*/
 		void back_move();
+		void redraw();
+		void gen_move(int x,int y);
 	private:
 		Engine m_engine;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;
+		
+		Glib::RefPtr<Gdk::Pixmap> ui_pixmap;
 		/** 棋子图像 */
 		Glib::RefPtr<Gdk::Pixbuf> chessman_images[18];
 		Glib::RefPtr<Gdk::Image> selected_chessman_image;

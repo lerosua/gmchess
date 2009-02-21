@@ -186,6 +186,10 @@ int Engine::get_piece(int rx,int ry)
 	return chessboard[site];
 
 }
+int Engine::get_dst_xy(int rx, int ry)
+{
+	return get_coord(rx+3,ry+3);
+}
 
 
 /** 
@@ -241,10 +245,18 @@ int Engine::fen_to_piece(int nArg) {
  */
 int Engine::do_move(int mv)
 {
+	int i,j;
+	for(i=0;i<16;i++)
+	{
+		for(j=0;j<16;j++)
+			printf(" %2d ",chessboard[i*16+j]);
+		printf("\n");
+	}
+
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
 	int eated = get_move_eat(mv);
-	//int eated = chessboard[dst];
+	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d",src,dst,mv,chessboard[src],chessboard[dst]);
 
 	if(eated != chessboard[dst])
 		return -1;
@@ -270,6 +282,13 @@ int Engine::do_move(int mv)
 	to_fens(str_fen);
 	fen_snapshots.push_back(std::string(str_fen));
 
+		printf("\n ==after do move ==\n");
+	for(i=0;i<16;i++)
+	{
+		for(j=0;j<16;j++)
+			printf(" %2d ",chessboard[i*16+j]);
+		printf("\n");
+	}
 	
 	return 0;
 }

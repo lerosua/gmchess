@@ -105,11 +105,14 @@ class Engine {
 		 * @param p_dst 棋子的终点
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
-		int get_move(int p_src,int p_dst){ return p_src + (p_dst<<8)+ (chessmans[p_dst] <<24);}
+		int get_move(int p_src,int p_dst){ return  p_src + (p_dst<<8)+ (chessmans[p_dst] <<24);}
+		int get_dst_xy(int rx, int ry);
+		int get_src_xy(int f_chess){return chessmans[f_chess] ; }
+
 		/** 得到着法的起点 */
-		int get_move_src(int mv){ return mv & 255 ;}
+		int get_move_src(int mv){ return (int)mv & 255 ;}
 		/** 得到着法的终点 */
-		int get_move_dst(int mv){ return (mv >>8)&225 ; }
+		int get_move_dst(int mv){ return (int) (mv >>8)&255 ; }
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
 		uint32_t move_to_iccs(int mv);
 		/** 把ICCS坐标格式转成着法*/
