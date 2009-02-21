@@ -72,11 +72,11 @@ class Board : public Gtk::DrawingArea {
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	public:
 
+#if 0
 		/** 返回棋子的类型 */
 		inline int get_chessman_type(int pc) {
 			  return PieceTypes[pc];
 		}
-#if 0
 		/** 由x，y位置获得棋盘数组的位置*/
 		inline int COORD_XY(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/

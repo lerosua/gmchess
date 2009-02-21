@@ -35,9 +35,19 @@ class MainWindow:public Gtk::Window
 		~MainWindow();
 		void onNextMove();
 		void onBackMove();
+	protected:
+		void init_ui_manager();
+		void on_menu_open_file();
+		void on_menu_file_quit();
+		void on_menu_view_preferences();
+		void on_menu_help_about();
+		
 	private:
-		Board* board;
-		GlademmXML  ui_xml;
+		Board*				board;
+		GlademmXML			ui_xml;
+		Glib::RefPtr<Gtk::UIManager>	ui_manager;
+		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
+		Gtk::Widget*			menubar;
 };
 
 #endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */

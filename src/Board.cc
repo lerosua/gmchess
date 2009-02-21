@@ -352,9 +352,11 @@ void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-	if(chessman<16)
+	//if(chessman<16|| chessman>47)
+	//	return;
+	int chess_type = m_engine.get_chessman_type(chessman);	
+	if(chess_type<0)
 		return;
-	int chess_type = get_chessman_type(chessman);	
 
 	Gdk::Point p = get_coordinate(x, y);
 	int px = p.get_x() - 57 / 2;

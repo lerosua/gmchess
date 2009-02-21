@@ -82,7 +82,10 @@ class Engine {
 			  return chessman_bytes[pt];
 		}
 		/** 由棋子代号转成棋子的类型 */
-		inline int get_chessman_type(int pc) {
+		int get_chessman_type(int pc) {
+			if(pc<16||pc>47)
+				return -1;
+			else
 			  return PieceTypes[pc];
 		}
 		/** 测试位置sq是否在棋盘内 */
