@@ -118,6 +118,8 @@ void MainWindow:: on_menu_open_file()
 }
 void MainWindow:: on_menu_file_quit()
 {
+	printf("gmchess quit\n");
+	Gtk::Main::quit();
 
 }
 
