@@ -1,0 +1,15 @@
+[Game "Chinese Chess"]
+[Event "1st Chinese Computer Games Championship, Beijing 2006"]
+[Round "19"]
+[Date "2006.08.07"]
+[Site "北京中国科技馆"]
+[RedTeam ""]
+[Red "相眼竞技"]
+[BlackTeam ""]
+[Black "棋天大圣"]
+[Result "0-1"]
+[ECCO "C46"]
+[Opening "中炮过河车互进七兵对屏风马平炮兑车"]
+[Variation "红左边炮对黑退边炮上右士右直车"]
+  1. 炮二平五 马８进７
+  2. 马二进三 车９平８
