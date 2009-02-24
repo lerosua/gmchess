@@ -124,8 +124,8 @@ class Engine {
 		int iccs_to_move(uint32_t iccs);
 
 		/** ICCS坐标格式转成中文纵线表达方式 */
-		uint64_t iccs_to_hanzi(uint32_t iccs);
-		uint32_t hanzi_to_iccs(uint64_t hanzi);
+		uint32_t iccs_to_hanzi(uint32_t iccs);
+		uint32_t hanzi_to_iccs(uint32_t hanzi);
 		/** 执行着法 */
 		int do_move(int mv);
 		/** 

@@ -367,7 +367,7 @@ int Engine::iccs_to_move(uint32_t iccs)
 
 
 
-uint64_t Engine::iccs_to_hanzi(uint32_t iccs)
+uint32_t Engine::iccs_to_hanzi(uint32_t iccs)
 {
 	int pos;
 	uint16_t *arg;
@@ -377,7 +377,7 @@ uint64_t Engine::iccs_to_hanzi(uint32_t iccs)
 
 }
 
-uint32_t Engine::hanzi_to_iccs(uint64_t f_hanzi)
+uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 {
 
 	union Hanzi c_hanzi;
