@@ -36,6 +36,7 @@ Board::Board() :
 	selected_x(-1),
 	selected_y(-1),
 	ui_pixmap(NULL),
+	p_pgnfile(NULL),
 	selected_chessman(-1)
 {
 	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"bg.png");
@@ -59,9 +60,11 @@ Board::Board() :
 	chessman_images[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
+	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 	this->show_all();
+	p_pgnfile->read();
 }
 
 Board::~Board()

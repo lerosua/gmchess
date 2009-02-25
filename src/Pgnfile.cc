@@ -3,8 +3,10 @@
 #include <locale.h> 
 #include <fstream> 
 #include "gmchess.h" 
+#include "Pgnfile.h"
+#include "Engine.h"
 
-Pgnfile::Pgnfile():m_engine(f_engine)
+Pgnfile::Pgnfile(Engine& f_engine):m_engine(f_engine)
 {
 
 }
@@ -122,7 +124,7 @@ int Pgnfile::read(void)
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos)
 			continue;
-		size_t pos = line.find_first_of("===");
+		pos = line.find_first_of("===");
 		if(pos != std::string::npos)
 			continue;
 		 Glib::ustring uline(line);
@@ -166,10 +168,15 @@ int Pgnfile::read(void)
 			c_hanzi.word[3] =word_to_digit(word4);
 			//std::cout<<c_hanzi.word[0]<<c_hanzi.word[1]<<c_hanzi.word[2]<<c_hanzi.word[3]<<" == "<<c_hanzi.digit<<std::endl;
 
+			uint32_t iccs = m_engine.hanzi_to_iccs(c_hanzi.digit);
+			int move = m_engine.iccs_to_move(iccs);
+			m_engine.do_move(move);
+
+			/*
 			uint32_t iccs = m_engine->hanzi_to_iccs(c_hanzi);
 			int move = m_engine->iccs_to_move(iccs);
 			m_engine->do_move(move);
-
+			*/
 
 		}while(i<uline.length());
 		

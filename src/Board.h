@@ -25,6 +25,7 @@
 #include <gtkmm/drawingarea.h>
 #include "gmchess.h"
 #include "Engine.h"
+#include "Pgnfile.h"
 
 
 /**
@@ -72,22 +73,6 @@ class Board : public Gtk::DrawingArea {
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	public:
 
-#if 0
-		/** 返回棋子的类型 */
-		inline int get_chessman_type(int pc) {
-			  return PieceTypes[pc];
-		}
-		/** 由x，y位置获得棋盘数组的位置*/
-		inline int COORD_XY(int x,int y){ return x+(y<<4);};
-		/** 获取y坐标*/
-		inline int RANK_Y(int sq) {	  return (sq >> 4)-3;};
-
-		/**获取x坐标*/
-		inline int RANK_X(int sq) {
-			  return (sq & 15)-3;
-		}
-#endif
-
 		/** 读谱状态下走下一步棋*/
 		void next_move();
 		/** 读谱状态下走上一步棋*/
@@ -96,6 +81,7 @@ class Board : public Gtk::DrawingArea {
 		void gen_move(int x,int y);
 	private:
 		Engine m_engine;
+		Pgnfile* p_pgnfile;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;

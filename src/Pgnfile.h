@@ -26,7 +26,7 @@ class Engine;
 
 class Pgnfile {
 	public:
-		Pgnfile(Engine* f_engine);
+		Pgnfile(Engine& f_engine);
 		~Pgnfile();
 		char word_to_pos(const Glib::ustring& word);
 		char word_to_digit(const Glib::ustring& word);
@@ -35,7 +35,7 @@ class Pgnfile {
 		int read(void);
 	private:
 		std::vector<Glib::ustring> move_chinese;
-		Engine* m_engine;
+		Engine& m_engine;
 
 
 

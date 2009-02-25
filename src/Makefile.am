@@ -16,12 +16,14 @@ chess_SOURCES = \
 	main.cc	\
 	Board.cc \
 	Engine.cc \
+	Pgnfile.cc \
 	MainWindow.cc
 noinst_HEADERS = \
 		 Board.h \
 		 gmchess.h \
 		 Engine.h \
 		 define.h \
+		 Pgnfile.h \
 		 MainWindow.h
 
 chess_LDFLAGS = 

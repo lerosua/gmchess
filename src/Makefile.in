@@ -48,7 +48,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_chess_OBJECTS = main.$(OBJEXT) Board.$(OBJEXT) Engine.$(OBJEXT) \
-	MainWindow.$(OBJEXT)
+	MainWindow.$(OBJEXT) Pgnfile.$(OBJEXT)
 chess_OBJECTS = $(am_chess_OBJECTS)
 am__DEPENDENCIES_1 =
 chess_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -248,12 +248,14 @@ chess_SOURCES = \
 	main.cc	\
 	Board.cc \
 	Engine.cc \
+	Pgnfile.cc \
 	MainWindow.cc
 
 noinst_HEADERS = \
 		 Board.h \
 		 gmchess.h \
 		 Engine.h \
+		 Pgnfile.h \
 		 MainWindow.h
 
 chess_LDFLAGS = 
@@ -331,6 +333,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Board.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pgnfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Engine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MainWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
