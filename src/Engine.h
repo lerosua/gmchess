@@ -60,9 +60,14 @@ class Engine {
 		/**
 		 * @brief FEN串转成棋子标识数字，
 		 * @param nArg FEN串字母
-		 * @return 返回棋子标识
+		 * @return 返回棋子类型标识
 		 */
 		int fen_to_piece(int nArg);
+		/** 由棋盘数组的值获取iccs坐标，横为a-i,纵为9-0*/
+		char get_iccs_x(int nArg);
+		char get_iccs_y(int nArg);
+		/** 数字转换成iccs坐标的横坐标 */
+		char digit_to_alpha(int nArg);
 		/** 由x，y位置获得棋盘数组的位置*/
 		int get_coord(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
@@ -91,7 +96,7 @@ class Engine {
 		/** 测试位置sq是否在棋盘内 */
 		bool in_board(int sq) {return  chessInBoard[sq] ; }
 		/** 交换走棋方*/
-		void change_side(){ now_player = ~now_player;};
+		void change_side(){ black_player = ~black_player;};
 		/** 引擎重置 */
 		void reset();
 		/** @brief 返回x，y位置上的棋子 为真实棋盘的坐标，
@@ -164,7 +169,7 @@ class Engine {
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走
 		 */
-		bool now_player;
+		bool black_player;
 		/** 走棋计数*/
 		int count;
 

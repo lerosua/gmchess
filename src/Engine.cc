@@ -18,7 +18,7 @@
 
 #include "Engine.h"
 #include <string.h>
-Engine::Engine():count(0),now_player(0)
+Engine::Engine():count(0),black_player(0)
 {
 	int i,j;
 	for(i=0;i<16;i++)
@@ -48,7 +48,7 @@ void Engine::reset()
 			chessmans[i*16 + j]=0;
 
 
-	now_player = 0;
+	black_player = 0;
 	count=0;
 	fen_snapshots.clear();
 	move_snapshots.clear();
@@ -62,24 +62,24 @@ void Engine::add_piece(int sq,int pc)
 
 void Engine::from_fens(const char *szFen) {
   int i, j, k;
-  int pcWhite[7];
+  int pcRed[7];
   int pcBlack[7];
   const char *lpFen;
   // FEN串的识别包括以下几个步骤：
   // 1. 初始化，清空棋盘
-  pcWhite[0] = SIDE_TAG(0) + KING_FROM;
-  pcWhite[1] = SIDE_TAG(0) + ADVISOR_FROM;
-  pcWhite[2] = SIDE_TAG(0) + BISHOP_FROM;
-  pcWhite[3] = SIDE_TAG(0) + KNIGHT_FROM;
-  pcWhite[4] = SIDE_TAG(0) + ROOK_FROM;
-  pcWhite[5] = SIDE_TAG(0) + CANNON_FROM;
-  pcWhite[6] = SIDE_TAG(0) + PAWN_FROM;
+  pcRed[0] = SIDE_TAG(0) + KING_FROM;
+  pcRed[1] = SIDE_TAG(0) + ADVISOR_FROM;
+  pcRed[2] = SIDE_TAG(0) + BISHOP_FROM;
+  pcRed[3] = SIDE_TAG(0) + KNIGHT_FROM;
+  pcRed[4] = SIDE_TAG(0) + ROOK_FROM;
+  pcRed[5] = SIDE_TAG(0) + CANNON_FROM;
+  pcRed[6] = SIDE_TAG(0) + PAWN_FROM;
   for (i = 0; i < 7; i ++) {
-    pcBlack[i] = pcWhite[i] + 16;
+    pcBlack[i] = pcRed[i] + 16;
   }
-  /* 数组"pcWhite[7]"和"pcBlack[7]"分别代表红方和黑方每个兵种即将占有的序号，
-   * 以"pcWhite[7]"为例，由于棋子16到31依次代表“帅仕仕相相马马车车炮炮兵兵兵兵兵”，
-   * 所以最初应该是"pcWhite[7] = {16, 17, 19, 21, 23, 25, 27}"，每添加一个棋子，该项就增加1，
+  /* 数组"pcRed[7]"和"pcBlack[7]"分别代表红方和黑方每个兵种即将占有的序号，
+   * 以"pcRed[7]"为例，由于棋子16到31依次代表“帅仕仕相相马马车车炮炮兵兵兵兵兵”，
+   * 所以最初应该是"pcRed[7] = {16, 17, 19, 21, 23, 25, 27}"，每添加一个棋子，该项就增加1，
    * 这种做法允许添加多余的棋子(例如添加第二个帅，就变成仕了)，但添加前要做边界检测
    */
 //  ClearBoard();
@@ -109,10 +109,10 @@ void Engine::from_fens(const char *szFen) {
       if (j <= FILE_RIGHT) {
         k = fen_to_piece(*lpFen);
         if (k < 7) {
-          if (pcWhite[k] < 32) {
-            //if (this->ucsqchessmans[pcWhite[k]] == 0) {
-              add_piece(get_coord(j, i), pcWhite[k]);
-              pcWhite[k] ++;
+          if (pcRed[k] < 32) {
+            //if (this->ucsqchessmans[pcRed[k]] == 0) {
+              add_piece(get_coord(j, i), pcRed[k]);
+              pcRed[k] ++;
             //}
           }
         }
@@ -141,7 +141,8 @@ void Engine::from_fens(const char *szFen) {
   }
   lpFen ++;
   // 3. 确定轮到哪方走
-  if (this->now_player == (*lpFen == 'b' ? 0 : 1)) {
+  //if (this->black_player == (*lpFen == 'b' ? 0 : 1)) {
+  if (this->black_player == (*lpFen == 'b' ? 1 : 0)) {
     change_side();
   }
 //  // 4. 把局面设成“不可逆”
@@ -177,7 +178,7 @@ void Engine::to_fens(char *szFen)  {
     lpFen ++;
   }
   *(lpFen - 1) = ' '; // 把最后一个'/'替换成' '
-  *lpFen = (this->now_player == 0 ? 'w' : 'b');
+  *lpFen = (this->black_player == 0 ? 'w' : 'b');
   lpFen ++;
   *lpFen = '\0';
 }
@@ -218,10 +219,69 @@ int Engine::get_dst_xy(int rx, int ry)
 	return get_coord(rx+3,ry+3);
 }
 
+char Engine::get_iccs_y(int nArg)
+{
+	int tmp = (nArg&240)>>4;
+	switch(tmp){
+	case 3:
+		return '9';
+	case 4:
+		return '8';
+	case 5:
+		return '7';
+	case 6:
+		return '6';
+	case 7:
+		return '5';
+	case 8:
+		return '4';
+	case 9:
+		return '3';
+	case 10:
+		return '2';
+	case 11:
+		return '1';
+	case 12:
+		return '0';
+	default:
+		return -1;
+		};
+}
+char Engine::get_iccs_x(int nArg)
+{
+	return (nArg&15+94);
+}
+
+char Engine::digit_to_alpha(int nArg)
+{
+	switch(nArg){
+		case '1':
+			return 'i';
+		case '2':
+			return 'h';
+		case '3':
+			return 'g';
+		case '4':
+			return 'f';
+		case '5':
+			return 'e';
+		case '6':
+			return 'd';
+		case '7':
+			return 'c';
+		case '8':
+			return 'b';
+		case '9':
+			return 'a';
+		default:
+			return -1;
+	}
+}
 
 /** 
- * FEN串中棋子标识  */
-int Engine::fen_to_piece(int nArg) {
+ * FEN串中棋子类型标识  */
+int Engine::fen_to_piece(int nArg) 
+{
   switch (nArg) {
   case 'K':
     return 0;
@@ -371,6 +431,8 @@ uint32_t Engine::iccs_to_hanzi(uint32_t iccs)
 {
 	int pos;
 	uint16_t *arg;
+	char *p;
+	p=(char*) &iccs;
 
 
 
@@ -379,16 +441,481 @@ uint32_t Engine::iccs_to_hanzi(uint32_t iccs)
 
 uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 {
+	/** hazi中文纵线表示方式中，hanzi的四个字符依次是: 炮二平五(C2.5) */
 
 	union Hanzi c_hanzi;
+	union Hanzi c_iccs;
+
+	c_hanzi.digit = f_hanzi;
+	/** cman_type 是棋子类型*/
+	int cman_type = fen_to_piece(c_hanzi.word[0]);
+	int src_x,src_y,dst_x,dst_y;
+	int num;
+
+	if(black_player)
+		num = 16;
+	else
+		num= 0;
+
+	if(0 == cman_type ){
+		/** 处理帅将的源地址*/
+		src_x = get_iccs_x(chessmans[16+num]);  
+		src_y = get_iccs_y(chessmans[16+num]);  
+		c_iccs.word[0] = src_x;
+		c_iccs.word[1] = src_y;
+	}
+	else if(1 == cman_type){
+		/** 处理士的源及目标地址*/
+		/** 士与相没有前后之分,能进则是后面那个，能退则是前面那个*/
+		src_x = digit_to_alpha(c_hanzi.word[1]);
+		c_iccs.word[0] = src_x;
+
+		dst_x = digit_to_alpha(c_hanzi.word[3]);
+		int a1_x = get_iccs_x(chessmans[17+num]);
+		int a2_x = get_iccs_x(chessmans[18+num]);
+		if(a1_x == a2_x){
+			/** 士在同一纵线上*/
+			int a1_y = get_iccs_y(chessmans[17+num]);
+			int a2_y = get_iccs_y(chessmans[18+num]);
+			
+			if(c_hanzi.word[2] == '+'){
+				src_y = a1_y<a2_y?a1_y:a2_y;
+				dst_y = src_y+1;
+
+			}
+			else if(c_hanzi.word[2] == '-'){
+				src_y = a1_y>a2_y?a1_y:a2_y;
+				dst_y = src_y-1;
+			}
+
+			c_iccs.word[1] =src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+
+		}
+		else{
+			if(a1_x == src_x){
+				src_y = get_iccs_y(chessmans[17+num]);
+			}
+			else if(a2_x == src_x){
+				src_y = get_iccs_y(chessmans[18+num]);
+			}
+			else{
+				DLOG("士的匹配位置出现问题\n");
+				goto error_out;
+			}
+
+			if(c_hanzi.word[2] == '+'){
+				dst_y = src_y+1;
+			}
+			else if(c_hanzi.word[2] == '-'){
+				dst_y = src_y-1;
+			}
+			c_iccs.word[1]=src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+
+		}
+			
+		return c_iccs.digit;
+	}
+	else if(2 == cman_type){
+		/** 相/象的处理*/
+		src_x = digit_to_alpha(c_hanzi.word[1]);
+		c_iccs.word[0] = src_x;
+
+		dst_x = digit_to_alpha(c_hanzi.word[3]);
+		int a1_x = get_iccs_x(chessmans[19+num]);
+		int a2_x = get_iccs_x(chessmans[20+num]);
+		if(a1_x == a2_x){
+			/** 象在同一纵线上*/
+			int a1_y = get_iccs_y(chessmans[19+num]);
+			int a2_y = get_iccs_y(chessmans[20+num]);
+			
+			if(c_hanzi.word[2] == '+'){
+				src_y = a1_y<a2_y?a1_y:a2_y;
+				dst_y = src_y+2;
+
+			}
+			else if(c_hanzi.word[2] == '-'){
+				src_y = a1_y>a2_y?a1_y:a2_y;
+				dst_y = src_y-2;
+			}
+
+			c_iccs.word[1] =src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+
+		}
+		else{
+			if(a1_x == src_x){
+				src_y = get_iccs_y(chessmans[19+num]);
+			}
+			else if(a2_x == src_x){
+				src_y = get_iccs_y(chessmans[20+num]);
+			}
+			else{
+				DLOG("象的匹配位置出现问题\n");
+				goto error_out;
+			}
+
+			if(c_hanzi.word[2] == '+'){
+				dst_y = src_y+2;
+			}
+			else if(c_hanzi.word[2] == '-'){
+				dst_y = src_y-2;
+			}
+			c_iccs.word[1]=src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+
+		}
 
 
-	/** 前面已经把中文表示转化成符号表示，比如炮二平三, C2.3 */
+		return c_iccs.digit;
+	}
+	else if(3 == cman_type){
+		/** 马的处理*/
+		src_x = digit_to_alpha(c_hanzi.word[1]);
+		//c_iccs.word[0] = src_x;
+
+		dst_x = digit_to_alpha(c_hanzi.word[3]);
+
+		int a1_x = get_iccs_x(chessmans[19+num]);
+		int a2_x = get_iccs_x(chessmans[20+num]);
+		if(src_x<0){
+			/** 同一纵线上有两匹马 */
+			int a1_y = get_iccs_y(chessmans[21+num]);
+			int a2_y = get_iccs_y(chessmans[22+num]);
+			if(c_hanzi.word[1] == 'a')
+				src_y = a1_y>a2_y?a1_y:a2_y;
+			else
+				src_y = a1_y<a2_y?a1_y:a2_y;
+			if(c_hanzi.word[2] == '+'){
+				if(abs(dst_x-src_x)== 1)
+					dst_y = src_y +2;
+				else
+					dst_y = src_y +1;
+			}
+
+			c_iccs.word[0] = a1_x;
+			c_iccs.word[1] =src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+		}
+		else{
+			if(a1_x == src_x){
+				src_y = get_iccs_y(chessmans[21+num]);
+			}
+			else if(a2_x == src_x){
+				src_y = get_iccs_y(chessmans[22+num]);
+			}
+			else{
+				DLOG("马的匹配位置出现问题\n");
+				goto error_out;
+			}
+
+			if(c_hanzi.word[2] == '+'){
+				if(abs(dst_x-src_x)== 1)
+					dst_y = src_y +2;
+				else
+					dst_y = src_y +1;
+			}
+			else if(c_hanzi.word[2] == '-'){
+				if(abs(dst_x-src_x)== 1)
+					dst_y = src_y -2;
+				else
+					dst_y = src_y -1;
+			}
+			c_iccs.word[0]=src_x;
+			c_iccs.word[1]=src_y;
+			c_iccs.word[2] =dst_x;
+			c_iccs.word[3] =dst_y;
+
+
+		}
+
+		return c_iccs.digit;
+	}
+	else if(4==cman_type||5==cman_type){
+		/** 车跑的目标坐标生成*/
+
+		src_x = digit_to_alpha(c_hanzi.word[1]);
+
+		int a1_x = get_iccs_x(chessmans[19+num]);
+		int a2_x = get_iccs_x(chessmans[20+num]);
+		if(src_x<0){
+			/** 同一纵线上有两个车或跑 */
+			int a1_y = get_iccs_y(chessmans[21+num]);
+			int a2_y = get_iccs_y(chessmans[22+num]);
+			if(c_hanzi.word[1] == 'a'){
+				src_y = a1_y>a2_y?a1_y:a2_y;
+			}
+			else{
+				src_y = a1_y>a2_y?a1_y:a2_y;
+			}
+			src_x= a1_x;
+		}
+		else {
+			int type_num;
+			if(cman_type==4)
+				type_num = 23;
+			else if(5==cman_type)
+				type_num=25;
+
+			if(a1_x == src_x){
+				src_y = get_iccs_y(chessmans[type_num+num]);
+			}
+			else if(a2_x == src_x){
+				src_y = get_iccs_y(chessmans[type_num+1+num]);
+			}
+			else{
+				DLOG("车炮的匹配位置出现问题\n");
+				goto error_out;
+			}
+		}
+
+		if(c_hanzi.word[2] == '+'){
+			char c= c_hanzi.word[3];
+			dst_x = src_x;
+			dst_y = src_y + atoi(&c);
+		}
+		else if(c_hanzi.word[2] == '-'){
+			char c= c_hanzi.word[3];
+			dst_x = src_x;
+			dst_y = src_y - atoi(&c);
+		}
+		else if(c_hanzi.word[2] == '.'){
+			dst_x = digit_to_alpha(c_hanzi.word[3]);
+			dst_y = src_y;
+
+		}
+		c_iccs.word[0]=src_x;
+		c_iccs.word[1]=src_y;
+		c_iccs.word[2] =dst_x;
+		c_iccs.word[3] =dst_y;
+
+		return c_iccs.digit;
+	}
+	else if(6==cman_type){
+
+		src_x = digit_to_alpha(c_hanzi.word[1]);
+
+		int a1_x = get_iccs_x(chessmans[19+num]);
+		int a2_x = get_iccs_x(chessmans[20+num]);
+		if(src_x<0){
+
+
+		}
+		else{
+
+
+		}
+
+		if(c_hanzi.word[2] == '+'){
+			char c= c_hanzi.word[3];
+			dst_x = src_x;
+			dst_y = src_y + atoi(&c);
+		}
+		else if(c_hanzi.word[2] == '-'){
+			char c= c_hanzi.word[3];
+			dst_x = src_x;
+			dst_y = src_y - atoi(&c);
+		}
+		else if(c_hanzi.word[2] == '.'){
+			dst_x = digit_to_alpha(c_hanzi.word[3]);
+			dst_y = src_y;
+
+		}
 
 
 
 
+		c_iccs.word[0]=src_x;
+		c_iccs.word[1]=src_y;
+		c_iccs.word[2] =dst_x;
+		c_iccs.word[3] =dst_y;
+
+		return c_iccs.digit;
+	}
+error_out:
+	printf(" %s error\n",__FUNCTION__);
+	return 0;
+}
+
+#if 0
+uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
+{
+
+	union Hanzi c_hanzi;
+	union Hanzi c_iccs;
+
+	c_hanzi.digit = f_hanzi;
+	/** cman 是棋子类型*/
+	int cman = fen_to_piece(c_hanzi.word[0]);
+	int pos_t;
+	if(c_hanzi.word[1]>96){
+	/** 这里处理前中后的棋子关系,比如前兵进一中的“前兵” */
+
+		pos_t = c_hanzi.word[1];
+	}
+	else if(cman ==1||cman==2)
+	{
+		/** 士相的前后位置也要另外处理*/
+		/** 仕(士)和相(象)如果在同一纵线上，不用“前”和“后”区别，
+		  * 因为能退的一定在前，能进的一定在后*/
+
+
+	}
+	else{
+		/**处理一般的棋子位置，比如炮二平五，中的"炮二"*/
+		pos_t = get_iccs_x(c_hanzi.word[1]);
+		c_iccs.word[0]=pos_t;
+
+		/** 跟着确定棋子的纵坐标*/
+		/** 一般棋子都有两个以上，要逐个查找在此横坐标上的棋子,
+		 * 还好有棋子数组，它里面保存着棋子在棋盘上的坐标,现在
+		 * 问题就是从棋子类型和一个横坐标得到它的纵坐标   */
+
+		
+		/* 以下是方便从棋子类型取棋子代号*/
+		  int i, j, k;
+		  int pcRed[7];
+		  int pcBlack[7];
+		  pcRed[0] = SIDE_TAG(0) + KING_FROM;
+		  pcRed[1] = SIDE_TAG(0) + ADVISOR_FROM;
+		  pcRed[2] = SIDE_TAG(0) + BISHOP_FROM;
+		  pcRed[3] = SIDE_TAG(0) + KNIGHT_FROM;
+		  pcRed[4] = SIDE_TAG(0) + ROOK_FROM;
+		  pcRed[5] = SIDE_TAG(0) + CANNON_FROM;
+		  pcRed[6] = SIDE_TAG(0) + PAWN_FROM;
+		  for (i = 0; i < 7; i ++) {
+			    pcBlack[i] = pcRed[i] + 16;
+		  }
+
+		  int man_start;
+		if(black_player){
+			/** 黑方处理*/
+			man_start = pcBlack[cman];
+			}
+		else{
+			/** 红方处理*/
+			man_start= pcRed[cman];
+		}	
+			while(man_start<48){
+				int tmp = chessmans[man_start];
+				if(cman<7){
+					if(man_start>tmp);
+						goto error_out;
+				}
+						
+
+				if( ((tmp&15)+94) == pos_t){
+					/**终于匹配了*/
+					int tmp_y=((tmp&240)>>4);
+					int result_y;
+					switch(tmp_y){
+						case 3:
+							return '9';
+							break;
+						case 4:
+							return '8';
+							break;
+						case 5:
+							return '7';
+							break;
+						case 6:
+							return '6';
+							break;
+						case 7:
+							return '5';
+							break;
+						case 8:
+							return '4';
+							break;
+						case 9:
+							return '3';
+							break;
+						case 10:
+							return '2';
+							break;
+						case 11:
+							return '1';
+							break;
+						case 12:
+							return '0';
+							break;
+						default:
+							return -1;
+							break;
+					};
+					if(result_y<0){
+						/**错误处理*/
+						return -1;
+					}
+					c_iccs.word[1]=result_y;
+
+					}
+					man_start++;
+
+			}
+			
+
+	}
+
+	/** 生成车，跑，兵，帅，的直线走法的目标*/
+	if(cman == 0 || cman == 4||cman == 5||cman == 6){
+
+	if(c_hanzi.word[2] == '.'){
+		c_iccs.word[3] = c_iccs.word[1];
+		c_iccs.word[2] = get_iccs_x(c_hanzi.word[3]);
+		
+	}
+	else if(c_hanzi.word[2] == '+'){
+		c_iccs.word[2]=c_iccs.word[0];
+		char c = get_iccs_x(c_hanzi.word[3]);
+		int num = atoi(&c);
+		c_iccs.word[3]= c_iccs.word[1] +num;
+
+	}
+	else if(c_hanzi.word[2] == '-'){
+		c_iccs.word[2]=c_iccs.word[0];
+		char c = get_iccs_x(c_hanzi.word[3]);
+		int num = atoi(&c);
+		c_iccs.word[3]= c_iccs.word[1] -num;
+
+	}
+		else{
+			goto error_out;
+		}
+	}
+	else if(cman ==1){
+		/** 士的走法目标*/
+
+	}
+	else if(cman == 2){
+		/** 相的走法目标*/
+
+	}
+	else if(cman == 3){
+		/** 马的走法目标*/
+
+
+	}
+
+
+
+	/** 前面已经把中文表示转化成符号表示，比如炮二平五, C2.5 */
+
+	return c_iccs.digit;
+
+
+error_out:
+	printf(" %s error\n",__FUNCTION__);
+	return 0;
 
 
 
 }
+
+#endif
