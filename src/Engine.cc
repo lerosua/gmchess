@@ -18,6 +18,7 @@
 
 #include "Engine.h"
 #include <string.h>
+#include <stdlib.h>
 Engine::Engine():count(0),black_player(0)
 {
 	int i,j;
@@ -35,9 +36,6 @@ Engine::~Engine()
 
 void Engine::reset()
 {
-	//memset(chessboard,0,256);
-	//memset(chessmans,0,48);
-
 	int i,j;
 	for(i=0;i<16;i++)
 		for(j=0;j<16;j++)
@@ -701,14 +699,41 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 		src_x = digit_to_alpha(c_hanzi.word[1]);
 
-		int a1_x = get_iccs_x(chessmans[19+num]);
-		int a2_x = get_iccs_x(chessmans[20+num]);
+		int a1_x = get_iccs_x(chessmans[27+num]);
+		int a2_x = get_iccs_x(chessmans[28+num]);
+		int a3_x = get_iccs_x(chessmans[29+num]);
+		int a4_x = get_iccs_x(chessmans[30+num]);
+		int a5_x = get_iccs_x(chessmans[31+num]);
 		if(src_x<0){
+			/** 处理纵线上多兵的问题，未解决*/
+			if(c_hanzi.word[1] == 'a'){
+
+
+			}
+			else if(c_hanzi.word[1] == 'b'){
+
+
+			}
+			else if(c_hanzi.word[1] == 'c'){
+			}
+			else if(c_hanzi.word[1] == 'd'){
+			}
+			else if(c_hanzi.word[1] == 'e'){
+			}
 
 
 		}
 		else{
-
+			if(a1_x == src_x)
+				src_y = get_iccs_y(chessmans[27+num]);
+			else if(a2_x == src_x)
+				src_y = get_iccs_y(chessmans[28+num]);
+			else if(a3_x == src_x)
+				src_y = get_iccs_y(chessmans[29+num]);
+			else if(a4_x == src_x)
+				src_y = get_iccs_y(chessmans[30+num]);
+			else if(a5_x == src_x)
+				src_y = get_iccs_y(chessmans[31+num]);
 
 		}
 
@@ -727,8 +752,6 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			dst_y = src_y;
 
 		}
-
-
 
 
 		c_iccs.word[0]=src_x;

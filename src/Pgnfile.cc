@@ -131,8 +131,6 @@ int Pgnfile::read(void)
 		move_chinese.push_back(uline);
 
 		int i=0;
-		/** 标志是否红方走子*/
-		bool red =true;
 		
 		do{
 			Glib::ustring word;
@@ -172,8 +170,6 @@ int Pgnfile::read(void)
 			int move = m_engine->iccs_to_move(iccs);
 			m_engine->do_move(move);
 
-
-			red = ~red;
 
 		}while(i<uline.length());
 		
