@@ -141,16 +141,16 @@ int Pgnfile::read(void)
 			int c = word_to_code(word);
 			if(c == -1)
 				continue;
-			//std::cout << word<<" ";
 			Glib::ustring word2;
 			Glib::ustring word3;
 			Glib::ustring word4;
 			word2.assign(1,uline[i++]);
 			word3.assign(1,uline[i++]);
 			word4.assign(1,uline[i++]);
-			//std::cout << word2<<" ";
-			//std::cout << word3<<" ";
-			//std::cout << word4<<" ";
+			std::cout << word<<" ";
+			std::cout << word2<<" ";
+			std::cout << word3<<" ";
+			std::cout << word4<<" ";
 
 
 			union Hanzi c_hanzi;
@@ -166,17 +166,12 @@ int Pgnfile::read(void)
 			}
 			c_hanzi.word[2] =word_to_action(word3);
 			c_hanzi.word[3] =word_to_digit(word4);
-			//std::cout<<c_hanzi.word[0]<<c_hanzi.word[1]<<c_hanzi.word[2]<<c_hanzi.word[3]<<" == "<<c_hanzi.digit<<std::endl;
+			std::cout<<c_hanzi.word[0]<<c_hanzi.word[1]<<c_hanzi.word[2]<<c_hanzi.word[3]<<" == "<<c_hanzi.digit<<std::endl;
 
 			uint32_t iccs = m_engine.hanzi_to_iccs(c_hanzi.digit);
 			int move = m_engine.iccs_to_move(iccs);
 			m_engine.do_move(move);
 
-			/*
-			uint32_t iccs = m_engine->hanzi_to_iccs(c_hanzi);
-			int move = m_engine->iccs_to_move(iccs);
-			m_engine->do_move(move);
-			*/
 
 		}while(i<uline.length());
 		

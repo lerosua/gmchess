@@ -73,10 +73,15 @@ class Board : public Gtk::DrawingArea {
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 	public:
 
+		/** 回到最初局面*/
+		void start_move();
+		/** 去到最后的局面*/
+		void end_move();
 		/** 读谱状态下走下一步棋*/
 		void next_move();
 		/** 读谱状态下走上一步棋*/
 		void back_move();
+		/** 重画棋盘界面*/
 		void redraw();
 		void gen_move(int x,int y);
 	private:

@@ -33,8 +33,10 @@ class MainWindow:public Gtk::Window
 	public:
 		MainWindow();
 		~MainWindow();
-		void onNextMove();
-		void onBackMove();
+		void on_start_move();
+		void on_end_move();
+		void on_next_move();
+		void on_back_move();
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();
@@ -48,6 +50,10 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::UIManager>	ui_manager;
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
+		//Gtk::Button*			button_start;
+		//Gtk::Button*			button_end;
+		//Gtk::Button*			button_prev;
+		//Gtk::Button*			button_next;
 };
 
 #endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */

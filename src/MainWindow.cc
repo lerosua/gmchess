@@ -17,6 +17,7 @@
  */
 #include "MainWindow.h"
 #include <glib/gi18n.h>
+#include <gtkmm/button.h>
 
 Glib::ustring ui_info =
 "<ui>"
@@ -48,11 +49,24 @@ MainWindow::MainWindow():menubar(NULL)
 
 	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
 
+	Gtk::Button* btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
+	Gtk::Button* btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
+	Gtk::Button* btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
+	Gtk::Button* btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
+
+	btn_start->signal_clicked().connect(
+			sigc::mem_fun(*this,&MainWindow::on_start_move));
+	btn_end->signal_clicked().connect(
+			sigc::mem_fun(*this,&MainWindow::on_end_move));
+	btn_prev->signal_clicked().connect(
+			sigc::mem_fun(*this,&MainWindow::on_back_move));
+	btn_next->signal_clicked().connect(
+			sigc::mem_fun(*this,&MainWindow::on_next_move));
+
 	board= Gtk::manage(new Board());
 	box_board->add(*board);
 
 	this->add(*main_window);
-
 
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
@@ -69,8 +83,23 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::onNextMove(){}
-void MainWindow::onBackMove(){}
+void MainWindow::on_next_move()
+{
+	board->next_move();
+
+}
+void MainWindow::on_back_move()
+{
+	board->back_move();
+}
+void MainWindow::on_start_move()
+{
+	board->start_move();
+}
+void MainWindow::on_end_move()
+{
+	board->end_move();
+}
 
 
 

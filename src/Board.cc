@@ -424,6 +424,16 @@ void Board::draw_board()
 	}
 }
 
+void Board::start_move()
+{
+	m_engine.get_snapshot(0);
+	redraw();
+}
+
+void Board::end_move()
+{
+
+}
 void Board::next_move()
 {}
 void Board::back_move()
