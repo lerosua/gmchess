@@ -21,6 +21,8 @@
 #include <stdlib.h>
 Engine::Engine():count(0),black_player(0)
 {
+	clean_board();
+	/*
 	int i,j;
 	for(i=0;i<16;i++)
 		for(j=0;j<16;j++)
@@ -29,12 +31,13 @@ Engine::Engine():count(0),black_player(0)
 	for(i=0;i<3;i++)
 		for(j=0;j<16;j++)
 			chessmans[i*16 + j]=0;
+			*/
 }
 
 Engine::~Engine()
 {}
 
-void Engine::reset()
+void Engine::clean_board()
 {
 	int i,j;
 	for(i=0;i<16;i++)
@@ -45,6 +48,11 @@ void Engine::reset()
 		for(j=0;j<16;j++)
 			chessmans[i*16 + j]=0;
 
+}
+void Engine::reset()
+{
+	
+	clean_board();
 
 	black_player = 0;
 	count=0;
@@ -186,8 +194,6 @@ void Engine::init_snapshot(const char* fen)
 	fen_snapshots.push_back(std::string(fen));
 	move_snapshots.push_back(0);
 
-
-
 	int i,j;
 	for(i=0;i<16;i++)
 	{
@@ -200,6 +206,8 @@ void Engine::init_snapshot(const char* fen)
 void Engine::get_snapshot(int num)
 {
 	std::string fens = fen_snapshots[num];
+	DLOG("get_snapshot = %s\n",fens.c_str());
+	clean_board();
 	from_fens(fens.c_str());
 	count = num;
 

@@ -85,6 +85,9 @@ class Board : public Gtk::DrawingArea {
 		void redraw();
 		void gen_move(int x,int y);
 	private:
+		/** 加载所需要图片进内存*/
+		void load_images();
+	private:
 		Engine m_engine;
 		Pgnfile* p_pgnfile;
 
@@ -94,10 +97,13 @@ class Board : public Gtk::DrawingArea {
 		Glib::RefPtr<Gdk::Pixmap> ui_pixmap;
 		/** 棋子图像 */
 		Glib::RefPtr<Gdk::Pixbuf> chessman_images[18];
+		/** 选中图像*/
 		Glib::RefPtr<Gdk::Image> selected_chessman_image;
 		int selected_x;
 		int selected_y;
 		int selected_chessman;
+		/** 步时 */
+		int m_step;
 };
 
 #endif // _BOARD_H_

@@ -35,9 +35,32 @@ const int chessman_width = 57;
 Board::Board() :
 	selected_x(-1),
 	selected_y(-1),
+	m_step(0),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
 	selected_chessman(-1)
+{
+	this->set_size_request(521,577);
+	/** 加载所需要图片进内存*/
+	load_images();
+	
+	p_pgnfile=new Pgnfile(m_engine);
+	m_engine.init_snapshot(start_fen);
+	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
+	this->show_all();
+
+
+
+	/** for test pgnfile */
+	p_pgnfile->read();
+	m_step = m_engine.how_step();
+}
+
+Board::~Board()
+{
+}
+
+void Board::load_images()
 {
 	bg_image = Gdk::Pixbuf::create_from_file(DATA_DIR"bg.png");
 	this->set_size_request(521,577);
@@ -60,17 +83,9 @@ Board::Board() :
 	chessman_images[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
-	p_pgnfile=new Pgnfile(m_engine);
-	m_engine.init_snapshot(start_fen);
-	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
-	this->show_all();
-	p_pgnfile->read();
-}
 
-Board::~Board()
-{
-}
 
+}
 void Board::get_grid_size(int& width, int& height)
 {
 	width = (get_width() - border_width * 2) / 8;
@@ -426,18 +441,37 @@ void Board::draw_board()
 
 void Board::start_move()
 {
-	m_engine.get_snapshot(0);
+	m_step = 0;
+	m_engine.get_snapshot(m_step);
 	redraw();
 }
 
 void Board::end_move()
 {
-
+	m_step = m_engine.how_step();
+	m_engine.get_snapshot(m_step);
+	redraw();
 }
 void Board::next_move()
-{}
+{
+	m_step++;
+	int all_step = m_engine.how_step();
+	if(m_step> all_step)
+		m_step = all_step;
+	DLOG("all_step = %d\n",all_step);
+	m_engine.get_snapshot(m_step);
+	redraw();
+}
 void Board::back_move()
-{}
+{
+	
+	m_step--;
+	if(m_step<0)
+		m_step =0;
+	m_engine.get_snapshot(m_step);
+	redraw();
+
+}
 
 void Board::gen_move(int dst_x,int dst_y)
 {

@@ -146,6 +146,10 @@ class Engine {
 		int get_move_eat(int mv){ return (mv >>24)&255;  }
 		/** 给着法加入被吃子信息*/
 		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;}
+		/** 清理棋盘及棋子数组*/
+		void clean_board();
+		/** 返回棋局走了多少步*/
+		int how_step(){ return fen_snapshots.size()-1;}
 
 	private:
 		/**
