@@ -96,7 +96,7 @@ class Engine {
 		/** 测试位置sq是否在棋盘内 */
 		bool in_board(int sq) {return  chessInBoard[sq] ; }
 		/** 交换走棋方*/
-		void change_side(){ black_player = ~black_player;};
+		void change_side(){black_player = 1-black_player;};
 		/** 引擎重置 */
 		void reset();
 		/** @brief 返回x，y位置上的棋子 为真实棋盘的坐标，
