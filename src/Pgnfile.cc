@@ -81,11 +81,11 @@ char Pgnfile::word_to_code(const Glib::ustring& word)
 {
 	if(false){
 	}
-	else if(word == "帅")
+	else if(word == "帅"|| word == "将")
 		return 'K'; 
 	else if(word == "仕" || word == "士")
 		return 'A';
-	else if(word == "相  || word == ""象")
+	else if(word == "相"  || word == "象")
 		return 'B';
 	else if(word == "马")
 		return 'N';
