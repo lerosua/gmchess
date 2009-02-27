@@ -49,10 +49,10 @@ MainWindow::MainWindow():menubar(NULL)
 
 	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
 
-	Gtk::Button* btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
-	Gtk::Button* btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
-	Gtk::Button* btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
-	Gtk::Button* btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
+	 btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
+	 btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
+	 btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
+	 btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
 
 	btn_start->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_start_move));
@@ -67,18 +67,27 @@ MainWindow::MainWindow():menubar(NULL)
 	box_board->add(*board);
 
 	this->add(*main_window);
+	this->set_title("GMChess");
 
+	/** 设置菜单*/
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
-
 	Gtk::VBox* menu_tool_box = dynamic_cast<Gtk::VBox*>
 		(ui_xml->get_widget("box_menu_toolbar"));
 	menu_tool_box->pack_start(*menubar,true,true);
-	this->set_title("GMChess");
 
+	/** 设置Treeview区*/
+	Gtk::ScrolledWindow* scrolwin=dynamic_cast<Gtk::ScrolledWindow*>
+		(ui_xml->get_widget("scrolledwindow"));
+	m_refTreeModel = Gtk::ListStore::create(m_columns);
+	m_treeview.set_model( m_refTreeModel);
+	scrolwin->add(m_treeview);
+	m_treeview.append_column(_("step"),m_columns.step_line);
 
+	show_all();
 
 }
+
 MainWindow::~MainWindow()
 {
 }
@@ -159,5 +168,12 @@ void MainWindow:: on_menu_view_preferences()
 
 void MainWindow:: on_menu_help_about()
 {
+
+}
+
+void MainWindow::add_step_line(const Glib::ustring& f_line)
+{
+	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
+	(*iter)[m_columns.step_line] = f_line;
 
 }

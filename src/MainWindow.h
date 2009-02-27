@@ -22,6 +22,8 @@
 #include <gtkmm.h>
 #include <gtkmm/window.h>
 #include <libglademm/xml.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/liststore.h>
 #include "Board.h"
 #define main_ui  "../data/gmchess.glade"
 typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
@@ -43,6 +45,18 @@ class MainWindow:public Gtk::Window
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
 		void on_menu_help_about();
+		void add_step_line(const Glib::ustring& f_line);
+	private:
+		class Columns:public Gtk::TreeModel::ColumnRecord
+		{
+			public:
+				Columns()
+				{
+					add(step_line);
+				}
+				Gtk::TreeModelColumn <Glib::ustring> step_line;
+		};
+		Columns m_columns;
 		
 	private:
 		Board*				board;
@@ -50,11 +64,13 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::UIManager>	ui_manager;
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
-		//Gtk::Button*			button_start;
-		//Gtk::Button*			button_end;
-		//Gtk::Button*			button_prev;
-		//Gtk::Button*			button_next;
+		Gtk::TreeView			m_treeview;
+		Glib::RefPtr<Gtk::ListStore>	m_refTreeModel;
+		Gtk::Button*			btn_start;
+		Gtk::Button*			btn_end ;
+		Gtk::Button*			btn_prev;
+		Gtk::Button*			btn_next;
 };
 
-#endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */
 
+#endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */

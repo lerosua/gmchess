@@ -204,13 +204,13 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			else if(dst_chessman == 0){
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
 				draw_select_frame(false);
-				gen_move(selected_x,selected_y);
+				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
 			else{
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
 				draw_select_frame(false);
-				gen_move(selected_x,selected_y);
+				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
 
@@ -473,7 +473,7 @@ void Board::back_move()
 
 }
 
-void Board::gen_move(int dst_x,int dst_y)
+void Board::try_move(int dst_x,int dst_y)
 {
 	int dst = m_engine.get_dst_xy(dst_x,dst_y);
 	int src = m_engine.get_chessman_xy(selected_chessman);

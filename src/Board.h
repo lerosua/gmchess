@@ -83,7 +83,7 @@ class Board : public Gtk::DrawingArea {
 		void back_move();
 		/** 重画棋盘界面*/
 		void redraw();
-		void gen_move(int x,int y);
+		void try_move(int x,int y);
 	private:
 		/** 加载所需要图片进内存*/
 		void load_images();
