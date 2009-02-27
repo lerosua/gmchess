@@ -152,7 +152,21 @@ void MainWindow::init_ui_manager()
 
 void MainWindow:: on_menu_open_file()
 {
+	Gtk::FileChooserDialog dlg(*this,
+			_("Choose File"), 
+			Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	dlg.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
+	//Gtk::FileFilter filter_media;
+	//filter_media.set_name();
+	if (Gtk::RESPONSE_OK == dlg.run()) {
+		Glib::ustring filename = dlg.get_filename();
+		if (filename.empty())
+			return;
+		Glib::ustring filtername = Glib::ustring("\"")+filename+"\"";
+		DLOG("播放 %s\n",filtername.c_str());
+	}
 }
 void MainWindow:: on_menu_file_quit()
 {
