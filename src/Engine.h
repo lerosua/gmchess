@@ -23,6 +23,7 @@
 #include "gmchess.h"
 #include <vector>
 #include <string>
+#include <glibmm.h>
 
 
 /**
@@ -45,6 +46,9 @@ class Engine {
 		 * @param num 某一步时
 		 */
 		void get_snapshot(int num);
+		/** 添加中文表达着法 */
+		void add_move_chinese(Glib::ustring f_line){ move_chinese.push_back(f_line); };
+		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return move_chinese;};
 		
 		/**
 		 * @brief 棋盘数组生成Fen串 
@@ -169,6 +173,8 @@ class Engine {
 		std::vector<std::string> fen_snapshots;
 		/** 用于保存所有的着法 */
 		std::vector<int> move_snapshots;
+		/** 着法的中文表达式*/
+		std::vector<Glib::ustring> move_chinese;
 		/** 
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走

@@ -22,16 +22,6 @@
 Engine::Engine():count(0),black_player(0)
 {
 	clean_board();
-	/*
-	int i,j;
-	for(i=0;i<16;i++)
-		for(j=0;j<16;j++)
-			chessboard[i*16+j] =0;
-
-	for(i=0;i<3;i++)
-		for(j=0;j<16;j++)
-			chessmans[i*16 + j]=0;
-			*/
 }
 
 Engine::~Engine()
@@ -58,6 +48,7 @@ void Engine::reset()
 	count=0;
 	fen_snapshots.clear();
 	move_snapshots.clear();
+	move_chinese.clear();
 }
 
 void Engine::add_piece(int sq,int pc)

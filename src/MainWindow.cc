@@ -166,6 +166,13 @@ void MainWindow:: on_menu_open_file()
 			return;
 		Glib::ustring filtername = Glib::ustring("\"")+filename+"\"";
 		DLOG("播放 %s\n",filtername.c_str());
+		int out = board->open_file( filtername);
+		if(out){
+			DLOG("open file :%s error\n",filtername.c_str());
+		}
+		else
+			init_move_treeview();
+
 	}
 }
 void MainWindow:: on_menu_file_quit()
@@ -189,5 +196,17 @@ void MainWindow::add_step_line(const Glib::ustring& f_line)
 {
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
 	(*iter)[m_columns.step_line] = f_line;
+
+}
+
+void MainWindow::init_move_treeview()
+{
+	m_refTreeModel->clear();
+
+	const std::vector<Glib::ustring>&  move_chinese = board->get_move_chinese_snapshot();
+	std::vector<Glib::ustring>::const_iterator iter;
+	iter = move_chinese.begin();
+	for(;iter != move_chinese.end(); iter++)
+		add_step_line(*iter);
 
 }

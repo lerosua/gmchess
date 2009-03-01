@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+//#include <vector>
+//#include <gtkmm.h>
 #include "define.h"
 //保存的最大历史局面数
 const int MAX_COUNT=512;
@@ -52,6 +54,9 @@ const char *const start_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9
 
 /** 棋子类型对应的棋子符号*/
 const char *const chessman_bytes = "KABNRCPkabnrcp";
+
+/** 着法的中文表达式*/
+//std::vector<Glib::ustring> move_chinese;
 
 const int PieceTypes[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

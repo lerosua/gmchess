@@ -130,7 +130,8 @@ int Pgnfile::read(void)
 		 Glib::ustring uline(line);
 		//std::cout<<uline<<std::endl;
 		/** 保存着法的中文表达*/
-		move_chinese.push_back(uline);
+		//move_chinese.push_back(uline);
+		m_engine.add_move_chinese(uline);
 
 		int i=0;
 		

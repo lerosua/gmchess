@@ -83,7 +83,10 @@ class Board : public Gtk::DrawingArea {
 		void back_move();
 		/** 重画棋盘界面*/
 		void redraw();
-		void try_move(int x,int y);
+		int try_move(int x,int y);
+		int open_file(const Glib::ustring& filename);
+		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};
+		
 	private:
 		/** 加载所需要图片进内存*/
 		void load_images();

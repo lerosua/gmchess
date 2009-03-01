@@ -33,8 +33,9 @@ class Pgnfile {
 		char word_to_action(const Glib::ustring& word);
 		char word_to_code(const Glib::ustring& word);
 		int read(void);
+
 	private:
-		std::vector<Glib::ustring> move_chinese;
+		//std::vector<Glib::ustring> move_chinese;
 		Engine& m_engine;
 
 

@@ -46,6 +46,7 @@ class MainWindow:public Gtk::Window
 		void on_menu_view_preferences();
 		void on_menu_help_about();
 		void add_step_line(const Glib::ustring& f_line);
+		void init_move_treeview();
 	private:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{
