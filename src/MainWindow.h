@@ -39,25 +39,29 @@ class MainWindow:public Gtk::Window
 		void on_end_move();
 		void on_next_move();
 		void on_back_move();
+		bool on_treeview_click(GdkEventButton* ev);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
 		void on_menu_help_about();
-		void add_step_line(const Glib::ustring& f_line);
+		void add_step_line(int num,const Glib::ustring& f_line);
 		void init_move_treeview();
-	private:
+	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{
 			public:
 				Columns()
 				{
+					add(step_num);
 					add(step_line);
 				}
+				Gtk::TreeModelColumn <int> step_num;
 				Gtk::TreeModelColumn <Glib::ustring> step_line;
 		};
 		Columns m_columns;
+		Glib::RefPtr<Gtk::ListStore>	m_refTreeModel;
 		
 	private:
 		Board*				board;
@@ -66,7 +70,6 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
 		Gtk::TreeView			m_treeview;
-		Glib::RefPtr<Gtk::ListStore>	m_refTreeModel;
 		Gtk::Button*			btn_start;
 		Gtk::Button*			btn_end ;
 		Gtk::Button*			btn_prev;

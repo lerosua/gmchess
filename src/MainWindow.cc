@@ -18,6 +18,7 @@
 #include "MainWindow.h"
 #include <glib/gi18n.h>
 #include <gtkmm/button.h>
+#include <gtkmm/treeselection.h>
 
 Glib::ustring ui_info =
 "<ui>"
@@ -83,6 +84,9 @@ MainWindow::MainWindow():menubar(NULL)
 	m_treeview.set_model( m_refTreeModel);
 	scrolwin->add(m_treeview);
 	m_treeview.append_column(_("step"),m_columns.step_line);
+	m_treeview.set_events(Gdk::BUTTON_PRESS_MASK);
+	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
+				&MainWindow::on_treeview_click),false);
 
 	show_all();
 
@@ -192,10 +196,11 @@ void MainWindow:: on_menu_help_about()
 
 }
 
-void MainWindow::add_step_line(const Glib::ustring& f_line)
+void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
 {
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
 	(*iter)[m_columns.step_line] = f_line;
+	(*iter)[m_columns.step_num] = num;
 
 }
 
@@ -206,7 +211,31 @@ void MainWindow::init_move_treeview()
 	const std::vector<Glib::ustring>&  move_chinese = board->get_move_chinese_snapshot();
 	std::vector<Glib::ustring>::const_iterator iter;
 	iter = move_chinese.begin();
-	for(;iter != move_chinese.end(); iter++)
-		add_step_line(*iter);
+	for(int i=0;iter != move_chinese.end(); iter++,i++)
+		add_step_line(i,*iter);
 
+}
+
+bool MainWindow::on_treeview_click(GdkEventButton* ev)
+{
+	Glib::RefPtr<Gtk::TreeSelection> selection = m_treeview.get_selection();
+	Gtk::TreeModel::iterator iter  = selection->get_selected();
+	if(!selection->count_selected_rows())
+		return false;
+	Gtk::TreeModel::Path path(iter);
+	Gtk::TreeViewColumn* tvc;
+	int cx, cy;
+
+	if(!m_treeview.get_path_at_pos((int) ev->x, (int) ev->y, path, tvc, cx, cy))
+		return false;;
+
+	DLOG(" %s\n",__FUNCTION__);
+	if(ev->type == GDK_2BUTTON_PRESS){
+		DLOG(" click %d \n",(*iter)[m_columns.step_num]);
+		std::cout<<(*iter)[m_columns.step_line]<<std::endl;
+
+		return true;
+	}
+
+	return false;
 }

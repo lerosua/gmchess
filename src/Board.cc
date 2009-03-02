@@ -490,5 +490,6 @@ int Board::open_file(const Glib::ustring& filename)
 	p_pgnfile->read();
 	m_step = m_engine.how_step();
 
+	redraw();
 	return 0;
 }
