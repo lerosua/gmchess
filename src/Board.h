@@ -83,6 +83,8 @@ class Board : public Gtk::DrawingArea {
 		void back_move();
 		/** 重画棋盘界面*/
 		void redraw();
+		/** 根据treeview的棋局着法获得棋盘局面*/
+		void get_board_by_move(int num);
 		int try_move(int x,int y);
 		int open_file(const Glib::ustring& filename);
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};

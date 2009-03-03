@@ -35,7 +35,6 @@ class Pgnfile {
 		int read(void);
 
 	private:
-		//std::vector<Glib::ustring> move_chinese;
 		Engine& m_engine;
 
 

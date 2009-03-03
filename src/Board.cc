@@ -456,6 +456,7 @@ void Board::next_move()
 	if(m_step> all_step)
 		m_step = all_step;
 	DLOG("all_step = %d\n",all_step);
+	DLOG("m_step = %d\n",m_step);
 	m_engine.get_snapshot(m_step);
 	redraw();
 }
@@ -466,8 +467,23 @@ void Board::back_move()
 	if(m_step<0)
 		m_step =0;
 	m_engine.get_snapshot(m_step);
+	DLOG("m_step = %d\n",m_step);
 	redraw();
 
+}
+/** treeview里的着法包含红黑方的各一着法，因此着法数为board类里
+ * 着法的一半
+ */
+void Board::get_board_by_move(int num)
+{
+	m_step = (num+1)*2;
+	int all_step = m_engine.how_step();
+	if(m_step> all_step)
+		m_step = all_step;
+	DLOG("m_step = %d\n",m_step);
+
+	m_engine.get_snapshot(m_step);
+	redraw();
 }
 
 int Board::try_move(int dst_x,int dst_y)

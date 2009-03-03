@@ -229,10 +229,9 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 	if(!m_treeview.get_path_at_pos((int) ev->x, (int) ev->y, path, tvc, cx, cy))
 		return false;;
 
-	DLOG(" %s\n",__FUNCTION__);
 	if(ev->type == GDK_2BUTTON_PRESS){
-		DLOG(" click %d \n",(*iter)[m_columns.step_num]);
-		std::cout<<(*iter)[m_columns.step_line]<<std::endl;
+		int num = (*iter)[m_columns.step_num];
+		board->get_board_by_move(num);
 
 		return true;
 	}
