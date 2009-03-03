@@ -817,14 +817,51 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 	else if(6==cman_type){
 
 		src_x = digit_to_alpha(c_hanzi.word[1]);
+		int a_x[5]={0};
+		int a_y[5]={0};
+		for(int i=0;i<5;i++){
+			a_x[i] = get_iccs_x(chessmans[i+27+num]);
+			a_y[i] = get_iccs_y(chessmans[i+27+num]);
+		}
 
-		int a1_x = get_iccs_x(chessmans[27+num]);
-		int a2_x = get_iccs_x(chessmans[28+num]);
-		int a3_x = get_iccs_x(chessmans[29+num]);
-		int a4_x = get_iccs_x(chessmans[30+num]);
-		int a5_x = get_iccs_x(chessmans[31+num]);
 		if(src_x<0){
-			/** 处理纵线上多兵的问题，未解决*/
+			int x_rand[9]={0};
+			int i;
+			/** 五个兵，分好纵线*/
+			for(i=0;i<5;i++){
+				int n = a_x[i] -'a';
+				if(n>=0)
+					x_rand[n]++;
+			}
+			for(i=9;i>=0;i--){
+				int p1_line[5]={0};
+				int n=0;
+				int start=0;
+				if(x_rand[i]>1){
+					/**此纵线上有两个以上兵*/
+					for(int j=0;j<5;j++){
+						if(i == (a_x[j]-'a')){
+							p1_line[n]=j;
+							n++;
+						}
+					}
+					/** 为纵线上的棋子排序*/
+					for(i=start;i<n-1;i++)
+						for(int j=n-1;j>i;j--){
+							if(a_y[p1_line[j]]>a_y[ p1_line[j-1] ]){
+								int tmp=p1_line[j];
+								p1_line[j]=p1_line[j-1];
+								p1_line[j-1]=tmp;
+						}
+
+					}
+					start=n;
+				}
+
+
+			}
+
+			/** 处理纵线上多兵的问题，还要考虑黑方位置问题，未解决*/
 			if(c_hanzi.word[1] == 'a'){
 
 
@@ -838,21 +875,19 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			else if(c_hanzi.word[1] == 'd'){
 			}
 			else if(c_hanzi.word[1] == 'e'){
+				/** 此情况最简单，全都在一条纵线上，最后一个兵*/
+
 			}
 
 
 		}
 		else{
-			if(a1_x == src_x)
-				src_y = get_iccs_y(chessmans[27+num]);
-			else if(a2_x == src_x)
-				src_y = get_iccs_y(chessmans[28+num]);
-			else if(a3_x == src_x)
-				src_y = get_iccs_y(chessmans[29+num]);
-			else if(a4_x == src_x)
-				src_y = get_iccs_y(chessmans[30+num]);
-			else if(a5_x == src_x)
-				src_y = get_iccs_y(chessmans[31+num]);
+			for(int i=0;i<5;i++){
+				if(a_x[i] == src_x)
+					src_y = a_y[i];
+					//src_y = get_iccs_y(chessmans[i+27+num]);
+
+			}
 
 		}
 

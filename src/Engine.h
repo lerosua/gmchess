@@ -67,7 +67,7 @@ class Engine {
 		 * @return 返回棋子类型标识
 		 */
 		int fen_to_piece(int nArg);
-		/** 由棋盘数组的值获取iccs坐标，横为a-i,纵为9-0*/
+		/** 由棋盘数组的值获取iccs坐标，纵线(x轴)为a-i,横线(y轴)为9-0*/
 		char get_iccs_x(int nArg);
 		char get_iccs_y(int nArg);
 		/** 数字转换成iccs坐标的横坐标 */
