@@ -102,6 +102,28 @@ char word_to_code(const Glib::ustring& word)
 		return -1;
 }
 
+bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name)
+{
+
+	size_t pos = line_str.find(name);
+	if(pos == std::string::npos)
+		return false;
+	pos = line_str.find_first_of("\"");
+	if(pos == std::string::npos)
+		return false;
+	Glib::ustring tmp = line_str.substr(pos+1,std::string::npos);
+	size_t end_pos = tmp.find_first_of("\"");
+	dst_str = tmp.substr(0,end_pos);
+	/*
+	size_t end_pos = line_str.find_last_of("\"");
+	if(end_pos == std::string::npos)
+		return false;
+	dst_str = line_str.substr(pos+1,end_pos);
+	*/
+
+	std::cout<<"get "<<name<<" = "<<dst_str<<std::endl;
+	return true;
+}
 
 
 int fun(void)
@@ -115,8 +137,15 @@ int fun(void)
 	std::string line;
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
-		if(pos != std::string::npos)
+		if(pos != std::string::npos){
+			Glib::ustring dst_str;
+			get_label(dst_str,line,"Site");
+			get_label(dst_str,line,"Red ");
+			get_label(dst_str,line,"RedTeam");
+			get_label(dst_str,line,"Event");
 			continue;
+		}
+#if 0
 		 Glib::ustring uline(line);
 		std::cout<<uline<<std::endl;
 
@@ -159,6 +188,7 @@ int fun(void)
 		}while(i<uline.length());
 		
 		std::cout<<std::endl;
+#endif
 	}
 
 	file.close();
