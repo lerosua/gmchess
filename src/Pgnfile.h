@@ -22,6 +22,17 @@
 #include <gtkmm.h> 
 #include <vector>
 
+typedef struct _board_info{
+		Glib::ustring event;
+		Glib::ustring date;
+		Glib::ustring site;
+		Glib::ustring red;
+		Glib::ustring black;
+		Glib::ustring result;
+		Glib::ustring ecco;
+		Glib::ustring opening;
+		Glib::ustring variation;
+}Board_info;
 class Engine;
 
 class Pgnfile {
@@ -33,12 +44,12 @@ class Pgnfile {
 		char word_to_action(const Glib::ustring& word);
 		char word_to_code(const Glib::ustring& word);
 		int read(void);
+		bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name);
+		const Board_info& get_board_info(){ return board_info ;}
 
 	private:
 		Engine& m_engine;
-
-
-
+		Board_info board_info;
 
 };
 

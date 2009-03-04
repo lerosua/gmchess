@@ -36,6 +36,7 @@ class Board : public Gtk::DrawingArea {
 	public:
 		Board();
 		~Board();
+		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
 	protected:
 		void on_map();
 		bool on_expose_event(GdkEventExpose* ev);

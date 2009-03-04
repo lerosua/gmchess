@@ -176,6 +176,7 @@ void MainWindow:: on_menu_open_file()
 		}
 		else
 			init_move_treeview();
+		set_information();
 
 	}
 }
@@ -237,4 +238,26 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 	}
 
 	return false;
+}
+
+
+
+void MainWindow::set_information()
+{
+	Gtk::Label* p1_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_name"));
+	Gtk::Label* p2_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_name"));
+	Gtk::Label* info   = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("info_label"));
+	
+	const Board_info& board_info = board->get_board_info();
+	p1_name->set_label(board_info.black);
+	p2_name->set_label(board_info.red);
+	Glib::ustring text = Glib::ustring("赛事: ") +board_info.event+"\n";
+	text = text + "时间: "+board_info.date+"\n";
+	text = text + "地点: "+board_info.site+"\n";
+	text = text + "结果: "+board_info.result+"\n";
+	text = text + "开局信息: "+board_info.opening+"\n";
+	text = text + "变着:  "+board_info.variation+"\n";
+	info->set_label(text);
+
+
 }

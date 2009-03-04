@@ -110,6 +110,22 @@ char Pgnfile::word_to_code(const Glib::ustring& word)
 }
 
 
+bool Pgnfile::get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name)
+{
+
+	size_t pos = line_str.find(name);
+	if(pos == std::string::npos)
+		return false;
+	pos = line_str.find_first_of("\"");
+	if(pos == std::string::npos)
+		return false;
+	Glib::ustring tmp = line_str.substr(pos+1,std::string::npos);
+	size_t end_pos = tmp.find_first_of("\"");
+	dst_str = tmp.substr(0,end_pos);
+
+	return true;
+
+}
 
 int Pgnfile::read(void)
 {
@@ -122,8 +138,19 @@ int Pgnfile::read(void)
 	std::string line;
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
-		if(pos != std::string::npos)
+		if(pos != std::string::npos){
+			get_label(board_info.event,line,"Event");
+			get_label(board_info.date ,line,"Date");
+			get_label(board_info.red  ,line,"Red ");
+			get_label(board_info.black,line,"Black ");
+			get_label(board_info.site, line, "Site");
+			get_label(board_info.result,line,"Result");
+			get_label(board_info.ecco,  line, "ECCO");
+			get_label(board_info.opening,line, "Opening");
+			get_label(board_info.variation,line, "Variation");
+
 			continue;
+		}
 		pos = line.find_first_of("===");
 		if(pos != std::string::npos)
 			continue;

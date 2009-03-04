@@ -47,7 +47,10 @@ class MainWindow:public Gtk::Window
 		void on_menu_view_preferences();
 		void on_menu_help_about();
 		void add_step_line(int num,const Glib::ustring& f_line);
+		/** 初始化着法treeview */
 		void init_move_treeview();
+		/** 设置棋盘相关信息*/
+		void set_information();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{
