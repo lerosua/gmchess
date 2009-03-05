@@ -258,6 +258,7 @@ void MainWindow::set_information()
 	text = text + "开局信息: "+board_info.opening+"\n";
 	text = text + "变着:  "+board_info.variation+"\n";
 	info->set_label(text);
+	info->set_ellipsize(Pango::ELLIPSIZE_END);
 
 
 }
