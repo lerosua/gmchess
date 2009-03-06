@@ -36,6 +36,7 @@ Board::Board() :
 	selected_x(-1),
 	selected_y(-1),
 	m_step(0),
+	m_status(FIGHT_STATUS),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
 	selected_chessman(-1)
@@ -502,6 +503,8 @@ int Board::try_move(int dst_x,int dst_y)
 
 int Board::open_file(const Glib::ustring& filename)
 {
+	m_status = READ_STATUS ;
+
 	/** for test pgnfile */
 	p_pgnfile->read();
 	m_step = m_engine.how_step();

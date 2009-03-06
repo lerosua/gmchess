@@ -35,10 +35,15 @@ class MainWindow:public Gtk::Window
 	public:
 		MainWindow();
 		~MainWindow();
+		/** 回到最初局面*/
 		void on_start_move();
+		/** 去到最后的局面*/
 		void on_end_move();
+		/** 执行下一步*/
 		void on_next_move();
+		/** 执行上一步*/
 		void on_back_move();
+		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
 	protected:
 		void init_ui_manager();
@@ -46,11 +51,13 @@ class MainWindow:public Gtk::Window
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
 		void on_menu_help_about();
+		/** 添加treview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
 		/** 初始化着法treeview */
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/
 		void set_information();
+		void set_move_button_property();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{

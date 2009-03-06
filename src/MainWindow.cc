@@ -88,6 +88,7 @@ MainWindow::MainWindow():menubar(NULL)
 	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
 				&MainWindow::on_treeview_click),false);
 
+	set_move_button_property();
 	show_all();
 
 }
@@ -259,6 +260,21 @@ void MainWindow::set_information()
 	text = text + "变着:  "+board_info.variation+"\n";
 	info->set_label(text);
 	info->set_ellipsize(Pango::ELLIPSIZE_END);
+	set_move_button_property();
 
+}
+
+
+void MainWindow::set_move_button_property()
+{
+	int f_status = board->get_status();
+	bool f_use=1;
+	if( READ_STATUS != f_status){
+		f_use = 0;
+	}
+	btn_next->set_sensitive(f_use);
+	btn_prev->set_sensitive(f_use);
+	btn_start->set_sensitive(f_use);
+	btn_end->set_sensitive(f_use);
 
 }

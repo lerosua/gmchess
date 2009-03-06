@@ -77,6 +77,11 @@ enum {
 	NULL_CHESSMAN,SELECTED_CHESSMAN,
 };
 
+/** 
+ * 程序棋局状态，分别为读谱，电脑对战，网络对战
+ */
+enum { READ_STATUS , FIGHT_STATUS, NETWORK_STATUS };
+
 /** 棋子数组示例*/
 const int PieceExample[48] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

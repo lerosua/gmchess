@@ -87,14 +87,20 @@ class Board : public Gtk::DrawingArea {
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		void get_board_by_move(int num);
 		int try_move(int x,int y);
+		/** 打开棋谱文件*/
 		int open_file(const Glib::ustring& filename);
+		/** 返回中文着法表达示快照集*/
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};
+		/** 返回程序棋盘状态*/
+		int get_status(){ return m_status; }
 		
 	private:
 		/** 加载所需要图片进内存*/
 		void load_images();
 	private:
+		/** 引擎 */
 		Engine m_engine;
+		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
 
 		/** 背景图像 */
@@ -110,6 +116,8 @@ class Board : public Gtk::DrawingArea {
 		int selected_chessman;
 		/** 步时 */
 		int m_step;
+		/** 棋局状态*/
+		int m_status;
 };
 
 #endif // _BOARD_H_
