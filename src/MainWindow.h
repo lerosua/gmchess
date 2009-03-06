@@ -50,6 +50,8 @@ class MainWindow:public Gtk::Window
 		void on_menu_open_file();
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
+		void on_menu_war_to_ai();
+		void on_menu_free_play();
 		void on_menu_help_about();
 		/** 添加treview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
@@ -57,6 +59,7 @@ class MainWindow:public Gtk::Window
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/
 		void set_information();
+		/** 设置着法按钮可见性*/
 		void set_move_button_property();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord

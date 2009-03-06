@@ -31,6 +31,10 @@ Glib::ustring ui_info =
 "		<menu action='ViewMenu'>"
 "			<menuitem action='ViewPreferences'/>"
 "		</menu>"
+"		<menu action='GameMenu'>"
+"			<menuitem action='WarAI'/>"
+"			<menuitem action='FreePlay'/>"
+"		</menu>"
 "		<menu action='HelpMenu'>"
 "			<menuitem action='HelpAbout'/>"
 "		</menu>"
@@ -140,6 +144,12 @@ void MainWindow::init_ui_manager()
 	action_group->add(Gtk::Action::create("ViewPreferences", Gtk::Stock::PREFERENCES),
 			sigc::mem_fun(*this, &MainWindow::on_menu_view_preferences));
 
+	//Game menu:
+	action_group->add(Gtk::Action::create("GameMenu",_("_Game")));
+	action_group->add(Gtk::Action::create("WarAI",Gtk::Stock::MEDIA_PLAY,_("_Fight to AI")),
+			sigc::mem_fun(*this, &MainWindow::on_menu_war_to_ai));
+	action_group->add(Gtk::Action::create("FreePlay",Gtk::Stock::MEDIA_PLAY,_("Free Play")),
+			sigc::mem_fun(*this, &MainWindow::on_menu_free_play));
 	//Help menu:
 	action_group->add(Gtk::Action::create("HelpMenu", _("_Help")));
 	action_group->add(Gtk::Action::create("HelpAbout", Gtk::Stock::HELP),
@@ -181,19 +191,29 @@ void MainWindow:: on_menu_open_file()
 
 	}
 }
-void MainWindow:: on_menu_file_quit()
+
+void MainWindow::on_menu_war_to_ai()
 {
-	printf("gmchess quit\n");
+
+}
+
+void MainWindow::on_menu_free_play()
+{
+
+}
+
+void MainWindow::on_menu_file_quit()
+{
 	Gtk::Main::quit();
 
 }
 
-void MainWindow:: on_menu_view_preferences()
+void MainWindow::on_menu_view_preferences()
 {
 
 }
 
-void MainWindow:: on_menu_help_about()
+void MainWindow::on_menu_help_about()
 {
 
 }

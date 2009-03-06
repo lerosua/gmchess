@@ -185,6 +185,7 @@ void Engine::init_snapshot(const char* fen)
 	fen_snapshots.push_back(std::string(fen));
 	move_snapshots.push_back(0);
 
+	/*
 	int i,j;
 	for(i=0;i<16;i++)
 	{
@@ -192,6 +193,7 @@ void Engine::init_snapshot(const char* fen)
 			printf(" %2d ",chessboard[i*16+j]);
 		printf("\n");
 	}
+	*/
 }
 
 void Engine::get_snapshot(int num)
@@ -385,7 +387,7 @@ int Engine::do_move(int mv)
 	to_fens(str_fen);
 	fen_snapshots.push_back(std::string(str_fen));
 
-		printf("\n ==after do move ==\n");
+	printf("\n ==after do move ==\n");
 	for(i=0;i<16;i++)
 	{
 		for(j=0;j<16;j++)

@@ -48,6 +48,7 @@ class Engine {
 		void get_snapshot(int num);
 		/** 添加中文表达着法 */
 		void add_move_chinese(Glib::ustring f_line){ move_chinese.push_back(f_line); };
+		/** 返回中文着法表达示快照集*/
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return move_chinese;};
 		
 		/**
