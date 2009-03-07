@@ -59,6 +59,12 @@ MainWindow::MainWindow():menubar(NULL)
 	 btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
 	 btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
 
+
+	 btn_beign = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_begin"));
+	 btn_lose  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_lose"));
+	 btn_huo   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_huo"));
+	 btn_undo  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_undo"));
+
 	btn_start->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_start_move));
 	btn_end->signal_clicked().connect(
@@ -68,8 +74,17 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_next->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_next_move));
 
+	btn_beign->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_begin_game));
+	btn_lose->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_lose_game));
+	btn_huo->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_huo_game));
+	btn_undo->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_undo_game));
+
 	board= Gtk::manage(new Board());
-	box_board->add(*board);
+	box_board->pack_start(*board);
 
 	this->add(*main_window);
 	this->set_title("GMChess");
@@ -296,5 +311,25 @@ void MainWindow::set_move_button_property()
 	btn_prev->set_sensitive(f_use);
 	btn_start->set_sensitive(f_use);
 	btn_end->set_sensitive(f_use);
+
+}
+
+void MainWindow::on_begin_game()
+{
+
+}
+
+void MainWindow::on_lose_game()
+{
+
+}
+
+void MainWindow::on_huo_game()
+{
+
+}
+
+void MainWindow::on_undo_game()
+{
 
 }

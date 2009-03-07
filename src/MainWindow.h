@@ -43,6 +43,14 @@ class MainWindow:public Gtk::Window
 		void on_next_move();
 		/** 执行上一步*/
 		void on_back_move();
+		/** 开始对战*/
+		void on_begin_game();
+		/** 认输*/
+		void on_lose_game();
+		/** 求和*/
+		void on_huo_game();
+		/** 悔棋*/
+		void on_undo_game();
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
 	protected:
@@ -83,10 +91,16 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
 		Gtk::TreeView			m_treeview;
+		/** treeview 里的按钮*/
 		Gtk::Button*			btn_start;
 		Gtk::Button*			btn_end ;
 		Gtk::Button*			btn_prev;
 		Gtk::Button*			btn_next;
+		/** 对战按钮*/
+		Gtk::Button*			btn_begin;
+		Gtk::Button*			btn_lose;
+		Gtk::Button*			btn_huo;
+		Gtk::Button*			btn_undo;
 };
 
 
