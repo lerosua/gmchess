@@ -100,6 +100,8 @@ class Engine {
 		}
 		/** 测试位置sq是否在棋盘内 */
 		bool in_board(int sq) {return  chessInBoard[sq] ; }
+		/** 测试位置sq是否在九宫格内 */
+		bool in_fort(int sq) { return chessInFort[sq]; }
 		/** 交换走棋方*/
 		void change_side(){black_player = 1-black_player;};
 		/** 引擎重置 */
@@ -138,6 +140,8 @@ class Engine {
 		uint32_t hanzi_to_iccs(uint32_t hanzi);
 		/** 执行着法 */
 		int do_move(int mv);
+		/** 检测着法是否合逻辑(合法）*/
+		bool logic_move(int mv);
 		/** 
 		 * @brief 撤消此着法 
 		 * @param mv 着法,已包含了被吃子信息

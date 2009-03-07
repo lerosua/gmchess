@@ -58,7 +58,6 @@ class Board : public Gtk::DrawingArea {
 		 * @param chess_type 棋子的类型
 		 */
 		void draw_chessman(int x, int y, int chess_type);
-		//void redraw_drawarea();
 		/**
 		 * @brief 根据棋盘数组画出对局
 		 */
@@ -91,7 +90,7 @@ class Board : public Gtk::DrawingArea {
 		int open_file(const Glib::ustring& filename);
 		/** 返回中文着法表达示快照集*/
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};
-		/** 返回程序棋盘状态*/
+		/** 返回程序棋盘状态:读谱，与电脑对战，网络对战,自由摆棋*/
 		int get_status(){ return m_status; }
 		
 	private:

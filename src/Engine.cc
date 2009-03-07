@@ -346,6 +346,110 @@ int Engine::fen_to_piece(int nArg)
   }
 }
 
+/** 目前只做基本检测，将军之类的走棋暂不考虑
+ * 着法的合法化有两种，
+ * 一是先根据棋子生成合法的着法，然后检测目标着法是否
+ * 匹配，如果不匹配则为非法的着法。
+ * 二是只判断目标着法是否合法的着法即可，以下函数目前使用此方法
+ **/
+bool Engine::logic_move(int mv)
+{
+	int src = get_move_src(mv);
+	int dst = get_move_dst(mv);
+	int eated = get_move_eat(mv);
+
+	if(!in_board(dst))
+		return false;
+	/** 获取要移动棋子的类型*/
+	int chess_t = get_chessman_type(chessboard[src]);
+	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
+	switch(chess_t){
+		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
+		case RED_KING:
+		case BLACK_KING:
+			DLOG("帅走\n");
+			if(in_fort(dst)){
+				if((1==abs(RANK_X(src)-RANK_X(dst))) || 
+					(1==abs(RANK_Y(src)-RANK_Y(dst)))){
+					if((RANK_X(src) == RANK_X(dst)) ||
+							(RANK_Y(src)==RANK_Y(dst))){
+						return true;
+					}
+				}
+			}
+			break;
+			/** 士的着法也是绝对值检测，但相差1即可，还需要检测
+			 * 是否在九宫格内*/
+		case RED_ADVISOR:
+		case BLACK_ADVISOR:
+			if(in_fort(dst) &&
+					(1==abs(RANK_X(src)-RANK_X(dst))) && 
+					(1==abs(RANK_Y(src)-RANK_Y(dst)))){
+				DLOG("可走，返回真\n");
+				return true;
+			}
+			break;
+			/** 相的着法初级只需要检测目标及起点x,y绝对值是否相
+			 * 差2即可,还需要注意不能过河
+			 */
+		case RED_BISHOP:
+		case BLACK_BISHOP:
+			DLOG("相走\n");
+			if((2==abs(RANK_X(src)-RANK_X(dst))) && 
+					(2==abs(RANK_Y(src)-RANK_Y(dst))))
+				return true;
+			break;
+			/** 马的着法，目标及起点绝对值相差1-2或2-1
+			 *  高级的还要判断绊马脚
+			 */
+		case RED_KNIGHT:
+		case BLACK_KNIGHT:
+			DLOG("马走\n");
+			if(((1==abs(RANK_X(src)-RANK_X(dst))) && 
+					(2==abs(RANK_Y(src)-RANK_Y(dst))))||
+					((2==abs(RANK_X(src)-RANK_X(dst))) && 
+					(1==abs(RANK_Y(src)-RANK_Y(dst)))))
+				return true;
+			break;
+			/** 炮和车合法着法的特点是同一横线或同一纵线，
+			 * 初级只需要检测是否同一横线或纵线即可
+			 * 但往下还需要检测是否跨子及吃子，目前不理这么多*/
+		case RED_ROOT:
+		case BLACK_ROOT:
+			DLOG("车走\n");
+			if((RANK_X(src) == RANK_X(dst)) ||
+					(RANK_Y(src)==RANK_Y(dst))){
+				return true;
+			}
+			break;
+		case RED_CANNON:
+		case BLACK_CANNON:
+			DLOG("炮走\n");
+			if((RANK_X(src) == RANK_X(dst)) ||
+					(RANK_Y(src)==RANK_Y(dst))){
+				return true;
+			}
+			break;
+			/** 兵的走法和帅类似，但要判断是否过河*/
+		case RED_PAWN:
+		case BLACK_PAWN:
+			DLOG("兵走\n");
+			if((1==abs(RANK_X(src)-RANK_X(dst))) || 
+				(1==abs(RANK_Y(src)-RANK_Y(dst)))){
+				if((RANK_X(src) == RANK_X(dst)) ||
+						(RANK_Y(src)==RANK_Y(dst))){
+					return true;
+				}
+			}
+			break;
+		default:
+			return false;
+			break;
+	};
+
+	return false;
+
+}
 /**
  * @brief 
  * 执行了mv着法，将生成的棋盘数组转成FEN串添加到FEN快照里
@@ -356,8 +460,6 @@ int Engine::fen_to_piece(int nArg)
  */
 int Engine::do_move(int mv)
 {
-	int i,j;
-
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
 	int eated = get_move_eat(mv);
@@ -387,13 +489,16 @@ int Engine::do_move(int mv)
 	to_fens(str_fen);
 	fen_snapshots.push_back(std::string(str_fen));
 
+	/*
 	printf("\n ==after do move ==\n");
+	int i,j;
 	for(i=0;i<16;i++)
 	{
 		for(j=0;j<16;j++)
 			printf(" %2d ",chessboard[i*16+j]);
 		printf("\n");
 	}
+	*/
 	
 	return 0;
 }

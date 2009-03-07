@@ -492,9 +492,10 @@ int Board::try_move(int dst_x,int dst_y)
 	int dst = m_engine.get_dst_xy(dst_x,dst_y);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
-	/** 这里应该写些代码对着法进行逻辑检测*/
-	printf("Board:: src = %x dst = %x mv = %d\n",src,dst,mv);
-	m_engine.do_move(mv);
+	DLOG("Board:: src = %x dst = %x mv = %d\n",src,dst,mv);
+	/** 对着法进行逻辑检测*/
+	if(m_engine.logic_move(mv))
+		m_engine.do_move(mv);
 
 	redraw();
 	return 0;
