@@ -60,7 +60,7 @@ MainWindow::MainWindow():menubar(NULL)
 	 btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
 
 
-	 btn_beign = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_begin"));
+	 btn_begin = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_begin"));
 	 btn_lose  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_lose"));
 	 btn_huo   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_huo"));
 	 btn_undo  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_undo"));
@@ -74,7 +74,7 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_next->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_next_move));
 
-	btn_beign->signal_clicked().connect(
+	btn_begin->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_begin_game));
 	btn_lose->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_lose_game));

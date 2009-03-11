@@ -155,6 +155,12 @@ class Engine {
 		int get_move_eat(int mv){ return (mv >>24)&255;  }
 		/** 给着法加入被吃子信息*/
 		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;}
+		/** 由目标及起点获得绊相角的位置坐标 */
+		int get_bishop_leg(int f_src,int f_dst)	{ return f_src + (f_dst-f_src)/2;}
+		/** 绊马脚用到的比较函数*/
+		int knight_cmp(int x,int y);
+		/** 由目标及起点获得绊马脚的位置坐标 */
+		int get_knight_leg(int f_src,int f_dst)	;
 		/** 清理棋盘及棋子数组*/
 		void clean_board();
 		/** 返回棋局走了多少步*/

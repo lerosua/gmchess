@@ -346,6 +346,22 @@ int Engine::fen_to_piece(int nArg)
   }
 }
 
+int Engine::knight_cmp(int y,int x)
+{
+	if((x-y)<0)
+		return x+1;
+	else
+		return x-1;
+}
+
+int Engine::get_knight_leg(int f_src, int f_dst)
+{
+	int a=knight_cmp(RANK_Y(f_src),RANK_Y(f_dst));
+	int b=knight_cmp(RANK_X(f_src),RANK_X(f_dst));
+	return a*16+b;
+
+}
+
 /** 目前只做基本检测，将军之类的走棋暂不考虑
  * 着法的合法化有两种，
  * 一是先根据棋子生成合法的着法，然后检测目标着法是否
@@ -360,6 +376,7 @@ bool Engine::logic_move(int mv)
 
 	if(!in_board(dst))
 		return false;
+	/** 判断是否过时的方法，dst & 0x80,在下方是非0, 上方是0 */
 	/** 获取要移动棋子的类型*/
 	int chess_t = get_chessman_type(chessboard[src]);
 	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
@@ -378,8 +395,8 @@ bool Engine::logic_move(int mv)
 				}
 			}
 			break;
-			/** 士的着法也是绝对值检测，但相差1即可，还需要检测
-			 * 是否在九宫格内*/
+		/** 士的着法也是绝对值检测，但相差1即可，还需要检测
+		 * 是否在九宫格内*/
 		case RED_ADVISOR:
 		case BLACK_ADVISOR:
 			if(in_fort(dst) &&
@@ -389,57 +406,149 @@ bool Engine::logic_move(int mv)
 				return true;
 			}
 			break;
-			/** 相的着法初级只需要检测目标及起点x,y绝对值是否相
-			 * 差2即可,还需要注意不能过河
-			 */
+		/** 相的着法初级只需要检测目标及起点x,y绝对值是否相
+		 * 差2即可,还需要注意不能过河,及阻象脚
+		 */
 		case RED_BISHOP:
+			if((dst&0x80) != 0){
+				if((2==abs(RANK_X(src)-RANK_X(dst))) && 
+					(2==abs(RANK_Y(src)-RANK_Y(dst)))){
+					int leg=get_bishop_leg(src,dst);
+					if(chessboard[leg]==0)
+						return true;
+				}
+			}
+			break;
 		case BLACK_BISHOP:
 			DLOG("相走\n");
-			if((2==abs(RANK_X(src)-RANK_X(dst))) && 
-					(2==abs(RANK_Y(src)-RANK_Y(dst))))
-				return true;
+			if((dst&0x80) == 0){
+				DLOG("进来了吗相走\n");
+				if((2==abs(RANK_X(src)-RANK_X(dst))) && 
+					(2==abs(RANK_Y(src)-RANK_Y(dst)))){
+					int leg=get_bishop_leg(src,dst);
+					DLOG("leg = %d\n",leg);
+					if(chessboard[leg]==0)
+						return true;
+				}
+			}
 			break;
-			/** 马的着法，目标及起点绝对值相差1-2或2-1
-			 *  高级的还要判断绊马脚
-			 */
+		/** 马的着法，目标及起点绝对值相差1-2或2-1
+		 *  判断绊马脚搞定
+		 */
 		case RED_KNIGHT:
 		case BLACK_KNIGHT:
 			DLOG("马走\n");
 			if(((1==abs(RANK_X(src)-RANK_X(dst))) && 
 					(2==abs(RANK_Y(src)-RANK_Y(dst))))||
 					((2==abs(RANK_X(src)-RANK_X(dst))) && 
-					(1==abs(RANK_Y(src)-RANK_Y(dst)))))
-				return true;
+					(1==abs(RANK_Y(src)-RANK_Y(dst))))){
+
+				int leg=get_knight_leg(src,dst);
+				if(chessboard[leg]==0)
+					return true;
+			}
 			break;
 			/** 炮和车合法着法的特点是同一横线或同一纵线，
 			 * 初级只需要检测是否同一横线或纵线即可
-			 * 但往下还需要检测是否跨子及吃子，目前不理这么多*/
+			 * 但往下还需要检测是否跨子,跨子检测搞定*/
 		case RED_ROOT:
 		case BLACK_ROOT:
 			DLOG("车走\n");
-			if((RANK_X(src) == RANK_X(dst)) ||
-					(RANK_Y(src)==RANK_Y(dst))){
+			if((RANK_X(src) == RANK_X(dst))){
+				int min_t = src<dst?src:dst;
+				int num_t = abs(RANK_Y(src)-RANK_Y(dst))-1;
+				min_t +=16;
+				for(int i =0;i<num_t;i++){
+					if(chessboard[min_t]==0)
+						min_t +=16;
+					else
+						return false;
+				}
 				return true;
+			}
+			else if((RANK_Y(src)==RANK_Y(dst))){
+				int min_t = src<dst?src:dst;
+				int num_t = abs(src-dst) -1 ;
+				min_t++;
+				for(int i =0;i<num_t; i++){
+					if(chessboard[min_t]==0)
+						min_t++;
+					else
+						return false;
+				}
+				return true;
+
 			}
 			break;
 		case RED_CANNON:
 		case BLACK_CANNON:
 			DLOG("炮走\n");
+			/*
 			if((RANK_X(src) == RANK_X(dst)) ||
 					(RANK_Y(src)==RANK_Y(dst))){
 				return true;
 			}
-			break;
-			/** 兵的走法和帅类似，但要判断是否过河*/
-		case RED_PAWN:
-		case BLACK_PAWN:
-			DLOG("兵走\n");
-			if((1==abs(RANK_X(src)-RANK_X(dst))) || 
-				(1==abs(RANK_Y(src)-RANK_Y(dst)))){
-				if((RANK_X(src) == RANK_X(dst)) ||
-						(RANK_Y(src)==RANK_Y(dst))){
+			*/
+
+			if((RANK_X(src) == RANK_X(dst))){
+				int min_t = src<dst?src:dst;
+				int num_t = abs(RANK_Y(src)-RANK_Y(dst))-1;
+				min_t +=16;
+				if(!eated){
+					for(int i =0;i<num_t;i++){
+						if(chessboard[min_t]==0)
+							min_t +=16;
+						else
+							return false;
+					}
 					return true;
 				}
+				else{
+					/** fixed it*/
+					for(int i =0;i<num_t;i++){
+						if(chessboard[min_t]==0)
+							min_t +=16;
+						else
+							return false;
+					}
+				return true;
+				}
+
+			}
+			else if((RANK_Y(src)==RANK_Y(dst))){
+				int min_t = src<dst?src:dst;
+				int num_t = abs(src-dst) -1 ;
+				min_t++;
+				for(int i =0;i<num_t; i++){
+					if(chessboard[min_t]==0)
+						min_t++;
+					else
+						return false;
+				}
+				return true;
+
+			}
+
+			break;
+			/** 兵的走法和帅类似，过河判断搞定*/
+		case RED_PAWN:
+			if((dst&0x80) != 0){
+				if((src-dst) == 16)
+					return true;
+			}
+			else{
+				if(1== abs(dst-src) || (src-dst)==16)
+						return true;
+			}
+			break;
+		case BLACK_PAWN:
+			if((dst&0x80) == 0){
+				if((dst-src) == 16) 
+					return true;
+			}
+			else{
+				if(1== abs(dst-src) || (dst-src)==16)
+						return true;
 			}
 			break;
 		default:
