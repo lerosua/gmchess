@@ -506,6 +506,8 @@ int Board::open_file(const Glib::ustring& filename)
 {
 	m_status = READ_STATUS ;
 
+	m_engine.reset();
+	m_engine.init_snapshot(start_fen);
 	/** for test pgnfile */
 	p_pgnfile->read();
 	m_step = m_engine.how_step();

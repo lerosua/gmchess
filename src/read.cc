@@ -145,7 +145,7 @@ int fun(void)
 			get_label(dst_str,line,"Event");
 			continue;
 		}
-#if 0
+#if 1
 		 Glib::ustring uline(line);
 		std::cout<<uline<<std::endl;
 
