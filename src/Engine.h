@@ -73,6 +73,7 @@ class Engine {
 		char get_iccs_y(int nArg);
 		/** 数字转换成iccs坐标的横坐标 */
 		char digit_to_alpha(int nArg);
+		char alpha_to_digit(int nArg);
 		/** 由x，y位置获得棋盘数组的位置*/
 		int get_coord(int x,int y){ return x+(y<<4);};
 		/** 获取y坐标*/
@@ -87,7 +88,7 @@ class Engine {
 			  int pc = 16 + (sd << 4);
 			    return pc;
 		}
-		/** 棋子代号转成FEN串字符 */
+		/** 棋子类型转成FEN串字符 */
 		inline char piece_to_fen(int pt) {
 			  return chessman_bytes[pt];
 		}

@@ -250,6 +250,38 @@ char Engine::get_iccs_x(int nArg)
 	return (nArg&15)+94;
 }
 
+char Engine::alpha_to_digit(int nArg)
+{
+	if(black_player){
+		return nArg-49;
+	}
+	else{
+	switch(nArg){
+		case 'i':
+			return '1';
+		case 'h':
+			return '2';
+		case 'g':
+			return '3';
+		case 'f':
+			return '4';
+		case 'e':
+			return '5';
+		case 'd':
+			return '6';
+		case 'c':
+			return '7';
+		case 'b':
+			return '8';
+		case 'a':
+			return '9';
+		default:
+			return -1;
+		}
+	}
+
+
+}
 char Engine::digit_to_alpha(int nArg)
 {
 	if(!black_player){
@@ -379,7 +411,7 @@ bool Engine::logic_move(int mv)
 	/** 判断是否过时的方法，dst & 0x80,在下方是非0, 上方是0 */
 	/** 获取要移动棋子的类型*/
 	int chess_t = get_chessman_type(chessboard[src]);
-	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
+	//DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
 	switch(chess_t){
 		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
 		case RED_KING:
@@ -448,9 +480,9 @@ bool Engine::logic_move(int mv)
 					return true;
 			}
 			break;
-			/** 炮和车合法着法的特点是同一横线或同一纵线，
-			 * 初级只需要检测是否同一横线或纵线即可
-			 * 但往下还需要检测是否跨子,跨子检测搞定*/
+		/** 炮和车合法着法的特点是同一横线或同一纵线，
+		 * 初级只需要检测是否同一横线或纵线即可
+		 * 但往下还需要检测是否跨子,跨子检测搞定*/
 		case RED_ROOT:
 		case BLACK_ROOT:
 			DLOG("车走\n");
@@ -483,17 +515,11 @@ bool Engine::logic_move(int mv)
 		case RED_CANNON:
 		case BLACK_CANNON:
 			DLOG("炮走\n");
-			/*
-			if((RANK_X(src) == RANK_X(dst)) ||
-					(RANK_Y(src)==RANK_Y(dst))){
-				return true;
-			}
-			*/
-
 			if((RANK_X(src) == RANK_X(dst))){
 				int min_t = src<dst?src:dst;
 				int num_t = abs(RANK_Y(src)-RANK_Y(dst))-1;
 				min_t +=16;
+				int paotai=0;
 				if(!eated){
 					for(int i =0;i<num_t;i++){
 						if(chessboard[min_t]==0)
@@ -504,14 +530,14 @@ bool Engine::logic_move(int mv)
 					return true;
 				}
 				else{
-					/** fixed it*/
 					for(int i =0;i<num_t;i++){
 						if(chessboard[min_t]==0)
 							min_t +=16;
 						else
-							return false;
+							paotai++;
 					}
-				return true;
+					if(1==paotai)
+						return true;
 				}
 
 			}
@@ -519,18 +545,31 @@ bool Engine::logic_move(int mv)
 				int min_t = src<dst?src:dst;
 				int num_t = abs(src-dst) -1 ;
 				min_t++;
-				for(int i =0;i<num_t; i++){
-					if(chessboard[min_t]==0)
-						min_t++;
-					else
-						return false;
+				int paotai=0;
+				if(!eated){
+					for(int i =0;i<num_t; i++){
+						if(chessboard[min_t]==0)
+							min_t++;
+						else
+							return false;
+					}
+					return true;
 				}
-				return true;
+				else {
+					for(int i =0;i<num_t; i++){
+						if(chessboard[min_t]==0)
+							min_t++;
+						else
+							paotai++;
+					}
+					if(1==paotai)
+						return true;
+				}
 
 			}
 
 			break;
-			/** 兵的走法和帅类似，过河判断搞定*/
+		/** 兵的走法和帅类似，过河判断搞定*/
 		case RED_PAWN:
 			if((dst&0x80) != 0){
 				if((src-dst) == 16)
@@ -657,13 +696,68 @@ int Engine::iccs_to_move(uint32_t iccs)
 
 
 
-uint32_t Engine::iccs_to_hanzi(uint32_t iccs)
+uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 {
 	int pos;
-	uint16_t *arg;
-	char *p;
-	p=(char*) &iccs;
+	union Hanzi c_hanzi;
+	union Hanzi c_iccs;
+	c_iccs.digit = f_iccs;
+	int c_mv = iccs_to_move(f_iccs);
+	int src = get_move_src(c_mv);
+	int dst = get_move_dst(c_mv);
 
+
+	int chess_t  = get_chessman_type(chessboard[src]);
+
+	c_hanzi.word[0] = piece_to_fen(chess_t);
+
+	switch(chess_t){
+		case RED_KING:
+		case BLACK_KING:
+			break;
+		case RED_ADVISOR:
+		case BLACK_ADVISOR:
+			break;
+		case RED_BISHOP:
+			break;
+		case BLACK_BISHOP:
+			break;
+		case RED_KNIGHT:
+		case BLACK_KNIGHT:
+			break;
+		case RED_ROOT:
+		case BLACK_ROOT:
+			break;
+		case RED_CANNON:
+		case BLACK_CANNON:
+			break;
+		case RED_PAWN:
+		case BLACK_PAWN:
+			break;
+		default:
+			return false;
+			break;
+	};
+
+	if(c_iccs.word[1]==c_iccs.word[3]){
+		c_hanzi.word[2]='.';
+		c_hanzi.word[3]= c_iccs.word[2] - 49;
+	}
+	else if(c_iccs.word[1] > c_iccs.word[3]){
+		if(black_player){
+			c_hanzi.word[2]='+';
+		}
+		else{
+			c_hanzi.word[2]='-';
+		}
+
+	}
+	else{
+		if(black_player)
+			c_hanzi.word[2]='-';
+		else
+			c_hanzi.word[2]='+';
+	}
 
 
 
@@ -672,7 +766,6 @@ uint32_t Engine::iccs_to_hanzi(uint32_t iccs)
 uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 {
 	/** hazi中文纵线表示方式中，hanzi的四个字符依次是: 炮二平五(C2.5) */
-
 	
 	union Hanzi c_hanzi;
 	union Hanzi c_iccs;
@@ -1049,10 +1142,10 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 				if(n>=0)
 					x_rand[n]++;
 			}
+			int p1_line[5]={0};
+			int n=0;
+			int start=0;
 			for(i=9;i>=0;i--){
-				int p1_line[5]={0};
-				int n=0;
-				int start=0;
 				if(x_rand[i]>1){
 					/**此纵线上有两个以上兵*/
 					for(int j=0;j<5;j++){
@@ -1079,20 +1172,27 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 			/** 处理纵线上多兵的问题，还要考虑黑方位置问题，未解决*/
 			if(c_hanzi.word[1] == 'a'){
-
+				src_x=a_x[p1_line[0]];
+				src_y=a_y[p1_line[0]];
 
 			}
 			else if(c_hanzi.word[1] == 'b'){
 
+				src_x=a_x[p1_line[1]];
+				src_y=a_y[p1_line[1]];
 
 			}
 			else if(c_hanzi.word[1] == 'c'){
+				src_x=a_x[p1_line[2]];
+				src_y=a_y[p1_line[2]];
 			}
 			else if(c_hanzi.word[1] == 'd'){
+				src_x=a_x[p1_line[3]];
+				src_y=a_y[p1_line[3]];
 			}
 			else if(c_hanzi.word[1] == 'e'){
-				/** 此情况最简单，全都在一条纵线上，最后一个兵*/
-
+				src_x=a_x[p1_line[4]];
+				src_y=a_y[p1_line[4]];
 			}
 
 
@@ -1101,8 +1201,6 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			for(int i=0;i<5;i++){
 				if(a_x[i] == src_x)
 					src_y = a_y[i];
-					//src_y = get_iccs_y(chessmans[i+27+num]);
-
 			}
 
 		}
