@@ -84,7 +84,7 @@ class Engine {
 			  return sq & 15;
 		}
 		
-		inline int SIDE_TAG(int sd) {
+		inline int side_tag(int sd) {
 			  int pc = 16 + (sd << 4);
 			    return pc;
 		}

@@ -64,13 +64,13 @@ void Engine::from_fens(const char *szFen) {
   const char *lpFen;
   // FEN串的识别包括以下几个步骤：
   // 1. 初始化，清空棋盘
-  pcRed[0] = SIDE_TAG(0) + KING_FROM;
-  pcRed[1] = SIDE_TAG(0) + ADVISOR_FROM;
-  pcRed[2] = SIDE_TAG(0) + BISHOP_FROM;
-  pcRed[3] = SIDE_TAG(0) + KNIGHT_FROM;
-  pcRed[4] = SIDE_TAG(0) + ROOK_FROM;
-  pcRed[5] = SIDE_TAG(0) + CANNON_FROM;
-  pcRed[6] = SIDE_TAG(0) + PAWN_FROM;
+  pcRed[0] = side_tag(0) + KING_FROM;
+  pcRed[1] = side_tag(0) + ADVISOR_FROM;
+  pcRed[2] = side_tag(0) + BISHOP_FROM;
+  pcRed[3] = side_tag(0) + KNIGHT_FROM;
+  pcRed[4] = side_tag(0) + ROOK_FROM;
+  pcRed[5] = side_tag(0) + CANNON_FROM;
+  pcRed[6] = side_tag(0) + PAWN_FROM;
   for (i = 0; i < 7; i ++) {
     pcBlack[i] = pcRed[i] + 16;
   }
@@ -250,6 +250,7 @@ char Engine::get_iccs_x(int nArg)
 	return (nArg&15)+94;
 }
 
+/** iccs中的x坐标转成中文纵线的x坐标（红黑方坐标相反)*/
 char Engine::alpha_to_digit(int nArg)
 {
 	if(black_player){
@@ -458,7 +459,6 @@ bool Engine::logic_move(int mv)
 				if((2==abs(RANK_X(src)-RANK_X(dst))) && 
 					(2==abs(RANK_Y(src)-RANK_Y(dst)))){
 					int leg=get_bishop_leg(src,dst);
-					DLOG("leg = %d\n",leg);
 					if(chessboard[leg]==0)
 						return true;
 				}
@@ -483,8 +483,8 @@ bool Engine::logic_move(int mv)
 		/** 炮和车合法着法的特点是同一横线或同一纵线，
 		 * 初级只需要检测是否同一横线或纵线即可
 		 * 但往下还需要检测是否跨子,跨子检测搞定*/
-		case RED_ROOT:
-		case BLACK_ROOT:
+		case RED_ROOK:
+		case BLACK_ROOK:
 			DLOG("车走\n");
 			if((RANK_X(src) == RANK_X(dst))){
 				int min_t = src<dst?src:dst;
@@ -698,15 +698,13 @@ int Engine::iccs_to_move(uint32_t iccs)
 
 uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 {
-	int pos;
 	union Hanzi c_hanzi;
 	union Hanzi c_iccs;
 	c_iccs.digit = f_iccs;
-	int c_mv = iccs_to_move(f_iccs);
-	int src = get_move_src(c_mv);
-	int dst = get_move_dst(c_mv);
+	int a1_x,a2_x;
 
-
+	int mv = iccs_to_move(f_iccs);
+	int src = get_move_src(mv);
 	int chess_t  = get_chessman_type(chessboard[src]);
 
 	c_hanzi.word[0] = piece_to_fen(chess_t);
@@ -714,52 +712,260 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 	switch(chess_t){
 		case RED_KING:
 		case BLACK_KING:
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+
+			if(c_iccs.word[1]==c_iccs.word[3]){
+				c_hanzi.word[2]='.';
+				/** alpha_to_digit 解决了红黑方方位表示的问题*/
+				c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
+			}
+			else if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+				c_hanzi.word[3]='1';
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+				c_hanzi.word[3]='1';
+			}
 			break;
+		/** 士相只有和进退，所以同一纵线上能退的肯定是前面那个*/
 		case RED_ADVISOR:
 		case BLACK_ADVISOR:
-			break;
 		case RED_BISHOP:
-			break;
 		case BLACK_BISHOP:
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+			if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+			}
+			c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
 			break;
+		/** 马和士相情况类似，但要区分前后*/
 		case RED_KNIGHT:
 		case BLACK_KNIGHT:
+			a1_x = get_iccs_x(chessmans[side_tag(black_player)+KNIGHT_FROM]);
+			a2_x = get_iccs_x(chessmans[side_tag(black_player)+KNIGHT_TO]);
+			if(a1_x==a2_x){
+				int a1_y = get_iccs_y(chessmans[side_tag(black_player)+KNIGHT_FROM]);
+				int a2_y = get_iccs_y(chessmans[side_tag(black_player)+KNIGHT_TO]);
+				if(a1_y > a2_y){
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+
+					}
+
+				}
+				else{
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+				}
+
+			}
+			else
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+			if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+			}
+			c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
 			break;
-		case RED_ROOT:
-		case BLACK_ROOT:
+		/**车和炮情况雷同*/
+		case RED_ROOK:
+		case BLACK_ROOK:
+			a1_x = get_iccs_x(chessmans[side_tag(black_player)+ROOK_FROM]);
+			a2_x = get_iccs_x(chessmans[side_tag(black_player)+ROOK_TO]);
+			if(a1_x==a2_x){
+				int a1_y = get_iccs_y(chessmans[side_tag(black_player)+ROOK_FROM]);
+				int a2_y = get_iccs_y(chessmans[side_tag(black_player)+ROOK_TO]);
+				if(a1_y > a2_y){
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+
+					}
+
+				}
+				else{
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+				}
+
+			}
+			else
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+
+			if(c_iccs.word[1]==c_iccs.word[3]){
+				c_hanzi.word[2]='.';
+				/** alpha_to_digit 解决了红黑方方位表示的问题*/
+				c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
+			}
+			else if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+				c_hanzi.word[3]=c_iccs.word[1]-c_iccs.word[3]+48;
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+				c_hanzi.word[3]=c_iccs.word[3]-c_iccs.word[1]+48;
+			}
 			break;
 		case RED_CANNON:
 		case BLACK_CANNON:
+			a1_x = get_iccs_x(chessmans[side_tag(black_player)+CANNON_FROM]);
+			a2_x = get_iccs_x(chessmans[side_tag(black_player)+CANNON_TO]);
+			if(a1_x==a2_x){
+				int a1_y = get_iccs_y(chessmans[side_tag(black_player)+CANNON_FROM]);
+				int a2_y = get_iccs_y(chessmans[side_tag(black_player)+CANNON_TO]);
+				if(a1_y > a2_y){
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+
+					}
+
+				}
+				else{
+					if(a1_y== c_iccs.word[1]){
+						if(black_player)
+							c_hanzi.word[1]='a';
+						else
+							c_hanzi.word[1]='b';
+					}
+					else{
+						if(black_player)
+							c_hanzi.word[1]='b';
+						else
+							c_hanzi.word[1]='a';
+					}
+				}
+
+			}
+			else
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+
+			if(c_iccs.word[1]==c_iccs.word[3]){
+				c_hanzi.word[2]='.';
+				/** alpha_to_digit 解决了红黑方方位表示的问题*/
+				c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
+			}
+			else if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+				c_hanzi.word[3]=c_iccs.word[1]-c_iccs.word[3]+48;
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+				c_hanzi.word[3]=c_iccs.word[3]-c_iccs.word[1]+48;
+			}
 			break;
 		case RED_PAWN:
 		case BLACK_PAWN:
+			/** fixed it */
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+			if(c_iccs.word[1]==c_iccs.word[3]){
+				c_hanzi.word[2]='.';
+				/** alpha_to_digit 解决了红黑方方位表示的问题*/
+				c_hanzi.word[3]= alpha_to_digit(c_iccs.word[2]);
+			}
+			else if(c_iccs.word[1] > c_iccs.word[3]){
+				if(black_player)
+					c_hanzi.word[2]='+';
+				else
+					c_hanzi.word[2]='-';
+				c_hanzi.word[3]='1';
+			}
+			else{
+				if(black_player)
+					c_hanzi.word[2]='-';
+				else
+					c_hanzi.word[2]='+';
+				c_hanzi.word[3]='1';
+			}
 			break;
 		default:
-			return false;
+			return 0;
 			break;
 	};
 
-	if(c_iccs.word[1]==c_iccs.word[3]){
-		c_hanzi.word[2]='.';
-		c_hanzi.word[3]= c_iccs.word[2] - 49;
-	}
-	else if(c_iccs.word[1] > c_iccs.word[3]){
-		if(black_player){
-			c_hanzi.word[2]='+';
-		}
-		else{
-			c_hanzi.word[2]='-';
-		}
 
-	}
-	else{
-		if(black_player)
-			c_hanzi.word[2]='-';
-		else
-			c_hanzi.word[2]='+';
-	}
-
-
+	return c_hanzi.digit;
 
 }
 
