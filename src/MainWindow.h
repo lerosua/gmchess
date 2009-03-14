@@ -55,6 +55,7 @@ class MainWindow:public Gtk::Window
 		bool on_treeview_click(GdkEventButton* ev);
 		/** 添加treview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
+		void del_step_last_line();
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

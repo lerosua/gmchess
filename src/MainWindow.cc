@@ -242,6 +242,14 @@ void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
 
 }
 
+void MainWindow::del_step_last_line()
+{
+	Gtk::TreeModel::iterator iter = m_refTreeModel->children().end();
+	iter--;
+	m_refTreeModel->erase(*iter);
+
+}
+
 void MainWindow::init_move_treeview()
 {
 	m_refTreeModel->clear();
@@ -332,5 +340,7 @@ void MainWindow::on_huo_game()
 
 void MainWindow::on_undo_game()
 {
+	/** 如果是网络对战，则需要确认信息*/
+	board->rue_move();
 
 }

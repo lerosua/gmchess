@@ -173,6 +173,7 @@ class Engine {
 		void clean_board();
 		/** 返回棋局走了多少步*/
 		int how_step(){ return fen_snapshots.size()-1;}
+		int get_last_move_from_snapshot(){return move_snapshots.back(); }
 
 	private:
 		/**

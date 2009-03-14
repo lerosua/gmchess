@@ -507,6 +507,21 @@ int Board::try_move(int dst_x,int dst_y)
 
 }
 
+void Board::rue_move()
+{
+
+	if(m_engine.how_step()<1)
+		return;
+	DLOG(" how_step %d\n",m_engine.how_step());
+	int mv = m_engine.get_last_move_from_snapshot();
+	DLOG(" undo move %d\n");
+	m_engine.undo_move(mv);
+	parent.del_step_last_line();
+
+	redraw();
+
+}
+
 int Board::open_file(const Glib::ustring& filename)
 {
 	m_status = READ_STATUS ;

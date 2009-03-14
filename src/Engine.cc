@@ -532,9 +532,10 @@ bool Engine::logic_move(int mv)
 				else{
 					for(int i =0;i<num_t;i++){
 						if(chessboard[min_t]==0)
-							min_t +=16;
+							;
 						else
 							paotai++;
+						min_t +=16;
 					}
 					if(1==paotai)
 						return true;
@@ -558,10 +559,12 @@ bool Engine::logic_move(int mv)
 				else {
 					for(int i =0;i<num_t; i++){
 						if(chessboard[min_t]==0)
-							min_t++;
+							;
 						else
 							paotai++;
+						min_t++;
 					}
+					DLOG(" 吃子走法,中间有%d个\n",paotai);
 					if(1==paotai)
 						return true;
 				}
@@ -675,7 +678,9 @@ void Engine::undo_move(int mv)
 	change_side();
 
 
-
+	move_snapshots.pop_back();
+	fen_snapshots.pop_back();
+	move_chinese.pop_back();
 }
 uint32_t Engine::move_to_iccs(int mv)
 {
