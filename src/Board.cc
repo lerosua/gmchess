@@ -20,6 +20,7 @@
 #include "Board.h"
 #include <vector>
 #include "Engine.h"
+#include "MainWindow.h"
 
 const int border_width = 32;
 const int chessman_width = 57;
@@ -32,7 +33,7 @@ const int chessman_width = 57;
 #define DATA_DIR "../data/wood/"
 
 
-Board::Board() :
+Board::Board(MainWindow& win) :
 	selected_x(-1),
 	selected_y(-1),
 	m_step(0),
@@ -40,6 +41,7 @@ Board::Board() :
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
 	selected_chessman(-1)
+	,parent(win)
 {
 	this->set_size_request(521,577);
 	/** 加载所需要图片进内存*/
@@ -472,12 +474,10 @@ void Board::back_move()
 	redraw();
 
 }
-/** treeview里的着法包含红黑方的各一着法，因此着法数为board类里
- * 着法的一半
- */
-void Board::get_board_by_move(int num)
+
+void Board::get_board_by_move(int m_step)
 {
-	m_step = (num+1)*2;
+	//m_step = (num+1)*2;
 	int all_step = m_engine.how_step();
 	if(m_step> all_step)
 		m_step = all_step;
@@ -494,8 +494,13 @@ int Board::try_move(int dst_x,int dst_y)
 	int mv =  m_engine.get_move(src,dst);
 	DLOG("Board:: src = %x dst = %x mv = %d\n",src,dst,mv);
 	/** 对着法进行逻辑检测*/
-	if(m_engine.logic_move(mv))
+	if(m_engine.logic_move(mv)){
 		m_engine.do_move(mv);
+		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
+		int num = m_engine.how_step();
+		parent.add_step_line(num,mv_chin);
+
+	}
 
 	redraw();
 	return 0;

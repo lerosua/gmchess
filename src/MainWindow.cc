@@ -83,7 +83,7 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_undo->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_undo_game));
 
-	board= Gtk::manage(new Board());
+	board= Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
 
 	this->add(*main_window);
@@ -102,6 +102,7 @@ MainWindow::MainWindow():menubar(NULL)
 	m_refTreeModel = Gtk::ListStore::create(m_columns);
 	m_treeview.set_model( m_refTreeModel);
 	scrolwin->add(m_treeview);
+	m_treeview.append_column(_("number"),m_columns.step_num);;
 	m_treeview.append_column(_("step"),m_columns.step_line);
 	m_treeview.set_events(Gdk::BUTTON_PRESS_MASK);
 	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
@@ -248,7 +249,7 @@ void MainWindow::init_move_treeview()
 	const std::vector<Glib::ustring>&  move_chinese = board->get_move_chinese_snapshot();
 	std::vector<Glib::ustring>::const_iterator iter;
 	iter = move_chinese.begin();
-	for(int i=0;iter != move_chinese.end(); iter++,i++)
+	for(int i=1;iter != move_chinese.end(); iter++,i++)
 		add_step_line(i,*iter);
 
 }

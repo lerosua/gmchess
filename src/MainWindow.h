@@ -53,6 +53,8 @@ class MainWindow:public Gtk::Window
 		void on_undo_game();
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
+		/** 添加treview数据*/
+		void add_step_line(int num,const Glib::ustring& f_line);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();
@@ -61,8 +63,6 @@ class MainWindow:public Gtk::Window
 		void on_menu_war_to_ai();
 		void on_menu_free_play();
 		void on_menu_help_about();
-		/** 添加treview数据*/
-		void add_step_line(int num,const Glib::ustring& f_line);
 		/** 初始化着法treeview */
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/

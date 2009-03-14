@@ -50,6 +50,7 @@ class Engine {
 		void add_move_chinese(Glib::ustring f_line){ move_chinese.push_back(f_line); };
 		/** 返回中文着法表达示快照集*/
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return move_chinese;};
+		const Glib::ustring& get_chinese_last_move(){ return move_chinese.back(); }
 		
 		/**
 		 * @brief 棋盘数组生成Fen串 
@@ -139,6 +140,12 @@ class Engine {
 		/** ICCS坐标格式转成中文纵线表达方式 */
 		uint32_t iccs_to_hanzi(uint32_t iccs);
 		uint32_t hanzi_to_iccs(uint32_t hanzi);
+
+		Glib::ustring hanzi_to_move_chinese(uint32_t hanzi);
+		Glib::ustring digit_to_word(char digit);
+		Glib::ustring action_to_word(char action);
+		Glib::ustring code_to_word(char code);
+
 		/** 执行着法 */
 		int do_move(int mv);
 		/** 检测着法是否合逻辑(合法）*/

@@ -27,14 +27,16 @@
 #include "Engine.h"
 #include "Pgnfile.h"
 
+class MainWindow;
 
 /**
  * @brief 棋盘类 
  * 负责棋盘和棋子的绘画
  */
-class Board : public Gtk::DrawingArea {
+class Board : public Gtk::DrawingArea 
+{
 	public:
-		Board();
+		Board(MainWindow& win);
 		~Board();
 		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
 	protected:
@@ -97,6 +99,7 @@ class Board : public Gtk::DrawingArea {
 		/** 加载所需要图片进内存*/
 		void load_images();
 	private:
+		MainWindow& parent;
 		/** 引擎 */
 		Engine m_engine;
 		/** 读PGN文件类*/

@@ -202,7 +202,7 @@ void Engine::get_snapshot(int num)
 	DLOG("get_snapshot = %s\n",fens.c_str());
 	clean_board();
 	from_fens(fens.c_str());
-	count = num;
+	//count = num;
 
 }
 int Engine::get_piece(int rx,int ry)
@@ -254,7 +254,7 @@ char Engine::get_iccs_x(int nArg)
 char Engine::alpha_to_digit(int nArg)
 {
 	if(black_player){
-		return nArg-49;
+		return nArg-48;
 	}
 	else{
 	switch(nArg){
@@ -611,6 +611,12 @@ int Engine::do_move(int mv)
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
 	int eated = get_move_eat(mv);
+
+	/** 得到中文表示法怎么这么曲折呢*/
+	uint32_t iccs =move_to_iccs(mv);
+	uint32_t hanzi = iccs_to_hanzi(iccs);
+	Glib::ustring mv_line = hanzi_to_move_chinese(hanzi);
+
 	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
 	if(eated != chessboard[dst])
@@ -636,6 +642,8 @@ int Engine::do_move(int mv)
 	char str_fen[128];
 	to_fens(str_fen);
 	fen_snapshots.push_back(std::string(str_fen));
+
+	add_move_chinese(mv_line);
 
 	/*
 	printf("\n ==after do move ==\n");
@@ -675,11 +683,15 @@ uint32_t Engine::move_to_iccs(int mv)
 		char c[4];
 		uint32_t dw;
 	}Ret;
-	Ret.c[0] = RANK_X(get_move_src(mv)) - FILE_LEFT +'a';
-	Ret.c[1] = '9' - RANK_Y(get_move_src(mv)) - RANK_TOP;
-	Ret.c[2] = RANK_X(get_move_dst(mv)) - FILE_LEFT + 'a';
-	Ret.c[3] = '0' - RANK_Y(get_move_dst(mv)) - RANK_TOP;
+	int src=get_move_src(mv);
+	int dst=get_move_dst(mv);
 
+	Ret.c[0] = get_iccs_x(src);
+	Ret.c[1] = get_iccs_y(src) ;
+	Ret.c[2] = get_iccs_x(dst);
+	Ret.c[3] = get_iccs_y(dst);
+
+	DLOG("%s : %c%c%c%c\n",__FUNCTION__,Ret.c[0],Ret.c[1],Ret.c[2],Ret.c[3]);
 	return Ret.dw;
 
 }
@@ -712,7 +724,8 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 	switch(chess_t){
 		case RED_KING:
 		case BLACK_KING:
-			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 
 			if(c_iccs.word[1]==c_iccs.word[3]){
 				c_hanzi.word[2]='.';
@@ -739,7 +752,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 		case BLACK_ADVISOR:
 		case RED_BISHOP:
 		case BLACK_BISHOP:
-			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 			if(c_iccs.word[1] > c_iccs.word[3]){
 				if(black_player)
 					c_hanzi.word[2]='+';
@@ -795,7 +808,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 
 			}
 			else
-				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 			if(c_iccs.word[1] > c_iccs.word[3]){
 				if(black_player)
 					c_hanzi.word[2]='+';
@@ -851,7 +864,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 
 			}
 			else
-				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 
 			if(c_iccs.word[1]==c_iccs.word[3]){
 				c_hanzi.word[2]='.';
@@ -913,7 +926,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 
 			}
 			else
-				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+				c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 
 			if(c_iccs.word[1]==c_iccs.word[3]){
 				c_hanzi.word[2]='.';
@@ -938,7 +951,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 		case RED_PAWN:
 		case BLACK_PAWN:
 			/** fixed it */
-			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[1]);
+			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 			if(c_iccs.word[1]==c_iccs.word[3]){
 				c_hanzi.word[2]='.';
 				/** alpha_to_digit 解决了红黑方方位表示的问题*/
@@ -964,11 +977,200 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 			break;
 	};
 
-
+	DLOG("%s : %c%c%c%c\n",__FUNCTION__,c_iccs.word[0],c_iccs.word[1],c_iccs.word[2],c_iccs.word[3]);
+	DLOG("%s : %c%c%c%c\n",__FUNCTION__,c_hanzi.word[0],c_hanzi.word[1],c_hanzi.word[2],c_hanzi.word[3]);
 	return c_hanzi.digit;
 
 }
 
+Glib::ustring  Engine::hanzi_to_move_chinese(uint32_t f_hanzi)
+{
+	//Glib::ustring tmp_t;
+	union Hanzi c_hanzi;
+	c_hanzi.digit = f_hanzi;
+	if(c_hanzi.word[1]>='a'){
+		return digit_to_word(c_hanzi.word[1])
+			+code_to_word(c_hanzi.word[0])
+			+action_to_word(c_hanzi.word[2])
+			+digit_to_word(c_hanzi.word[3]) ;
+		
+	}
+	else{
+		//tmp_t=code_to_word(c_hanzi.word[0])
+		return code_to_word(c_hanzi.word[0])
+			+digit_to_word(c_hanzi.word[1])
+			+action_to_word(c_hanzi.word[2])
+			+digit_to_word(c_hanzi.word[3]) ;
+	}
+	
+
+
+}
+
+Glib::ustring Engine::digit_to_word(char digit)
+{
+	DLOG("digit = %c",digit);
+	if(black_player){
+		switch(digit){
+			case '1':
+				return Glib::ustring("1");
+				break;
+			case '2':
+				return Glib::ustring("2");
+				break;
+			case '3':
+				return Glib::ustring("3");
+				break;
+			case '4':
+				return Glib::ustring("4");
+				break;
+			case '5':
+				return Glib::ustring("5");
+				break;
+			case '6':
+				return Glib::ustring("6");
+				break;
+			case '7':
+				return Glib::ustring("7");
+				break;
+			case '8':
+				return Glib::ustring("8");
+				break;
+			case '9':
+				return Glib::ustring("9");
+				break;
+			case 'a':
+				return Glib::ustring("前");
+				break;
+			case 'b':
+				return Glib::ustring("后");
+				break;
+			case 'c':
+				return Glib::ustring("三");
+				break;
+			case 'd':
+				return Glib::ustring("四");
+				break;
+			case 'e':
+				return Glib::ustring("五");
+				break;
+			default:
+				break;
+			};
+	}
+	else{
+	switch(digit){
+		case '1':
+			return Glib::ustring("一");
+			break;
+		case '2':
+			return Glib::ustring("二");
+			break;
+		case '3':
+			return Glib::ustring("三");
+			break;
+		case '4':
+			return Glib::ustring("四");
+			break;
+		case '5':
+			return Glib::ustring("五");
+			break;
+		case '6':
+			return Glib::ustring("六");
+			break;
+		case '7':
+			return Glib::ustring("七");
+			break;
+		case '8':
+			return Glib::ustring("八");
+			break;
+		case '9':
+			return Glib::ustring("九");
+			break;
+		case 'a':
+			return Glib::ustring("前");
+			break;
+		case 'b':
+			return Glib::ustring("后");
+			break;
+		case 'c':
+			return Glib::ustring("三");
+			break;
+		case 'd':
+			return Glib::ustring("四");
+			break;
+		case 'e':
+			return Glib::ustring("五");
+			break;
+		default:
+			break;
+		};
+	}
+	return Glib::ustring("NULL");
+
+}
+Glib::ustring Engine::action_to_word(char action)
+{
+	DLOG(" action = %c\n",action);
+	switch(action){
+		case '.':
+			return Glib::ustring("平");
+			break;
+		case '+':
+			return Glib::ustring("进");
+			break;
+		case '-':
+			return Glib::ustring("退");
+			break;
+		default:
+			break;
+	};
+	return Glib::ustring("NULL");
+}
+Glib::ustring Engine::code_to_word(char code)
+{
+	DLOG("code = %c\n",code);
+	switch(code){
+		case 'K':
+			return Glib::ustring("帅");
+			break;
+		case 'A':
+			return Glib::ustring("仕");
+			break;
+		case 'B':
+			return Glib::ustring("相");
+			break;
+		case 'N':
+		case 'n':
+			return Glib::ustring("马");
+			break;
+		case 'C':
+		case 'c':
+			return Glib::ustring("炮");
+		case 'R':
+		case 'r':
+			return Glib::ustring("车");
+			break;
+		case 'P':
+			return Glib::ustring("兵");
+			break;
+		case 'k':
+			return Glib::ustring("将");
+			break;
+		case 'a':
+			return Glib::ustring("士");
+			break;
+		case 'b':
+			return Glib::ustring("象");
+			break;
+		case 'p':
+			return Glib::ustring("卒");
+			break;
+		default:
+			break;
+	};
+	return Glib::ustring("NULL");
+}
 uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 {
 	/** hazi中文纵线表示方式中，hanzi的四个字符依次是: 炮二平五(C2.5) */
@@ -1260,7 +1462,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 		return c_iccs.digit;
 	}
 	else if(4==cman_type||5==cman_type){
-		/** 车跑的目标坐标生成*/
+		/** 车炮的目标坐标生成*/
 		int type_num;
 			if(cman_type==4)
 				type_num = 23;
@@ -1272,7 +1474,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 		int a1_x = get_iccs_x(chessmans[type_num+num]);
 		int a2_x = get_iccs_x(chessmans[type_num+1+num]);
 		if(src_x<0){
-			/** 同一纵线上有两个车或跑 */
+			/** 同一纵线上有两个车或炮 */
 			int a1_y = get_iccs_y(chessmans[type_num+num]);
 			int a2_y = get_iccs_y(chessmans[type_num+1+num]);
 			if(c_hanzi.word[1] == 'a'){
