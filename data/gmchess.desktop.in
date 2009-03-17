@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=gmchess
+_Name=gmchess
+_Comment=Chinese chess game play and recoder
+Exec=gmchess
+Icon=gmchess
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Game;
+GenericName[zh_CN]=中国象棋

@@ -25,7 +25,8 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include "Board.h"
-#define main_ui  "../data/gmchess.glade"
+//#define main_ui  "../data/gmchess.glade"
+#define main_ui  DATA_DIR"/gmchess.glade"
 typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
 
 class Board;

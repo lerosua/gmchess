@@ -1,23 +1,22 @@
-## Process this file with automake to produce Makefile.in
+#SUBDIRS =engine
 
-AM_CPPFLAGS = \
-	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
-	$(CHESS_CFLAGS)
+INCLUDES = 								\
+	   -I$(top_srcdir)                                              \
+	   -I$(srcdir)                                                  \
+	   -g								\
+	   -DDATA_DIR=\""${datadir}/gmchess"\" 				\
+	   @PACKAGE_CFLAGS@
 
-AM_CFLAGS =\
-	 -Wall\
-	 -g
+bin_PROGRAMS=gmchess
 
-bin_PROGRAMS = chess
-
-chess_SOURCES = \
+gmchess_SOURCES= \
 	main.cc	\
 	Board.cc \
 	Engine.cc \
 	Pgnfile.cc \
 	MainWindow.cc
+
+
 noinst_HEADERS = \
 		 Board.h \
 		 gmchess.h \
@@ -26,8 +25,6 @@ noinst_HEADERS = \
 		 Pgnfile.h \
 		 MainWindow.h
 
-chess_LDFLAGS = 
+gmchess_LDFLAGS = 
 
-chess_LDADD = $(CHESS_LIBS)
-
-EXTRA_DIST = $(glade_DATA)
+gmchess_LDADD = @LIBS@ @PACKAGE_LIBS@
