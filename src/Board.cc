@@ -71,7 +71,7 @@ void Board::load_images()
 	chessman_images[BLACK_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_king_die.png");
 	chessman_images[BLACK_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_knight.png");
 	chessman_images[BLACK_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_pawn.png");
-	chessman_images[BLACK_ROOK] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_root.png");
+	chessman_images[BLACK_ROOK] = Gdk::Pixbuf::create_from_file(DATA_DIR"black_rook.png");
 	chessman_images[RED_ADVISOR] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_advisor.png");
 	chessman_images[RED_BISHOP] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_bishop.png");
 	chessman_images[RED_CANNON] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_cannon.png");
@@ -79,7 +79,7 @@ void Board::load_images()
 	chessman_images[RED_KING_DIE] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_king_die.png");
 	chessman_images[RED_KNIGHT] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_knight.png");
 	chessman_images[RED_PAWN] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_pawn.png");
-	chessman_images[RED_ROOK] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_root.png");
+	chessman_images[RED_ROOK] = Gdk::Pixbuf::create_from_file(DATA_DIR"red_rook.png");
 	chessman_images[SELECTED_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"select.png");
 	chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(DATA_DIR"null.png");
 	
