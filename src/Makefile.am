@@ -1,4 +1,4 @@
-#SUBDIRS =engine
+SUBDIRS =engine
 
 INCLUDES = 								\
 	   -I$(top_srcdir)                                              \

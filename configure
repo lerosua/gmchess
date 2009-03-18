@@ -9975,7 +9975,7 @@ $as_echo "$LINGUAS" >&6; }
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile data/Makefile data/wood/Makefile po/Makefile.in"
+ac_config_files="$ac_config_files Makefile src/Makefile src/engine/Makefile data/Makefile data/wood/Makefile po/Makefile.in"
 
 
 cat >confcache <<\_ACEOF
@@ -10621,6 +10621,7 @@ do
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/engine/Makefile") CONFIG_FILES="$CONFIG_FILES src/engine/Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "data/wood/Makefile") CONFIG_FILES="$CONFIG_FILES data/wood/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;

@@ -58,6 +58,7 @@ AM_GLIB_GNU_GETTEXT
 
 AC_CONFIG_FILES([Makefile
 	src/Makefile
+	src/engine/Makefile
 	data/Makefile
 	data/wood/Makefile
 	po/Makefile.in
