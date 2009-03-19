@@ -13,5 +13,6 @@ eleeye_engine_SOURCES= \
 		search.cpp \
 		ucci.cpp
 
-
-AM_CPPFLAGS = -ldl
+eleeye_engine_LDFLAGS= -ldl
+AM_CPPFLAGS =
+#AM_CPPFLAGS = -ldl
