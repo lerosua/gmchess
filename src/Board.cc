@@ -475,15 +475,16 @@ void Board::back_move()
 
 }
 
-void Board::get_board_by_move(int m_step)
+void Board::get_board_by_move(int f_step)
 {
 	//m_step = (num+1)*2;
 	int all_step = m_engine.how_step();
-	if(m_step> all_step)
-		m_step = all_step;
-	DLOG("m_step = %d\n",m_step);
+	if(f_step> all_step)
+		f_step = all_step;
+	DLOG("m_step = %d\n",f_step);
 
-	m_engine.get_snapshot(m_step);
+	m_engine.get_snapshot(f_step);
+	m_step = f_step;
 	redraw();
 }
 
