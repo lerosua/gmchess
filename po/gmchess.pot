@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-03-20 20:58+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/MainWindow.cc:105
+msgid "number"
+msgstr ""
+
+#: ../src/MainWindow.cc:106
+msgid "step"
+msgstr ""
+
+#. File menu:
+#: ../src/MainWindow.cc:146
+msgid "_File"
+msgstr ""
+
+#: ../src/MainWindow.cc:148
+msgid "Open file"
+msgstr ""
+
+#: ../src/MainWindow.cc:149
+msgid "Open chessman File"
+msgstr ""
+
+#. View menu:
+#: ../src/MainWindow.cc:157
+msgid "_View"
+msgstr ""
+
+#. Game menu:
+#: ../src/MainWindow.cc:164
+msgid "_Game"
+msgstr ""
+
+#: ../src/MainWindow.cc:165
+msgid "_Fight to AI"
+msgstr ""
+
+#: ../src/MainWindow.cc:167
+msgid "Free Play"
+msgstr ""
+
+#. Help menu:
+#: ../src/MainWindow.cc:170
+msgid "_Help"
+msgstr ""
+
+#: ../src/MainWindow.cc:187
+msgid "Choose File"
+msgstr ""
+
+#: ../data/gmchess.glade.h:1
+msgid " "
+msgstr ""
+
+#: ../data/gmchess.glade.h:2
+msgid "          "
+msgstr ""
+
+#: ../data/gmchess.glade.h:3
+msgid ""
+"&#x4E2D;&#x56FD;&#x8C61;&#x68CB;&#x7A0B;&#x5E8F;for linux &#x6D4B;&#x8BD5;"
+"&#x7248;&#x672C;\n"
+"gmchess by lerosua and wind"
+msgstr ""
+
+#: ../data/gmchess.glade.h:5
+msgid "&#x5C40;&#x65F6;: "
+msgstr ""
+
+#: ../data/gmchess.glade.h:6
+msgid "&#x5F00;&#x59CB;"
+msgstr ""
+
+#: ../data/gmchess.glade.h:7
+msgid "&#x6094;&#x68CB;"
+msgstr ""
+
+#: ../data/gmchess.glade.h:8
+msgid "&#x6635;&#x79F0;: "
+msgstr ""
+
+#: ../data/gmchess.glade.h:9
+msgid "&#x6B65;&#x65F6;: "
+msgstr ""
+
+#: ../data/gmchess.glade.h:10
+msgid "&#x6C42;&#x548C;"
+msgstr ""
+
+#: ../data/gmchess.glade.h:11
+msgid "&#x8BA4;&#x8F93;"
+msgstr ""
+
+#: ../data/gmchess.glade.h:12
+msgid "<b>Comment</b>"
+msgstr ""
+
+#: ../data/gmchess.glade.h:13
+msgid "Board Information"
+msgstr ""
+
+#: ../data/gmchess.glade.h:14
+msgid "Engine"
+msgstr ""
+
+#: ../data/gmchess.glade.h:15
+msgid "Information"
+msgstr ""
+
+#: ../data/gmchess.glade.h:16
+msgid "chess"
+msgstr ""
+
+#: ../data/gmchess.glade.h:17
+msgid "label"
+msgstr ""
+
+#: ../data/gmchess.glade.h:18
+msgid "page 3"
+msgstr ""

@@ -5,6 +5,7 @@ INCLUDES = 								\
 	   -I$(srcdir)                                                  \
 	   -g								\
 	   -DDATA_DIR=\""${datadir}/gmchess"\" 				\
+	   -DGMCHESS_LOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"    \
 	   @PACKAGE_CFLAGS@
 
 bin_PROGRAMS=gmchess

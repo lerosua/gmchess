@@ -9,7 +9,7 @@ AM_INIT_AUTOMAKE(gmchess,0.10)
 
 
 IT_PROG_INTLTOOL([0.35.0])
-#AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 
 # Checks for programs.
