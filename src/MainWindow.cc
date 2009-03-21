@@ -296,12 +296,12 @@ void MainWindow::set_information()
 	const Board_info& board_info = board->get_board_info();
 	p1_name->set_label(board_info.black);
 	p2_name->set_label(board_info.red);
-	Glib::ustring text = Glib::ustring("赛事: ") +board_info.event+"\n";
-	text = text + "时间: "+board_info.date+"\n";
-	text = text + "地点: "+board_info.site+"\n";
-	text = text + "结果: "+board_info.result+"\n";
-	text = text + "开局信息: "+board_info.opening+"\n";
-	text = text + "变着:  "+board_info.variation+"\n";
+	Glib::ustring text = Glib::ustring(_("Game: ")) +board_info.event+"\n";
+	text = text + _("Time: ")+board_info.date+"\n";
+	text = text + _("Site: ")+board_info.site+"\n";
+	text = text + _("Result: ")+board_info.result+"\n";
+	text = text + _("Opening: ")+board_info.opening+"\n";
+	text = text + _("Variation:  ")+board_info.variation+"\n";
 	info->set_label(text);
 	info->set_ellipsize(Pango::ELLIPSIZE_END);
 	set_move_button_property();
