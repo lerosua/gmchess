@@ -127,15 +127,20 @@ bool Pgnfile::get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, c
 
 }
 
-int Pgnfile::read(void)
+int Pgnfile::read(const Glib::ustring & filename)
 {
-	std::ifstream file("test.pgn");
+	//std::ifstream file("test.pgn");
+	std::fstream file;
+	file.open(filename.c_str(),std::ios::in);
 	if(!file){
-		printf("open file error\n");
+		DLOG("open %s file error\n",filename.c_str());
 		return -1;
 	}
 
+	m_engine.init_snapshot(start_fen);
+
 	std::string line;
+	Glib::ustring startFen;
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos){
@@ -148,10 +153,19 @@ int Pgnfile::read(void)
 			get_label(board_info.ecco,  line, "ECCO");
 			get_label(board_info.opening,line, "Opening");
 			get_label(board_info.variation,line, "Variation");
+			if(get_label(startFen,line, "FEN")){
+				DLOG("get FEN %s\n",startFen.c_str());
+				m_engine.init_snapshot(startFen.c_str());
+			}
 
 			continue;
 		}
+		/**暂时过滤象眼的信息*/
 		pos = line.find_first_of("===");
+		if(pos != std::string::npos)
+			continue;
+		/**暂时过滤棋步注释*/
+		pos = line.find_first_of("{");
 		if(pos != std::string::npos)
 			continue;
 		 Glib::ustring uline(line);
@@ -197,7 +211,9 @@ int Pgnfile::read(void)
 
 			uint32_t iccs = m_engine.hanzi_to_iccs(c_hanzi.digit);
 			int move = m_engine.iccs_to_move(iccs);
-			m_engine.do_move(move);
+			if(m_engine.logic_move(move)){
+				m_engine.do_move(move);
+			}
 
 
 		}while(i<uline.length());

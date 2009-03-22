@@ -181,6 +181,7 @@ void Engine::to_fens(char *szFen)  {
 
 void Engine::init_snapshot(const char* fen)
 {
+	reset();
 	from_fens(fen);
 	fen_snapshots.push_back(std::string(fen));
 	move_snapshots.push_back(0);
@@ -1342,9 +1343,9 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 				}
 			}
 
-			c_iccs.word[1] =src_y;
-			c_iccs.word[2] =dst_x;
-			c_iccs.word[3] =dst_y;
+		//	c_iccs.word[1] =src_y;
+		//	c_iccs.word[2] =dst_x;
+		//	c_iccs.word[3] =dst_y;
 
 		}
 		else{
@@ -1371,13 +1372,14 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 				else
 					dst_y = src_y+2;
 			}
-			c_iccs.word[1]=src_y;
-			c_iccs.word[2] =dst_x;
-			c_iccs.word[3] =dst_y;
-
+			//c_iccs.word[1]=src_y;
+			//c_iccs.word[2] =dst_x;
+			//c_iccs.word[3] =dst_y;
 		}
 
-
+		c_iccs.word[1]=src_y;
+		c_iccs.word[2] =dst_x;
+		c_iccs.word[3] =dst_y;
 		DLOG("hazi[0...3] = %c%c%c%c\n",c_iccs.word[0],c_iccs.word[1],c_iccs.word[2],c_iccs.word[3]);
 		return c_iccs.digit;
 	}
@@ -1428,6 +1430,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			}
 			DLOG("src_y = %c\n",src_y);
 
+		}
 			if(c_hanzi.word[2] == '+'){
 				if(abs(dst_x-src_x)== 1){
 					if(!black_player)
@@ -1457,7 +1460,6 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			}
 
 
-		}
 			c_iccs.word[0]=src_x;
 			c_iccs.word[1]=src_y;
 			c_iccs.word[2] =dst_x;

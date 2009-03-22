@@ -525,13 +525,12 @@ void Board::rue_move()
 
 int Board::open_file(const Glib::ustring& filename)
 {
-	m_status = READ_STATUS ;
 
-	m_engine.reset();
-	m_engine.init_snapshot(start_fen);
 	/** for test pgnfile */
-	p_pgnfile->read();
-	m_step = m_engine.how_step();
+	if(p_pgnfile->read(filename)){
+		m_step = m_engine.how_step();
+		m_status = READ_STATUS ;
+	}
 
 	redraw();
 	return 0;

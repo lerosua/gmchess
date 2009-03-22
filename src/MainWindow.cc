@@ -196,7 +196,7 @@ void MainWindow:: on_menu_open_file()
 		if (filename.empty())
 			return;
 		Glib::ustring filtername = Glib::ustring("\"")+filename+"\"";
-		DLOG("播放 %s\n",filtername.c_str());
+		//DLOG("播放 %s\n",filtername.c_str());
 		int out = board->open_file( filtername);
 		if(out){
 			DLOG("open file :%s error\n",filtername.c_str());

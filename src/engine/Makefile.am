@@ -15,4 +15,3 @@ eleeye_engine_SOURCES= \
 
 eleeye_engine_LDFLAGS= -ldl
 AM_CPPFLAGS =
-#AM_CPPFLAGS = -ldl
