@@ -192,14 +192,14 @@ void MainWindow:: on_menu_open_file()
 	//Gtk::FileFilter filter_media;
 	//filter_media.set_name();
 	if (Gtk::RESPONSE_OK == dlg.run()) {
-		Glib::ustring filename = dlg.get_filename();
+		std::string filename = dlg.get_filename();
 		if (filename.empty())
 			return;
-		Glib::ustring filtername = Glib::ustring("\"")+filename+"\"";
+		//std::string filtername = std::string("\"")+filename+"\"";
 		//DLOG("播放 %s\n",filtername.c_str());
-		int out = board->open_file( filtername);
+		int out = board->open_file( filename);
 		if(out){
-			DLOG("open file :%s error\n",filtername.c_str());
+			DLOG("open file :%s error\n",filename.c_str());
 		}
 		else
 			init_move_treeview();

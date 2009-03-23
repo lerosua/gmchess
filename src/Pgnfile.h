@@ -43,7 +43,7 @@ class Pgnfile {
 		char word_to_digit(const Glib::ustring& word);
 		char word_to_action(const Glib::ustring& word);
 		char word_to_code(const Glib::ustring& word);
-		int read(const Glib::ustring & filename);
+		int read(const std::string & filename);
 		bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name);
 		const Board_info& get_board_info(){ return board_info ;}
 

@@ -523,11 +523,11 @@ void Board::rue_move()
 
 }
 
-int Board::open_file(const Glib::ustring& filename)
+int Board::open_file(const std::string& filename)
 {
 
 	/** for test pgnfile */
-	if(p_pgnfile->read(filename)){
+	if(!p_pgnfile->read(filename)){
 		m_step = m_engine.how_step();
 		m_status = READ_STATUS ;
 	}

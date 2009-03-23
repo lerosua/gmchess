@@ -91,7 +91,7 @@ class Board : public Gtk::DrawingArea
 		/** 悔棋*/
 		void rue_move();
 		/** 打开棋谱文件*/
-		int open_file(const Glib::ustring& filename);
+		int open_file(const std::string& filename);
 		/** 返回中文着法表达示快照集*/
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};
 		/** 返回程序棋盘状态:读谱，与电脑对战，网络对战,自由摆棋*/
