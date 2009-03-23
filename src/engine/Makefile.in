@@ -32,7 +32,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = eleeye_engine$(EXEEXT)
+bin_PROGRAMS = eleeye_engine$(EXEEXT) convert_pgn$(EXEEXT)
 subdir = src/engine
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -45,6 +45,15 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am_convert_pgn_OBJECTS = convert_pgn-convert_pgn.$(OBJEXT) \
+	convert_pgn-pregen.$(OBJEXT) convert_pgn-position.$(OBJEXT) \
+	convert_pgn-genmoves.$(OBJEXT) convert_pgn-cchess.$(OBJEXT) \
+	convert_pgn-pgnfile.$(OBJEXT)
+convert_pgn_OBJECTS = $(am_convert_pgn_OBJECTS)
+convert_pgn_LDADD = $(LDADD)
+convert_pgn_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(convert_pgn_CXXFLAGS) \
+	$(CXXFLAGS) $(convert_pgn_LDFLAGS) $(LDFLAGS) -o $@
 am_eleeye_engine_OBJECTS = eleeye_engine-book.$(OBJEXT) \
 	eleeye_engine-eleeye.$(OBJEXT) \
 	eleeye_engine-genmoves.$(OBJEXT) eleeye_engine-hash.$(OBJEXT) \
@@ -69,8 +78,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(eleeye_engine_SOURCES)
-DIST_SOURCES = $(eleeye_engine_SOURCES)
+SOURCES = $(convert_pgn_SOURCES) $(eleeye_engine_SOURCES)
+DIST_SOURCES = $(convert_pgn_SOURCES) $(eleeye_engine_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -216,6 +225,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 eleeye_engine_CXXFLAGS = $(AM_CPPFLAGS)
+convert_pgn_CXXFLAGS = $(AM_CPPFLAGS)
 eleeye_engine_SOURCES = \
 		book.cpp \
 		eleeye.cpp \
@@ -228,7 +238,16 @@ eleeye_engine_SOURCES = \
 		search.cpp \
 		ucci.cpp
 
+convert_pgn_SOURCES = \
+		      convert_pgn.cpp \
+		      pregen.cpp \
+		      position.cpp \
+		      genmoves.cpp  \
+		      cchess.cpp \
+		      pgnfile.cpp
+
 eleeye_engine_LDFLAGS = -ldl
+convert_pgn_LDFLAGS = -ldl
 AM_CPPFLAGS = 
 all: all-am
 
@@ -291,6 +310,9 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+convert_pgn$(EXEEXT): $(convert_pgn_OBJECTS) $(convert_pgn_DEPENDENCIES) 
+	@rm -f convert_pgn$(EXEEXT)
+	$(convert_pgn_LINK) $(convert_pgn_OBJECTS) $(convert_pgn_LDADD) $(LIBS)
 eleeye_engine$(EXEEXT): $(eleeye_engine_OBJECTS) $(eleeye_engine_DEPENDENCIES) 
 	@rm -f eleeye_engine$(EXEEXT)
 	$(eleeye_engine_LINK) $(eleeye_engine_OBJECTS) $(eleeye_engine_LDADD) $(LIBS)
@@ -301,6 +323,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-cchess.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-convert_pgn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-genmoves.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-pgnfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-position.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convert_pgn-pregen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eleeye_engine-book.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eleeye_engine-eleeye.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eleeye_engine-genmoves.Po@am__quote@
@@ -332,6 +360,90 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+convert_pgn-convert_pgn.o: convert_pgn.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-convert_pgn.o -MD -MP -MF $(DEPDIR)/convert_pgn-convert_pgn.Tpo -c -o convert_pgn-convert_pgn.o `test -f 'convert_pgn.cpp' || echo '$(srcdir)/'`convert_pgn.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-convert_pgn.Tpo $(DEPDIR)/convert_pgn-convert_pgn.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convert_pgn.cpp' object='convert_pgn-convert_pgn.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-convert_pgn.o `test -f 'convert_pgn.cpp' || echo '$(srcdir)/'`convert_pgn.cpp
+
+convert_pgn-convert_pgn.obj: convert_pgn.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-convert_pgn.obj -MD -MP -MF $(DEPDIR)/convert_pgn-convert_pgn.Tpo -c -o convert_pgn-convert_pgn.obj `if test -f 'convert_pgn.cpp'; then $(CYGPATH_W) 'convert_pgn.cpp'; else $(CYGPATH_W) '$(srcdir)/convert_pgn.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-convert_pgn.Tpo $(DEPDIR)/convert_pgn-convert_pgn.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convert_pgn.cpp' object='convert_pgn-convert_pgn.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-convert_pgn.obj `if test -f 'convert_pgn.cpp'; then $(CYGPATH_W) 'convert_pgn.cpp'; else $(CYGPATH_W) '$(srcdir)/convert_pgn.cpp'; fi`
+
+convert_pgn-pregen.o: pregen.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-pregen.o -MD -MP -MF $(DEPDIR)/convert_pgn-pregen.Tpo -c -o convert_pgn-pregen.o `test -f 'pregen.cpp' || echo '$(srcdir)/'`pregen.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-pregen.Tpo $(DEPDIR)/convert_pgn-pregen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pregen.cpp' object='convert_pgn-pregen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-pregen.o `test -f 'pregen.cpp' || echo '$(srcdir)/'`pregen.cpp
+
+convert_pgn-pregen.obj: pregen.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-pregen.obj -MD -MP -MF $(DEPDIR)/convert_pgn-pregen.Tpo -c -o convert_pgn-pregen.obj `if test -f 'pregen.cpp'; then $(CYGPATH_W) 'pregen.cpp'; else $(CYGPATH_W) '$(srcdir)/pregen.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-pregen.Tpo $(DEPDIR)/convert_pgn-pregen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pregen.cpp' object='convert_pgn-pregen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-pregen.obj `if test -f 'pregen.cpp'; then $(CYGPATH_W) 'pregen.cpp'; else $(CYGPATH_W) '$(srcdir)/pregen.cpp'; fi`
+
+convert_pgn-position.o: position.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-position.o -MD -MP -MF $(DEPDIR)/convert_pgn-position.Tpo -c -o convert_pgn-position.o `test -f 'position.cpp' || echo '$(srcdir)/'`position.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-position.Tpo $(DEPDIR)/convert_pgn-position.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='position.cpp' object='convert_pgn-position.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-position.o `test -f 'position.cpp' || echo '$(srcdir)/'`position.cpp
+
+convert_pgn-position.obj: position.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-position.obj -MD -MP -MF $(DEPDIR)/convert_pgn-position.Tpo -c -o convert_pgn-position.obj `if test -f 'position.cpp'; then $(CYGPATH_W) 'position.cpp'; else $(CYGPATH_W) '$(srcdir)/position.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-position.Tpo $(DEPDIR)/convert_pgn-position.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='position.cpp' object='convert_pgn-position.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-position.obj `if test -f 'position.cpp'; then $(CYGPATH_W) 'position.cpp'; else $(CYGPATH_W) '$(srcdir)/position.cpp'; fi`
+
+convert_pgn-genmoves.o: genmoves.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-genmoves.o -MD -MP -MF $(DEPDIR)/convert_pgn-genmoves.Tpo -c -o convert_pgn-genmoves.o `test -f 'genmoves.cpp' || echo '$(srcdir)/'`genmoves.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-genmoves.Tpo $(DEPDIR)/convert_pgn-genmoves.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='genmoves.cpp' object='convert_pgn-genmoves.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-genmoves.o `test -f 'genmoves.cpp' || echo '$(srcdir)/'`genmoves.cpp
+
+convert_pgn-genmoves.obj: genmoves.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-genmoves.obj -MD -MP -MF $(DEPDIR)/convert_pgn-genmoves.Tpo -c -o convert_pgn-genmoves.obj `if test -f 'genmoves.cpp'; then $(CYGPATH_W) 'genmoves.cpp'; else $(CYGPATH_W) '$(srcdir)/genmoves.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-genmoves.Tpo $(DEPDIR)/convert_pgn-genmoves.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='genmoves.cpp' object='convert_pgn-genmoves.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-genmoves.obj `if test -f 'genmoves.cpp'; then $(CYGPATH_W) 'genmoves.cpp'; else $(CYGPATH_W) '$(srcdir)/genmoves.cpp'; fi`
+
+convert_pgn-cchess.o: cchess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-cchess.o -MD -MP -MF $(DEPDIR)/convert_pgn-cchess.Tpo -c -o convert_pgn-cchess.o `test -f 'cchess.cpp' || echo '$(srcdir)/'`cchess.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-cchess.Tpo $(DEPDIR)/convert_pgn-cchess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cchess.cpp' object='convert_pgn-cchess.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-cchess.o `test -f 'cchess.cpp' || echo '$(srcdir)/'`cchess.cpp
+
+convert_pgn-cchess.obj: cchess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-cchess.obj -MD -MP -MF $(DEPDIR)/convert_pgn-cchess.Tpo -c -o convert_pgn-cchess.obj `if test -f 'cchess.cpp'; then $(CYGPATH_W) 'cchess.cpp'; else $(CYGPATH_W) '$(srcdir)/cchess.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-cchess.Tpo $(DEPDIR)/convert_pgn-cchess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cchess.cpp' object='convert_pgn-cchess.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-cchess.obj `if test -f 'cchess.cpp'; then $(CYGPATH_W) 'cchess.cpp'; else $(CYGPATH_W) '$(srcdir)/cchess.cpp'; fi`
+
+convert_pgn-pgnfile.o: pgnfile.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-pgnfile.o -MD -MP -MF $(DEPDIR)/convert_pgn-pgnfile.Tpo -c -o convert_pgn-pgnfile.o `test -f 'pgnfile.cpp' || echo '$(srcdir)/'`pgnfile.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-pgnfile.Tpo $(DEPDIR)/convert_pgn-pgnfile.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pgnfile.cpp' object='convert_pgn-pgnfile.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-pgnfile.o `test -f 'pgnfile.cpp' || echo '$(srcdir)/'`pgnfile.cpp
+
+convert_pgn-pgnfile.obj: pgnfile.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -MT convert_pgn-pgnfile.obj -MD -MP -MF $(DEPDIR)/convert_pgn-pgnfile.Tpo -c -o convert_pgn-pgnfile.obj `if test -f 'pgnfile.cpp'; then $(CYGPATH_W) 'pgnfile.cpp'; else $(CYGPATH_W) '$(srcdir)/pgnfile.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/convert_pgn-pgnfile.Tpo $(DEPDIR)/convert_pgn-pgnfile.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='pgnfile.cpp' object='convert_pgn-pgnfile.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(convert_pgn_CXXFLAGS) $(CXXFLAGS) -c -o convert_pgn-pgnfile.obj `if test -f 'pgnfile.cpp'; then $(CYGPATH_W) 'pgnfile.cpp'; else $(CYGPATH_W) '$(srcdir)/pgnfile.cpp'; fi`
 
 eleeye_engine-book.o: book.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(eleeye_engine_CXXFLAGS) $(CXXFLAGS) -MT eleeye_engine-book.o -MD -MP -MF $(DEPDIR)/eleeye_engine-book.Tpo -c -o eleeye_engine-book.o `test -f 'book.cpp' || echo '$(srcdir)/'`book.cpp

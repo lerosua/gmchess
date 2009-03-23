@@ -189,21 +189,43 @@ void MainWindow:: on_menu_open_file()
 	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dlg.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
-	//Gtk::FileFilter filter_media;
-	//filter_media.set_name();
+	Gtk::FileFilter filter_pgn;
+	filter_pgn.set_name("PGN");
+	filter_pgn.add_pattern("*.pgn");
+	dlg.add_filter(filter_pgn);
+	/** 中游象棋*/
+	Gtk::FileFilter filter_ccm;
+	filter_ccm.set_name("CCM");
+	filter_ccm.add_pattern("*.ccm");
+	dlg.add_filter(filter_ccm);
+	/** QQ象棋*/
+	Gtk::FileFilter filter_che;
+	filter_che.set_name("CHE");
+	filter_che.add_pattern("*.che");
+	dlg.add_filter(filter_che);
+	/** 联众象棋*/
+	Gtk::FileFilter filter_chn;
+	filter_chn.set_name("CHN");
+	filter_chn.add_pattern("*.chn");
+	dlg.add_filter(filter_chn);
+
+	Gtk::FileFilter filter_any;
+	filter_chn.set_name("All Files");
+	filter_chn.add_pattern("*");
+	dlg.add_filter(filter_any);
+	
 	if (Gtk::RESPONSE_OK == dlg.run()) {
 		std::string filename = dlg.get_filename();
 		if (filename.empty())
 			return;
-		//std::string filtername = std::string("\"")+filename+"\"";
-		//DLOG("播放 %s\n",filtername.c_str());
 		int out = board->open_file( filename);
-		if(out){
+		if(out<0){
 			DLOG("open file :%s error\n",filename.c_str());
 		}
-		else
+		else{
 			init_move_treeview();
-		set_information();
+			set_information();
+		}
 
 	}
 }

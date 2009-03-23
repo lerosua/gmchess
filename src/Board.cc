@@ -527,10 +527,12 @@ int Board::open_file(const std::string& filename)
 {
 
 	/** for test pgnfile */
-	if(!p_pgnfile->read(filename)){
-		m_step = m_engine.how_step();
-		m_status = READ_STATUS ;
+	if(p_pgnfile->read(filename)<0){
+		/** open fail */
+		return -1;
 	}
+	m_step = m_engine.how_step();
+	m_status = READ_STATUS ;
 
 	redraw();
 	return 0;
