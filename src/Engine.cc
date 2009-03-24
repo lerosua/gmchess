@@ -1485,10 +1485,16 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			int a1_y = get_iccs_y(chessmans[type_num+num]);
 			int a2_y = get_iccs_y(chessmans[type_num+1+num]);
 			if(c_hanzi.word[1] == 'a'){
-				src_y = a1_y>a2_y?a1_y:a2_y;
+				if(!black_player)
+					src_y = a1_y>a2_y?a1_y:a2_y;
+				else
+					src_y = a1_y<a2_y?a1_y:a2_y;
 			}
 			else{
-				src_y = a1_y>a2_y?a1_y:a2_y;
+				if(!black_player)
+					src_y = a1_y>a2_y?a1_y:a2_y;
+				else
+					src_y = a1_y<a2_y?a1_y:a2_y;
 			}
 			src_x= a1_x;
 		}

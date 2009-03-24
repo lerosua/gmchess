@@ -129,7 +129,6 @@ bool Pgnfile::get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, c
 
 int Pgnfile::read(const std::string & filename)
 {
-	//std::ifstream file("test.pgn");
 	std::fstream file;
 	file.open(filename.c_str(),std::ios_base::in);
 	if(!file){
@@ -141,6 +140,7 @@ int Pgnfile::read(const std::string & filename)
 
 	std::string line;
 	Glib::ustring startFen;
+	bool comment=false;
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos){
@@ -166,10 +166,21 @@ int Pgnfile::read(const std::string & filename)
 			continue;
 		/**暂时过滤棋步注释*/
 		pos = line.find_first_of("{");
-		if(pos != std::string::npos)
+		if(pos != std::string::npos){
+			comment = true;
 			continue;
-		 Glib::ustring uline(line);
+		}
 
+		pos = line.find_last_of("}");
+		if(pos != std::string::npos){
+			comment = false;
+			continue;
+		}
+
+		if(comment)
+			continue;
+
+		 Glib::ustring uline(line);
 		int i=0;
 		
 		do{

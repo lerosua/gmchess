@@ -57,6 +57,9 @@ class MainWindow:public Gtk::Window
 		/** 添加treview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
 		void del_step_last_line();
+		/** 显示出当前步时位置*/
+		void show_treeview_step();
+		bool on_foreach_iter(const Gtk::TreeModel::iterator iter);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

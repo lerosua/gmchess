@@ -96,6 +96,7 @@ class Board : public Gtk::DrawingArea
 		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return m_engine.get_move_chinese_snapshot();};
 		/** 返回程序棋盘状态:读谱，与电脑对战，网络对战,自由摆棋*/
 		int get_status(){ return m_status; }
+		int get_step(){ return m_step; }
 		
 	private:
 		/** 加载所需要图片进内存*/

@@ -117,22 +117,50 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::show_treeview_step()
+{
+	Glib::RefPtr<Gtk::TreeModel> model= m_treeview.get_model();
+	model->foreach_iter(sigc::mem_fun(*this, &MainWindow::on_foreach_iter));
+
+}
+
+bool MainWindow::on_foreach_iter(const Gtk::TreeModel::iterator iter)
+{
+	int n_step = (*iter)[m_columns.step_num];
+	int m_step = board->get_step();
+	if(n_step == m_step){
+		Glib::RefPtr<Gtk::TreeSelection> sel = m_treeview.get_selection();
+		Gtk::TreeModel::Path path(iter);
+		m_treeview.scroll_to_row(path);
+		sel->select(iter);
+
+		return true;
+	}
+	return false;
+
+
+}
+
 void MainWindow::on_next_move()
 {
 	board->next_move();
+	show_treeview_step();
 
 }
 void MainWindow::on_back_move()
 {
 	board->back_move();
+	show_treeview_step();
 }
 void MainWindow::on_start_move()
 {
 	board->start_move();
+	m_treeview.scroll_to_point(1,1);
 }
 void MainWindow::on_end_move()
 {
 	board->end_move();
+	show_treeview_step();
 }
 
 
