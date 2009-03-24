@@ -25,7 +25,6 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include "Board.h"
-//#define main_ui  "../data/gmchess.glade"
 #define main_ui  DATA_DIR"/gmchess.glade"
 typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
 
@@ -68,7 +67,8 @@ class MainWindow:public Gtk::Window
 		void on_menu_view_preferences();
 		void on_menu_war_to_ai();
 		void on_menu_free_play();
-		void on_menu_help_about();
+		void on_menu_help();
+		void on_menu_about();
 		/** 初始化着法treeview */
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/

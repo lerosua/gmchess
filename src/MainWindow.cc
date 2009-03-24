@@ -19,6 +19,9 @@
 #include <glib/gi18n.h>
 #include <gtkmm/button.h>
 #include <gtkmm/treeselection.h>
+#include <gtkmm/aboutdialog.h>
+
+#define version "0.10"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -36,7 +39,8 @@ Glib::ustring ui_info =
 "			<menuitem action='FreePlay'/>"
 "		</menu>"
 "		<menu action='HelpMenu'>"
-"			<menuitem action='HelpAbout'/>"
+"			<menuitem action='Help'/>"
+"			<menuitem action='About'/>"
 "		</menu>"
 "	</menubar>"
 "</ui>";
@@ -205,8 +209,10 @@ void MainWindow::init_ui_manager()
 			sigc::mem_fun(*this, &MainWindow::on_menu_free_play));
 	//Help menu:
 	action_group->add(Gtk::Action::create("HelpMenu", _("_Help")));
-	action_group->add(Gtk::Action::create("HelpAbout", Gtk::Stock::HELP),
-			sigc::mem_fun(*this, &MainWindow::on_menu_help_about));
+	action_group->add(Gtk::Action::create("Help", Gtk::Stock::HELP),
+			sigc::mem_fun(*this, &MainWindow::on_menu_help));
+	action_group->add(Gtk::Action::create("About", Gtk::Stock::ABOUT),
+			sigc::mem_fun(*this, &MainWindow::on_menu_about));
 
 	if (!ui_manager)
 		ui_manager = Gtk::UIManager::create();
@@ -319,8 +325,35 @@ void MainWindow::on_menu_view_preferences()
 
 }
 
-void MainWindow::on_menu_help_about()
+void MainWindow::on_menu_help()
 {
+
+}
+
+void MainWindow::on_menu_about()
+{
+	static Gtk::AboutDialog*  about(0);
+	if(about == 0){
+		std::vector<Glib::ustring> authors;
+		authors.push_back("lerosua ");
+		authors.push_back("wind");
+		about = new Gtk::AboutDialog ;
+		Glib::RefPtr<Gdk::Pixbuf> logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
+		about->set_logo(logo);
+		about->set_program_name("GMChess");
+		about->set_version(version);
+		about->set_website("http://lerosua.org");
+		//about->set_website_label("lerosua");
+		about->set_copyright("Copyright (c) 2009 lerosua");
+		about->set_comments(_("GMChess is chinese chess game write by gtkmm"));
+		about->set_authors(authors);
+		about->set_license (_("This program is licenced under GNU General Public Licence (GPL) version 2."));
+		about->set_translator_credits("lerosua");
+
+
+	}
+	about->show();
+	about->raise();
 
 }
 
