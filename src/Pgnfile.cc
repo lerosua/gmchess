@@ -132,7 +132,6 @@ int Pgnfile::read(const std::string & filename)
 	//std::ifstream file("test.pgn");
 	std::fstream file;
 	file.open(filename.c_str(),std::ios_base::in);
-	//file.open(filename.c_str(),std::ios_base::in);
 	if(!file){
 		DLOG("open %s file error\n",filename.c_str());
 		return -1;
