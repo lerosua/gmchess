@@ -161,7 +161,7 @@ int Pgnfile::read(const std::string & filename)
 			continue;
 		}
 		/**暂时过滤象眼的信息*/
-		pos = line.find_first_of("===");
+		pos = line.find_first_of("=");
 		if(pos != std::string::npos)
 			continue;
 		/**暂时过滤棋步注释*/
@@ -169,9 +169,6 @@ int Pgnfile::read(const std::string & filename)
 		if(pos != std::string::npos)
 			continue;
 		 Glib::ustring uline(line);
-		//std::cout<<uline<<std::endl;
-		/** 保存着法的中文表达*/
-		//m_engine.add_move_chinese(uline);
 
 		int i=0;
 		

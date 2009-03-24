@@ -97,10 +97,10 @@ inline int ICCS_MOVE(const char *szIccsStr) {
 }
 
 static const char *const cszAdvertStr = "\r\n"
-    "============================\r\n"
-    " 欢迎访问《象棋百科全书网》 \r\n"
-    " 推荐用《象棋巫师》观赏棋谱 \r\n"
-    "http://www.elephantbase.net/\r\n";
+    "=============================\r\n"
+    "= 欢迎访问《象棋百科全书网》=\r\n"
+    "= 推荐用《象棋巫师》观赏棋谱=\r\n"
+    "=http://www.elephantbase.net=\r\n";
 
 bool PgnFileStruct::Read(const char *szFileName, bool bNoAdvert) {
   FILE *fp;

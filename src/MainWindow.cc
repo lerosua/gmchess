@@ -209,25 +209,56 @@ void MainWindow:: on_menu_open_file()
 	filter_chn.add_pattern("*.chn");
 	dlg.add_filter(filter_chn);
 
+	/** 弈天象棋*/
+	Gtk::FileFilter filter_mxq;
+	filter_mxq.set_name("MXQ");
+	filter_mxq.add_pattern("*.mxq");
+	dlg.add_filter(filter_mxq);
+	/** 象棋演播室*/
+	Gtk::FileFilter filter_xqf;
+	filter_xqf.set_name("MXQ");
+	filter_xqf.add_pattern("*.mxq");
+	dlg.add_filter(filter_xqf);
+	/** 所有文件*/
 	Gtk::FileFilter filter_any;
-	filter_chn.set_name("All Files");
-	filter_chn.add_pattern("*");
+	filter_any.set_name("All Files");
+	filter_any.add_pattern("*");
 	dlg.add_filter(filter_any);
 	
+	std::string filename ;
 	if (Gtk::RESPONSE_OK == dlg.run()) {
-		std::string filename = dlg.get_filename();
-		if (filename.empty())
-			return;
-		int out = board->open_file( filename);
+		filename = dlg.get_filename();
+	}
+	if (filename.empty())
+		return;
+	/** 获取文件后先它将它转换成pgn文件才能打开*/
+		int out;
+
+		size_t pos = filename.find(".pgn");
+		if(pos == std::string::npos){
+			char cmd[1024];
+			sprintf(cmd,"convert_pgn \"%s\" /tmp/gmchess.pgn",filename.c_str());
+			if(system(cmd)<0){
+				DLOG("convert pgn file error\n");
+				return;
+			}
+
+			out = board->open_file("/tmp/gmchess.pgn");
+		}
+		else
+			out = board->open_file( filename);
 		if(out<0){
 			DLOG("open file :%s error\n",filename.c_str());
+			Gtk::MessageDialog dialog("Error",false,
+					Gtk::MESSAGE_INFO);
+			dialog.set_secondary_text(_("the file maybe not right format for chess"));
+			dialog.run();
 		}
 		else{
 			init_move_treeview();
 			set_information();
 		}
 
-	}
 }
 
 void MainWindow::on_menu_war_to_ai()

@@ -391,7 +391,9 @@ inline void GetXqfString(char *szPgn, const char *szXqf)
 {
 	strncpy(szPgn, szXqf + 1, szXqf[0]);
 	szPgn[szXqf[0]] = '\0';
-} int Xqf2Pgn(const char *szXqfFile, const char *szPgnFile,
+} 
+
+int Xqf2Pgn(const char *szXqfFile, const char *szPgnFile,
 		    const EccoApiStruct & EccoApi)
 {
 	int i, nArg0, nArgs[4];
@@ -620,6 +622,28 @@ inline void GetXqfString(char *szPgn, const char *szXqf)
 	}
 }
 
+/** 只是将大写的PGN后缀文件copy一下 */
+int Pgn2Pgn(const char *szFile, const char *szPgnFile,
+		    const EccoApiStruct & EccoApi)
+{
+	FILE * infp;
+	FILE * outfp;
+	char c;
+	infp = fopen(szFile, "rb");
+	if (infp == NULL) {
+		return _ERROR_OPEN;
+	}
+	if((outfp=fopen(szPgnFile,"wb"))==NULL) 
+		return _ERROR_OPEN;
+	while(!feof(infp)){
+		c=fgetc(infp);
+		fputc(c,outfp);
+	}
+	fclose(infp);
+	fclose(outfp);
+	return 0;
+
+}
 
 /** 
  *  CCM=中国游戏中心象棋
@@ -628,24 +652,23 @@ inline void GetXqfString(char *szPgn, const char *szXqf)
  *  MXQ=弈天象棋
  *  XQF=象棋演播室
  */
-enum { CCM, CHE, CHN, MXQ, XQF, ERR };
+enum { PGN,CCM, CHE, CHN, MXQ, XQF, ERR };
 int format(char *filename)
 {
-	if ((strstr(filename, ".ccm") != NULL)
+	if ((strstr(filename, ".pgn") != NULL)
+	     || strstr(filename, ".PGN") != NULL) {
+		return PGN;
+	}else if ((strstr(filename, ".ccm") != NULL)
 	     || strstr(filename, ".CCM") != NULL) {
-		printf("format ccm\n");
 		return CCM;
 	} else if ((strstr(filename, ".che") != NULL)
 		    || strstr(filename, ".CHE") != NULL) {
-		printf("format che\n");
 		return CHE;
 	} else if ((strstr(filename, ".chn") != NULL)
 		    || strstr(filename, ".CHN")) {
-		printf("format chn\n");
 		return CHN;
 	} else if ((strstr(filename, ".xqf") != NULL)
 		    || strstr(filename, ".XQF")) {
-		printf("format xqf\n");
 		return XQF;
 	} else
 		return ERR;
@@ -691,6 +714,9 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	switch (format(argv[1])) {
+	case PGN:
+		fun = Pgn2Pgn;
+		break;
 	case CCM:
 		fun = Ccm2Pgn;
 		break;
