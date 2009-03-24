@@ -49,11 +49,12 @@ class MainWindow:public Gtk::Window
 		/** 认输*/
 		void on_lose_game();
 		/** 求和*/
-		void on_huo_game();
+		void on_draw_game();
 		/** 悔棋*/
-		void on_undo_game();
+		void on_rue_game();
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
+		void set_comment(const std::string& f_comment);
 		/** 添加treview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
 		void del_step_last_line();
@@ -96,7 +97,9 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
 		Gtk::TreeView			m_treeview;
-		/** treeview 里的按钮*/
+		Gtk::ButtonBox*			buttonbox_war;
+		Gtk::TextView*			text_comment;
+		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;
 		Gtk::Button*			btn_end ;
 		Gtk::Button*			btn_prev;
@@ -104,8 +107,8 @@ class MainWindow:public Gtk::Window
 		/** 对战按钮*/
 		Gtk::Button*			btn_begin;
 		Gtk::Button*			btn_lose;
-		Gtk::Button*			btn_huo;
-		Gtk::Button*			btn_undo;
+		Gtk::Button*			btn_draw;
+		Gtk::Button*			btn_rue;
 };
 
 

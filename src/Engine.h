@@ -23,6 +23,7 @@
 #include "gmchess.h"
 #include <vector>
 #include <string>
+#include <map>
 #include <glibmm.h>
 
 
@@ -172,8 +173,14 @@ class Engine {
 		/** 清理棋盘及棋子数组*/
 		void clean_board();
 		/** 返回棋局走了多少步*/
-		int how_step(){ return fen_snapshots.size()-1;}
+		//int how_step(){ return fen_snapshots.size()-1;}
+		int how_step(){ return fen_snapshots.empty()?0:fen_snapshots.size()-1;}
+		/** 获取最后一个着法的镜像，悔棋用*/
 		int get_last_move_from_snapshot(){return move_snapshots.back(); }
+		/** 添加着法注释*/
+		void add_comment(const std::string& str);
+		/** 获取某着法的注释，如果有的话*/
+		std::string* get_comment(int f_step);
 
 	private:
 		/**
@@ -195,6 +202,8 @@ class Engine {
 		std::vector<int> move_snapshots;
 		/** 着法的中文表达式*/
 		std::vector<Glib::ustring> move_chinese;
+		/** 着法的注释*/
+		std::map<int,std::string> move_comment;
 		/** 
 		 * @brief 谁走子的信息
 		 * 0 是红方先走，1是黑方先走

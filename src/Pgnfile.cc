@@ -141,6 +141,7 @@ int Pgnfile::read(const std::string & filename)
 	std::string line;
 	Glib::ustring startFen;
 	bool comment=false;
+	std::string comment_str;
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos){
@@ -168,17 +169,35 @@ int Pgnfile::read(const std::string & filename)
 		pos = line.find_first_of("{");
 		if(pos != std::string::npos){
 			comment = true;
+
+			/** 注释在一行内结束*/
+			size_t s_pos = line.find_last_of("}");
+			if(s_pos != std::string::npos){
+				comment_str += line;
+				m_engine.add_comment(comment_str);
+				comment = false;
+				comment_str.clear();
+				continue;
+			}
+
+			/** 注释有多行*/
+			comment_str += line;
 			continue;
 		}
 
 		pos = line.find_last_of("}");
 		if(pos != std::string::npos){
+			comment_str += line;
+			m_engine.add_comment(comment_str);
 			comment = false;
+			comment_str.clear();
 			continue;
 		}
 
-		if(comment)
+		if(comment){
+			comment_str += line;
 			continue;
+		}
 
 		 Glib::ustring uline(line);
 		int i=0;

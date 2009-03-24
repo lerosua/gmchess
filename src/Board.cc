@@ -443,6 +443,13 @@ void Board::start_move()
 {
 	m_step = 0;
 	m_engine.get_snapshot(m_step);
+
+	/** 设置此步的注释*/
+	std::string* str=m_engine.get_comment(m_step);
+	if(str != NULL){
+		parent.set_comment(*str);
+	}
+
 	redraw();
 }
 
@@ -450,6 +457,13 @@ void Board::end_move()
 {
 	m_step = m_engine.how_step();
 	m_engine.get_snapshot(m_step);
+
+	/** 设置此步的注释*/
+	std::string* str=m_engine.get_comment(m_step);
+	if(str != NULL){
+		parent.set_comment(*str);
+	}
+
 	redraw();
 }
 void Board::next_move()
@@ -458,9 +472,14 @@ void Board::next_move()
 	int all_step = m_engine.how_step();
 	if(m_step> all_step)
 		m_step = all_step;
-	DLOG("all_step = %d\n",all_step);
-	DLOG("m_step = %d\n",m_step);
 	m_engine.get_snapshot(m_step);
+
+	/** 设置此步的注释*/
+	std::string* str=m_engine.get_comment(m_step);
+	if(str != NULL){
+		parent.set_comment(*str);
+	}
+
 	redraw();
 }
 void Board::back_move()
@@ -471,6 +490,13 @@ void Board::back_move()
 		m_step =0;
 	m_engine.get_snapshot(m_step);
 	DLOG("m_step = %d\n",m_step);
+
+
+	/** 设置此步的注释*/
+	std::string* str=m_engine.get_comment(m_step);
+	if(str != NULL){
+		parent.set_comment(*str);
+	}
 	redraw();
 
 }
@@ -485,6 +511,12 @@ void Board::get_board_by_move(int f_step)
 
 	m_engine.get_snapshot(f_step);
 	m_step = f_step;
+
+	/** 设置此步的注释*/
+	std::string* str=m_engine.get_comment(f_step);
+	if(str != NULL){
+		parent.set_comment(*str);
+	}
 	redraw();
 }
 

@@ -49,12 +49,33 @@ void Engine::reset()
 	fen_snapshots.clear();
 	move_snapshots.clear();
 	move_chinese.clear();
+	move_comment.clear();
 }
 
 void Engine::add_piece(int sq,int pc)
 {
 	chessboard[sq]=pc;
 	chessmans[pc]=sq;
+}
+
+void Engine::add_comment(const std::string& str)
+{
+	int step=how_step();
+	/** 直接赋值据说性能比较差*/
+	//move_comment[step] = str;
+	move_comment.insert(std::map<int,std::string>::value_type(step,str));
+}
+std::string* Engine::get_comment(int f_step)
+{
+	std::map<int,std::string>::iterator iter = move_comment.find(f_step);
+	if(iter == move_comment.end()){
+
+		/** 没找到 */
+		return NULL;
+	}
+	else{
+		return &(iter->second);
+	}
 }
 
 void Engine::from_fens(const char *szFen) {

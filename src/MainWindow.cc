@@ -53,6 +53,8 @@ MainWindow::MainWindow():menubar(NULL)
 	Gtk::VBox* main_window = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("main_window"));
 
 	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
+	buttonbox_war = dynamic_cast<Gtk::ButtonBox*>(ui_xml->get_widget("hbuttonbox_war"));
+	text_comment = dynamic_cast<Gtk::TextView*>(ui_xml->get_widget("textview_comment"));
 
 	 btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
 	 btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
@@ -62,8 +64,8 @@ MainWindow::MainWindow():menubar(NULL)
 
 	 btn_begin = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_begin"));
 	 btn_lose  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_lose"));
-	 btn_huo   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_huo"));
-	 btn_undo  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_undo"));
+	 btn_draw   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_draw"));
+	 btn_rue  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_rue"));
 
 	btn_start->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_start_move));
@@ -78,10 +80,10 @@ MainWindow::MainWindow():menubar(NULL)
 			sigc::mem_fun(*this, &MainWindow::on_begin_game));
 	btn_lose->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_lose_game));
-	btn_huo->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_huo_game));
-	btn_undo->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_undo_game));
+	btn_draw->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_draw_game));
+	btn_rue->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
 	board= Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
@@ -117,6 +119,13 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::set_comment(const std::string& f_comment)
+{
+	text_comment->set_wrap_mode(Gtk::WRAP_WORD);
+	Glib::RefPtr<Gtk::TextBuffer> buffer = text_comment->get_buffer();
+	buffer->set_text(f_comment);
+
+}
 void MainWindow::show_treeview_step()
 {
 	Glib::RefPtr<Gtk::TreeModel> model= m_treeview.get_model();
@@ -414,12 +423,13 @@ void MainWindow::on_lose_game()
 
 }
 
-void MainWindow::on_huo_game()
+/** draw 是打平局面的意思*/
+void MainWindow::on_draw_game()
 {
 
 }
 
-void MainWindow::on_undo_game()
+void MainWindow::on_rue_game()
 {
 	/** 如果是网络对战，则需要确认信息*/
 	board->rue_move();

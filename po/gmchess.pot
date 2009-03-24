@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-22 08:49+0800\n"
+"POT-Creation-Date: 2009-03-24 21:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,75 +16,79 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:105
+#: ../src/MainWindow.cc:107
 msgid "number"
 msgstr ""
 
-#: ../src/MainWindow.cc:106
+#: ../src/MainWindow.cc:108
 msgid "step"
 msgstr ""
 
 #. File menu:
-#: ../src/MainWindow.cc:146
+#: ../src/MainWindow.cc:183
 msgid "_File"
 msgstr ""
 
-#: ../src/MainWindow.cc:148
+#: ../src/MainWindow.cc:185
 msgid "Open file"
 msgstr ""
 
-#: ../src/MainWindow.cc:149
+#: ../src/MainWindow.cc:186
 msgid "Open chessman File"
 msgstr ""
 
 #. View menu:
-#: ../src/MainWindow.cc:157
+#: ../src/MainWindow.cc:194
 msgid "_View"
 msgstr ""
 
 #. Game menu:
-#: ../src/MainWindow.cc:164
+#: ../src/MainWindow.cc:201
 msgid "_Game"
 msgstr ""
 
-#: ../src/MainWindow.cc:165
+#: ../src/MainWindow.cc:202
 msgid "_Fight to AI"
 msgstr ""
 
-#: ../src/MainWindow.cc:167
+#: ../src/MainWindow.cc:204
 msgid "Free Play"
 msgstr ""
 
 #. Help menu:
-#: ../src/MainWindow.cc:170
+#: ../src/MainWindow.cc:207
 msgid "_Help"
 msgstr ""
 
-#: ../src/MainWindow.cc:187
+#: ../src/MainWindow.cc:224
 msgid "Choose File"
 msgstr ""
 
-#: ../src/MainWindow.cc:299
+#: ../src/MainWindow.cc:291
+msgid "the file maybe not right format for chess"
+msgstr ""
+
+#: ../src/MainWindow.cc:389
 msgid "Game: "
 msgstr ""
 
-#: ../src/MainWindow.cc:300
+#: ../src/MainWindow.cc:390
 msgid "Time: "
 msgstr ""
 
-#: ../src/MainWindow.cc:301
+#: ../src/MainWindow.cc:391
 msgid "Site: "
 msgstr ""
 
-#: ../src/MainWindow.cc:302
+#: ../src/MainWindow.cc:392
 msgid "Result: "
 msgstr ""
 
-#: ../src/MainWindow.cc:303
+#: ../src/MainWindow.cc:393
 msgid "Opening: "
 msgstr ""
 
-#: ../src/MainWindow.cc:304
+#: ../src/MainWindow.cc:394
 msgid "Variation:  "
 msgstr ""
 
@@ -111,53 +115,69 @@ msgid ""
 msgstr ""
 
 #: ../data/gmchess.glade.h:7
-msgid "Engine"
+msgid "Draw"
 msgstr ""
 
 #: ../data/gmchess.glade.h:8
-msgid "Information"
+msgid "Engine"
 msgstr ""
 
 #: ../data/gmchess.glade.h:9
-msgid "chess"
+msgid "Information"
 msgstr ""
 
 #: ../data/gmchess.glade.h:10
-msgid "hui"
+msgid "Lost"
 msgstr ""
 
 #: ../data/gmchess.glade.h:11
-msgid "huo"
+msgid "Rue"
 msgstr ""
 
 #: ../data/gmchess.glade.h:12
-msgid "label"
+msgid "Start"
 msgstr ""
 
 #: ../data/gmchess.glade.h:13
-msgid "lost"
+msgid "chess"
 msgstr ""
 
 #: ../data/gmchess.glade.h:14
-msgid "nickname:"
+msgid "first station"
 msgstr ""
 
 #: ../data/gmchess.glade.h:15
-msgid "nickname: "
+msgid "label"
 msgstr ""
 
 #: ../data/gmchess.glade.h:16
-msgid "page 3"
+msgid "last move"
 msgstr ""
 
 #: ../data/gmchess.glade.h:17
-msgid "play time: "
+msgid "next move"
 msgstr ""
 
 #: ../data/gmchess.glade.h:18
-msgid "start"
+msgid "nickname:"
 msgstr ""
 
 #: ../data/gmchess.glade.h:19
+msgid "nickname: "
+msgstr ""
+
+#: ../data/gmchess.glade.h:20
+msgid "page 3"
+msgstr ""
+
+#: ../data/gmchess.glade.h:21
+msgid "play time: "
+msgstr ""
+
+#: ../data/gmchess.glade.h:22
+msgid "preview move"
+msgstr ""
+
+#: ../data/gmchess.glade.h:23
 msgid "step time: "
 msgstr ""
