@@ -73,6 +73,10 @@ class Board : public Gtk::DrawingArea
 		void draw_select_frame(bool selected = true);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
+		/** 处理拖文件事件*/
+		void on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
+				int,int,const Gtk::SelectionData& selection_data,
+				guint,guint time);
 	public:
 
 		/** 回到最初局面*/

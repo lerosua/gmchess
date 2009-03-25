@@ -281,13 +281,20 @@ void MainWindow:: on_menu_open_file()
 	}
 	if (filename.empty())
 		return;
+	open_file(filename);
+}
+
+void MainWindow::open_file(const std::string& filename)
+{
+
 	/** 获取文件后先它将它转换成pgn文件才能打开*/
 		int out;
 
 		size_t pos = filename.find(".pgn");
 		if(pos == std::string::npos){
 			char cmd[1024];
-			sprintf(cmd,"convert_pgn \"%s\" /tmp/gmchess.pgn",filename.c_str());
+			//sprintf(cmd,"convert_pgn \"%s\" /tmp/gmchess.pgn",filename.c_str());
+			sprintf(cmd,"convert_pgn \"%s\" ",filename.c_str());
 			if(system(cmd)<0){
 				DLOG("convert pgn file error\n");
 				return;
@@ -298,7 +305,7 @@ void MainWindow:: on_menu_open_file()
 		else
 			out = board->open_file( filename);
 		if(out<0){
-			DLOG("open file :%s error\n",filename.c_str());
+			DLOG("open file: %s error\n",filename.c_str());
 			Gtk::MessageDialog dialog("Error",false,
 					Gtk::MESSAGE_INFO);
 			dialog.set_secondary_text(_("the file maybe not right format for chess"));
@@ -308,6 +315,7 @@ void MainWindow:: on_menu_open_file()
 			init_move_treeview();
 			set_information();
 		}
+
 
 }
 
@@ -456,6 +464,11 @@ void MainWindow::set_move_button_property()
 	btn_prev->set_sensitive(f_use);
 	btn_start->set_sensitive(f_use);
 	btn_end->set_sensitive(f_use);
+
+	btn_begin->set_sensitive(1-f_use);
+	btn_lose->set_sensitive(1-f_use);
+	btn_draw->set_sensitive(1-f_use);
+	btn_rue->set_sensitive(1-f_use);
 
 }
 

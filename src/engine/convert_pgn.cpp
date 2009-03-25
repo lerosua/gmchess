@@ -751,23 +751,19 @@ int main(int argc, char **argv)
 		printf("File Creation Error!\n");
 		break;
 	case _OK:
+		printf("File convert finish\n");
 
-#ifdef _WIN32
-		if (argc == 2) {
-			ShellExecute(NULL, NULL, "CCM2PGN.PGN", NULL,
-				      NULL, SW_SHOW);
+		int out= file_gbk_to_utf8("/tmp/gb.pgn",argc==2?"/tmp/gmchess.pgn":argv[2]);
+		if(out<0){
+			printf("file code change error\n");
+			return -1;
 		}
-#endif				/*  */
+		remove("/tmp/gb.pgn");
+
 		break;
 	}
 	EccoApi.Shutdown();
 	
-	int out= file_gbk_to_utf8("/tmp/gb.pgn",argc==2?"/tmp/gmchess.pgn":argv[2]);
-	if(out<0){
-		printf("file code change error");
-		return -1;
-	}
-	remove("/tmp/gb.pgn");
 	return 0;
 }
 

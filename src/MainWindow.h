@@ -61,6 +61,7 @@ class MainWindow:public Gtk::Window
 		/** 显示出当前步时位置*/
 		void show_treeview_step();
 		bool on_foreach_iter(const Gtk::TreeModel::iterator iter);
+		void open_file(const std::string& filename);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

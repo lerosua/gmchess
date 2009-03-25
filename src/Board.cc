@@ -19,6 +19,8 @@
 
 #include "Board.h"
 #include <vector>
+#include <string.h>
+#include <cassert>
 #include "Engine.h"
 #include "MainWindow.h"
 
@@ -31,7 +33,72 @@ const int chessman_width = 57;
 #define PIECE_END   48  //棋子结束数字
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
 #define IMGAGE_DIR DATA_DIR"/wood/"
+#define HEX_ESCAPE '%'
 
+
+int hex_to_int (gchar c)
+{
+	return  c >= '0' && c <= '9' ? c - '0'
+		: c >= 'A' && c <= 'F' ? c - 'A' + 10
+		: c >= 'a' && c <= 'f' ? c - 'a' + 10
+		: -1;
+}
+
+int unescape_character (const char *scanner)
+{
+	int first_digit;
+	int second_digit;
+
+	first_digit = hex_to_int (*scanner++);
+	if (first_digit < 0) {
+		return -1;
+	}
+
+	second_digit = hex_to_int (*scanner++);
+	if (second_digit < 0) {
+		return -1;
+	}
+
+	return (first_digit << 4) | second_digit;
+}
+
+/** 用于在拖放时得到的文件名的转码*/
+std::string  wind_unescape_string (const char *escaped_string, 
+		const gchar *illegal_characters)
+{
+	const char *in;
+	char *out;
+	int character;
+
+	if (escaped_string == NULL) {
+		return std::string();
+	}
+
+	//result = g_malloc (strlen (escaped_string) + 1);
+	char result[strlen (escaped_string) + 1];
+
+	out = result;
+	for (in = escaped_string; *in != '\0'; in++) {
+		character = *in;
+		if (*in == HEX_ESCAPE) {
+			character = unescape_character (in + 1);
+
+			/* Check for an illegal character. We consider '\0' illegal here. */
+			if (character <= 0
+					|| (illegal_characters != NULL
+						&& strchr (illegal_characters, (char)character) != NULL)) {
+				return std::string();
+			}
+			in += 2;
+		}
+		*out++ = (char)character;
+	}
+
+	*out = '\0';
+	assert (out - result <= strlen (escaped_string));
+	return std::string(result);
+
+}
 
 Board::Board(MainWindow& win) :
 	selected_x(-1),
@@ -43,7 +110,17 @@ Board::Board(MainWindow& win) :
 	selected_chessman(-1)
 	,parent(win)
 {
+
+	std::list<Gtk::TargetEntry> listTargets;
+	listTargets.push_back(Gtk::TargetEntry("STRING"));
+	listTargets.push_back(Gtk::TargetEntry("text/plain"));
+
 	this->set_size_request(521,577);
+
+	this->drag_dest_set(listTargets);
+	this->signal_drag_data_received().connect(
+			sigc::mem_fun(*this, &Board::on_drog_data_received));
+
 	/** 加载所需要图片进内存*/
 	load_images();
 	
@@ -578,4 +655,22 @@ int Board::open_file(const std::string& filename)
 
 	redraw();
 	return 0;
+}
+
+
+void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
+		int, int, const Gtk::SelectionData& selection_data,
+		guint,guint f_time)
+{
+	if((selection_data.get_length() >= 0)&&(selection_data.get_format()== 8))
+	{
+		context->drag_finish(false,false,f_time);
+		std::string filename = wind_unescape_string(selection_data.get_text().c_str(), NULL);
+		size_t pos = filename.find('\r');
+		if (std::string::npos != pos)
+			filename = filename.substr(7, pos-7);
+		//DLOG("播放 %s###\n",filename.c_str());
+		parent.open_file(filename);
+
+	}
 }
