@@ -352,8 +352,6 @@ void MainWindow::on_menu_about()
 
 
 	}
-	//about->show();
-	//about->raise();
 	about->run();
 	about->hide();
 
@@ -440,6 +438,7 @@ void MainWindow::set_move_button_property()
 	bool f_use=1;
 	if( READ_STATUS != f_status){
 		f_use = 0;
+		buttonbox_war->hide();
 	}
 	btn_next->set_sensitive(f_use);
 	btn_prev->set_sensitive(f_use);

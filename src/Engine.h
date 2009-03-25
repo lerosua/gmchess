@@ -209,8 +209,6 @@ class Engine {
 		 * 0 是红方先走，1是黑方先走
 		 */
 		bool black_player;
-		/** 走棋计数*/
-		int count;
 
 
 

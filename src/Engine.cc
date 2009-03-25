@@ -19,7 +19,7 @@
 #include "Engine.h"
 #include <string.h>
 #include <stdlib.h>
-Engine::Engine():count(0),black_player(0)
+Engine::Engine():black_player(0)
 {
 	clean_board();
 }
@@ -45,7 +45,6 @@ void Engine::reset()
 	clean_board();
 
 	black_player = 0;
-	count=0;
 	fen_snapshots.clear();
 	move_snapshots.clear();
 	move_chinese.clear();
@@ -221,10 +220,9 @@ void Engine::init_snapshot(const char* fen)
 void Engine::get_snapshot(int num)
 {
 	std::string fens = fen_snapshots[num];
-	DLOG("get_snapshot = %s\n",fens.c_str());
+	//DLOG("get_snapshot = %s\n",fens.c_str());
 	clean_board();
 	from_fens(fens.c_str());
-	//count = num;
 
 }
 int Engine::get_piece(int rx,int ry)

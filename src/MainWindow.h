@@ -54,8 +54,9 @@ class MainWindow:public Gtk::Window
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
 		void set_comment(const std::string& f_comment);
-		/** 添加treview数据*/
+		/** 添加treeview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
+		/** 删除treeview的最后一行,悔棋用的*/
 		void del_step_last_line();
 		/** 显示出当前步时位置*/
 		void show_treeview_step();
