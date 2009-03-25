@@ -235,32 +235,38 @@ void MainWindow:: on_menu_open_file()
 	Gtk::FileFilter filter_pgn;
 	filter_pgn.set_name("PGN");
 	filter_pgn.add_pattern("*.pgn");
+	filter_pgn.add_pattern("*.PGN");
 	dlg.add_filter(filter_pgn);
 	/** 中游象棋*/
 	Gtk::FileFilter filter_ccm;
 	filter_ccm.set_name("CCM");
 	filter_ccm.add_pattern("*.ccm");
+	filter_ccm.add_pattern("*.CCM");
 	dlg.add_filter(filter_ccm);
 	/** QQ象棋*/
 	Gtk::FileFilter filter_che;
 	filter_che.set_name("CHE");
 	filter_che.add_pattern("*.che");
+	filter_che.add_pattern("*.CHE");
 	dlg.add_filter(filter_che);
 	/** 联众象棋*/
 	Gtk::FileFilter filter_chn;
 	filter_chn.set_name("CHN");
 	filter_chn.add_pattern("*.chn");
+	filter_chn.add_pattern("*.CHN");
 	dlg.add_filter(filter_chn);
 
 	/** 弈天象棋*/
 	Gtk::FileFilter filter_mxq;
 	filter_mxq.set_name("MXQ");
 	filter_mxq.add_pattern("*.mxq");
+	filter_mxq.add_pattern("*.MXQ");
 	dlg.add_filter(filter_mxq);
 	/** 象棋演播室*/
 	Gtk::FileFilter filter_xqf;
 	filter_xqf.set_name("XQF");
 	filter_xqf.add_pattern("*.xqf");
+	filter_xqf.add_pattern("*.XQF");
 	dlg.add_filter(filter_xqf);
 	/** 所有文件*/
 	Gtk::FileFilter filter_any;
