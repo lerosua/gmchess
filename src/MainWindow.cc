@@ -108,7 +108,8 @@ MainWindow::MainWindow():menubar(NULL)
 	m_refTreeModel = Gtk::ListStore::create(m_columns);
 	m_treeview.set_model( m_refTreeModel);
 	scrolwin->add(m_treeview);
-	m_treeview.append_column(_("number"),m_columns.step_num);;
+	m_treeview.append_column(_("bout"),m_columns.step_bout);
+	m_treeview.append_column("  ",m_columns.player);
 	m_treeview.append_column(_("step"),m_columns.step_line);
 	m_treeview.set_events(Gdk::BUTTON_PRESS_MASK);
 	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
@@ -368,6 +369,11 @@ void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
 	(*iter)[m_columns.step_line] = f_line;
 	(*iter)[m_columns.step_num] = num;
+	(*iter)[m_columns.step_bout] = (int)((num+1)/2);
+	if((num%2) ==0)
+		(*iter)[m_columns.player] = _("Black");
+	else
+		(*iter)[m_columns.player] = _("Red");
 
 }
 

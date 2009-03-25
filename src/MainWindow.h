@@ -83,9 +83,14 @@ class MainWindow:public Gtk::Window
 				Columns()
 				{
 					add(step_num);
+					add(step_bout);
+					add(player);
 					add(step_line);
 				}
 				Gtk::TreeModelColumn <int> step_num;
+				/** 着法回合,红黑各一着为一回合*/
+				Gtk::TreeModelColumn <int> step_bout;
+				Gtk::TreeModelColumn <Glib::ustring> player;
 				Gtk::TreeModelColumn <Glib::ustring> step_line;
 		};
 		Columns m_columns;
