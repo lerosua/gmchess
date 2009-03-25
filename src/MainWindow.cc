@@ -259,12 +259,12 @@ void MainWindow:: on_menu_open_file()
 	dlg.add_filter(filter_mxq);
 	/** 象棋演播室*/
 	Gtk::FileFilter filter_xqf;
-	filter_xqf.set_name("MXQ");
-	filter_xqf.add_pattern("*.mxq");
+	filter_xqf.set_name("XQF");
+	filter_xqf.add_pattern("*.xqf");
 	dlg.add_filter(filter_xqf);
 	/** 所有文件*/
 	Gtk::FileFilter filter_any;
-	filter_any.set_name("All Files");
+	filter_any.set_name(_("All Files"));
 	filter_any.add_pattern("*");
 	dlg.add_filter(filter_any);
 	
@@ -352,8 +352,10 @@ void MainWindow::on_menu_about()
 
 
 	}
-	about->show();
-	about->raise();
+	//about->show();
+	//about->raise();
+	about->run();
+	about->hide();
 
 }
 

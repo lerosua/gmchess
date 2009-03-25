@@ -1513,9 +1513,9 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			}
 			else{
 				if(!black_player)
-					src_y = a1_y>a2_y?a1_y:a2_y;
-				else
 					src_y = a1_y<a2_y?a1_y:a2_y;
+				else
+					src_y = a1_y>a2_y?a1_y:a2_y;
 			}
 			src_x= a1_x;
 		}

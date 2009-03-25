@@ -449,6 +449,8 @@ void Board::start_move()
 	if(str != NULL){
 		parent.set_comment(*str);
 	}
+	else
+		parent.set_comment(" ");
 
 	redraw();
 }
@@ -463,6 +465,8 @@ void Board::end_move()
 	if(str != NULL){
 		parent.set_comment(*str);
 	}
+	else
+		parent.set_comment(" ");
 
 	redraw();
 }
@@ -479,6 +483,8 @@ void Board::next_move()
 	if(str != NULL){
 		parent.set_comment(*str);
 	}
+	else
+		parent.set_comment(" ");
 
 	redraw();
 }
@@ -497,6 +503,8 @@ void Board::back_move()
 	if(str != NULL){
 		parent.set_comment(*str);
 	}
+	else
+		parent.set_comment(" ");
 	redraw();
 
 }
@@ -517,6 +525,8 @@ void Board::get_board_by_move(int f_step)
 	if(str != NULL){
 		parent.set_comment(*str);
 	}
+	else
+		parent.set_comment(" ");
 	redraw();
 }
 
