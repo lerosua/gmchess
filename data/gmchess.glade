@@ -1021,7 +1021,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label28">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">九</property>
+		      <property name="label" translatable="yes">nine</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1046,7 +1046,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label29">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">八</property>
+		      <property name="label" translatable="yes">eight</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1071,7 +1071,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label30">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">七</property>
+		      <property name="label" translatable="yes">seven</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1096,7 +1096,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label31">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">六</property>
+		      <property name="label" translatable="yes">six</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1121,7 +1121,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label32">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">五</property>
+		      <property name="label" translatable="yes">five</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1146,7 +1146,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label33">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">四</property>
+		      <property name="label" translatable="yes">four</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1171,7 +1171,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label34">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">三</property>
+		      <property name="label" translatable="yes">three</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1196,7 +1196,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label35">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">二</property>
+		      <property name="label" translatable="yes">two</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1221,7 +1221,7 @@
 		  <child>
 		    <widget class="GtkLabel" id="label36">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">一</property>
+		      <property name="label" translatable="yes">one</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_LEFT</property>

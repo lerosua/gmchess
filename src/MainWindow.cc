@@ -95,6 +95,8 @@ MainWindow::MainWindow():menubar(NULL)
 	this->add(*main_window);
 	this->set_title("GMChess");
 
+	ui_logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
+	this->set_icon(ui_logo);
 	/** 设置菜单*/
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
@@ -353,8 +355,8 @@ void MainWindow::on_menu_about()
 		authors.push_back("lerosua ");
 		authors.push_back("wind");
 		about = new Gtk::AboutDialog ;
-		Glib::RefPtr<Gdk::Pixbuf> logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
-		about->set_logo(logo);
+		//Glib::RefPtr<Gdk::Pixbuf> logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
+		about->set_logo(ui_logo);
 		about->set_program_name("GMChess");
 		about->set_version(version);
 		about->set_website("http://lerosua.org");
@@ -368,7 +370,9 @@ void MainWindow::on_menu_about()
 
 	}
 	about->run();
-	about->hide();
+	//about->hide();
+	delete about;
+	about=0;
 
 }
 

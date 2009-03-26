@@ -106,6 +106,7 @@ class MainWindow:public Gtk::Window
 		Gtk::TreeView			m_treeview;
 		Gtk::ButtonBox*			buttonbox_war;
 		Gtk::TextView*			text_comment;
+		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;
 		Gtk::Button*			btn_end ;

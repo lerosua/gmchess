@@ -8,108 +8,108 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-25 18:44+0800\n"
+"POT-Creation-Date: 2009-03-26 09:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:111
+#: ../src/MainWindow.cc:113
 msgid "bout"
 msgstr ""
 
-#: ../src/MainWindow.cc:113
+#: ../src/MainWindow.cc:115
 msgid "step"
 msgstr ""
 
 #. File menu:
-#: ../src/MainWindow.cc:188
+#: ../src/MainWindow.cc:190
 msgid "_File"
 msgstr ""
 
-#: ../src/MainWindow.cc:190
+#: ../src/MainWindow.cc:192
 msgid "Open file"
 msgstr ""
 
-#: ../src/MainWindow.cc:191
+#: ../src/MainWindow.cc:193
 msgid "Open chessman File"
 msgstr ""
 
 #. View menu:
-#: ../src/MainWindow.cc:199
+#: ../src/MainWindow.cc:201
 msgid "_View"
 msgstr ""
 
 #. Game menu:
-#: ../src/MainWindow.cc:206
+#: ../src/MainWindow.cc:208
 msgid "_Game"
 msgstr ""
 
-#: ../src/MainWindow.cc:207
+#: ../src/MainWindow.cc:209
 msgid "_Fight to AI"
 msgstr ""
 
-#: ../src/MainWindow.cc:209
+#: ../src/MainWindow.cc:211
 msgid "Free Play"
 msgstr ""
 
 #. Help menu:
-#: ../src/MainWindow.cc:212
+#: ../src/MainWindow.cc:214
 msgid "_Help"
 msgstr ""
 
-#: ../src/MainWindow.cc:231
+#: ../src/MainWindow.cc:233
 msgid "Choose File"
 msgstr ""
 
-#: ../src/MainWindow.cc:274
+#: ../src/MainWindow.cc:276
 msgid "All Files"
 msgstr ""
 
-#: ../src/MainWindow.cc:304
+#: ../src/MainWindow.cc:313
 msgid "the file maybe not right format for chess"
 msgstr ""
 
-#: ../src/MainWindow.cc:355
+#: ../src/MainWindow.cc:365
 msgid "GMChess is chinese chess game write by gtkmm"
 msgstr ""
 
-#: ../src/MainWindow.cc:357
+#: ../src/MainWindow.cc:367
 msgid ""
 "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr ""
 
-#: ../src/MainWindow.cc:374
+#: ../src/MainWindow.cc:386
 msgid "Black"
 msgstr ""
 
-#: ../src/MainWindow.cc:376
+#: ../src/MainWindow.cc:388
 msgid "Red"
 msgstr ""
 
-#: ../src/MainWindow.cc:434
+#: ../src/MainWindow.cc:446
 msgid "Game: "
 msgstr ""
 
-#: ../src/MainWindow.cc:435
+#: ../src/MainWindow.cc:447
 msgid "Time: "
 msgstr ""
 
-#: ../src/MainWindow.cc:436
+#: ../src/MainWindow.cc:448
 msgid "Site: "
 msgstr ""
 
-#: ../src/MainWindow.cc:437
+#: ../src/MainWindow.cc:449
 msgid "Result: "
 msgstr ""
 
-#: ../src/MainWindow.cc:438
+#: ../src/MainWindow.cc:450
 msgid "Opening: "
 msgstr ""
 
-#: ../src/MainWindow.cc:439
+#: ../src/MainWindow.cc:451
 msgid "Variation:  "
 msgstr ""
 
@@ -200,77 +200,77 @@ msgid "chess"
 msgstr ""
 
 #: ../data/gmchess.glade.h:23
-msgid "first station"
+msgid "eight"
 msgstr ""
 
 #: ../data/gmchess.glade.h:24
-msgid "label"
+msgid "first station"
 msgstr ""
 
 #: ../data/gmchess.glade.h:25
-msgid "last move"
+msgid "five"
 msgstr ""
 
 #: ../data/gmchess.glade.h:26
-msgid "next move"
+msgid "four"
 msgstr ""
 
 #: ../data/gmchess.glade.h:27
-msgid "nickname:"
+msgid "label"
 msgstr ""
 
 #: ../data/gmchess.glade.h:28
-msgid "nickname: "
+msgid "last move"
 msgstr ""
 
 #: ../data/gmchess.glade.h:29
-msgid "page 3"
+msgid "next move"
 msgstr ""
 
 #: ../data/gmchess.glade.h:30
-msgid "play time: "
+msgid "nickname:"
 msgstr ""
 
 #: ../data/gmchess.glade.h:31
-msgid "preview move"
+msgid "nickname: "
 msgstr ""
 
 #: ../data/gmchess.glade.h:32
-msgid "step time: "
+msgid "nine"
 msgstr ""
 
 #: ../data/gmchess.glade.h:33
-msgid "一"
+msgid "one"
 msgstr ""
 
 #: ../data/gmchess.glade.h:34
-msgid "七"
+msgid "page 3"
 msgstr ""
 
 #: ../data/gmchess.glade.h:35
-msgid "三"
+msgid "play time: "
 msgstr ""
 
 #: ../data/gmchess.glade.h:36
-msgid "九"
+msgid "preview move"
 msgstr ""
 
 #: ../data/gmchess.glade.h:37
-msgid "二"
+msgid "seven"
 msgstr ""
 
 #: ../data/gmchess.glade.h:38
-msgid "五"
+msgid "six"
 msgstr ""
 
 #: ../data/gmchess.glade.h:39
-msgid "八"
+msgid "step time: "
 msgstr ""
 
 #: ../data/gmchess.glade.h:40
-msgid "六"
+msgid "three"
 msgstr ""
 
 #: ../data/gmchess.glade.h:41
-msgid "四"
+msgid "two"
 msgstr ""
