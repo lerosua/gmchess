@@ -978,6 +978,33 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 		case BLACK_PAWN:
 			/** fixed it */
 			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
+#if 0
+			int num;
+			if(black_player)
+				num=16;
+			else
+				num=0;
+
+			int a_x[5]={0};
+			int a_y[5]={0};
+			for(int i=0;i<5;i++){
+				a_x[i] = get_iccs_x(chessmans[i+27+num]);
+				a_y[i] = get_iccs_y(chessmans[i+27+num]);
+			}
+
+			int mark=0;
+			for(int i=0;i<5;i++){
+				if(c_hanzi.word[1]==a_x[i])
+					mark++;
+			}
+			/** 即是如何纵线上有多个兵，就要区分前后三四了*/
+			if(mark>1){
+
+
+			}
+#endif
+
+
 			if(c_iccs.word[1]==c_iccs.word[3]){
 				c_hanzi.word[2]='.';
 				/** alpha_to_digit 解决了红黑方方位表示的问题*/
@@ -1284,8 +1311,8 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 					dst_y = src_y-1;
 				}
 				else{
-					src_y = a1_y>a2_y?a1_y:a2_y;
-					dst_y = src_y-1;
+					src_y = a1_y<a2_y?a1_y:a2_y;
+					dst_y = src_y+1;
 				}
 			}
 
@@ -1536,24 +1563,20 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 		}
 
 		char c= c_hanzi.word[3];
-		DLOG("src_y=%c, c=%c\n",src_y,c);
+		//DLOG("src_y=%c, c=%c src_y-c=%c\n",src_y,c,src_y-c);
 		if(c_hanzi.word[2] == '+'){
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y + c;
-				//dst_y = src_y + atoi(&c);
+				dst_y = src_y + c-48;
 			else
-				dst_y = src_y - c;
-				//dst_y = src_y - atoi(&c);
+				dst_y = src_y - c+48;
 		}
 		else if(c_hanzi.word[2] == '-'){
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y - c;
-				//dst_y = src_y - atoi(&c);
+				dst_y = src_y - c+48;
 			else
-				dst_y = src_y + c;
-				//dst_y = src_y + atoi(&c);
+				dst_y = src_y + c-48;
 		}
 		else if(c_hanzi.word[2] == '.'){
 			dst_x = digit_to_alpha(c_hanzi.word[3]);
@@ -1580,20 +1603,30 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 		if(src_x<0){
 			int x_rand[9]={0};
+			int p1_line[5]={0};
 			int i;
+			for(i=0;i<5;i++)
+				p1_line[i]=10;
+
 			/** 五个兵，分好纵线*/
 			for(i=0;i<5;i++){
 				int n = a_x[i] -'a';
-				if(n>=0)
+				if(n>=0){
 					x_rand[n]++;
+					DLOG("ax[%d]=%c x_rand[%d]=%d\n",i,a_x[i],n,x_rand[n]);
+				}
 			}
-			int p1_line[5]={0};
+
 			int n=0;
 			int start=0;
-			for(i=9;i>=0;i--){
+			if(!black_player){
+			for(i=8;i>=0;i--){
+				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
 				if(x_rand[i]>1){
 					/**此纵线上有两个以上兵*/
+					DLOG("此纵线有两兵以上\n");
 					for(int j=0;j<5;j++){
+						DLOG("i = %d\n",i);
 						if(i == (a_x[j]-'a')){
 							p1_line[n]=j;
 							n++;
@@ -1601,11 +1634,41 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 					}
 					/** 为纵线上的棋子排序*/
 					for(i=start;i<n-1;i++)
-						for(int j=n-1;j>i;j--){
-							if(a_y[p1_line[j]]>a_y[ p1_line[j-1] ]){
+						for(int j=n-2;j>=i;j--){
+							if(a_y[p1_line[j]]<a_y[ p1_line[j+1] ]){
 								int tmp=p1_line[j];
-								p1_line[j]=p1_line[j-1];
-								p1_line[j-1]=tmp;
+								p1_line[j]=p1_line[j+1];
+								p1_line[j+1]=tmp;
+						}
+
+					}
+					start=n;
+				}
+
+
+			}
+			}
+			else{
+			for(i=0;i<9;i++){
+				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
+				if(x_rand[i]>1){
+					/**此纵线上有两个以上兵*/
+					DLOG("此纵线有两兵以上\n");
+					for(int j=0;j<5;j++){
+						DLOG("i = %d\n",i);
+						if(i == (a_x[j]-'a')){
+							p1_line[n]=j;
+							n++;
+							printf("xx------p1_line[%d]=%d\n",n,p1_line[n-1]);
+						}
+					}
+					/** 为纵线上的棋子排序*/
+					for(i=start;i<n-1;i++)
+						for(int j=n-2;j>=i;j--){
+							if(a_y[p1_line[j]]>a_y[ p1_line[j+1] ]){
+								int tmp=p1_line[j];
+								p1_line[j]=p1_line[j+1];
+								p1_line[j+1]=tmp;
 						}
 
 					}
@@ -1615,10 +1678,17 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 			}
 
+			}
+			DLOG("start= %d\n",start);
+			for(i=0;i<5;i++)
+				printf("p1_line[%d]=%d\n",i,p1_line[i]);
+
 			/** 处理纵线上多兵的问题，还要考虑黑方位置问题，未解决*/
 			if(c_hanzi.word[1] == 'a'){
 				src_x=a_x[p1_line[0]];
 				src_y=a_y[p1_line[0]];
+				DLOG("前兵走: p1_line[0]=%d,src_y=%c\n",p1_line[0],src_y);
+				DLOG("前兵走: p1_line[1]=%d,other_y=%c\n",p1_line[1],a_y[p1_line[1]]);
 
 			}
 			else if(c_hanzi.word[1] == 'b'){
@@ -1628,8 +1698,13 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 			}
 			else if(c_hanzi.word[1] == 'c'){
-				src_x=a_x[p1_line[2]];
-				src_y=a_y[p1_line[2]];
+				if(start==2){
+					src_x=a_x[p1_line[1]];
+					src_y=a_y[p1_line[1]];
+				}else{
+					src_x=a_x[p1_line[2]];
+					src_y=a_y[p1_line[2]];
+				}
 			}
 			else if(c_hanzi.word[1] == 'd'){
 				src_x=a_x[p1_line[3]];
