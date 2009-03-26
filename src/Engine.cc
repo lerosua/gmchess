@@ -432,7 +432,7 @@ bool Engine::logic_move(int mv)
 	/** 判断是否过时的方法，dst & 0x80,在下方是非0, 上方是0 */
 	/** 获取要移动棋子的类型*/
 	int chess_t = get_chessman_type(chessboard[src]);
-	//DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
+	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
 	switch(chess_t){
 		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
 		case RED_KING:
@@ -633,17 +633,18 @@ int Engine::do_move(int mv)
 {
 	int src = get_move_src(mv);
 	int dst = get_move_dst(mv);
-	int eated = get_move_eat(mv);
+	//int eated = get_move_eat(mv);
+	int eated = chessboard[dst];
 
 	/** 得到中文表示法怎么这么曲折呢*/
 	uint32_t iccs =move_to_iccs(mv);
 	uint32_t hanzi = iccs_to_hanzi(iccs);
 	Glib::ustring mv_line = hanzi_to_move_chinese(hanzi);
 
-	printf(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
+	DLOG(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
-	if(eated != chessboard[dst])
-		return -1;
+	//if(eated != chessboard[dst])
+	//	return -1;
 	/**
 	 * 如果dst的位置上有棋子，即是出现被吃子现象，
 	 * 则要将这个棋子的位置值置0,表示被吃掉，不再出现在棋盘上
@@ -1534,21 +1535,25 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			}
 		}
 
+		char c= c_hanzi.word[3];
+		DLOG("src_y=%c, c=%c\n",src_y,c);
 		if(c_hanzi.word[2] == '+'){
-			char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y + atoi(&c);
+				dst_y = src_y + c;
+				//dst_y = src_y + atoi(&c);
 			else
-				dst_y = src_y - atoi(&c);
+				dst_y = src_y - c;
+				//dst_y = src_y - atoi(&c);
 		}
 		else if(c_hanzi.word[2] == '-'){
-			char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y - atoi(&c);
+				dst_y = src_y - c;
+				//dst_y = src_y - atoi(&c);
 			else
-				dst_y = src_y + atoi(&c);
+				dst_y = src_y + c;
+				//dst_y = src_y + atoi(&c);
 		}
 		else if(c_hanzi.word[2] == '.'){
 			dst_x = digit_to_alpha(c_hanzi.word[3]);
@@ -1649,17 +1654,17 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y + atoi(&c);
+				dst_y = src_y + 1;
 			else
-				dst_y = src_y - atoi(&c);
+				dst_y = src_y - 1;
 		}
 		else if(c_hanzi.word[2] == '-'){
 			char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
-				dst_y = src_y - atoi(&c);
+				dst_y = src_y - 1;
 			else
-				dst_y = src_y + atoi(&c);
+				dst_y = src_y + 1;
 		}
 		else if(c_hanzi.word[2] == '.'){
 			dst_x = digit_to_alpha(c_hanzi.word[3]);

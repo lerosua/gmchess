@@ -123,7 +123,7 @@ class Engine {
 		 * @param p_dst 棋子的终点
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
-		int get_move(int p_src,int p_dst){ return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<24);}
+		int get_move(int p_src,int p_dst){  return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<16);}
 		/** 从真实棋盘坐标(rx,ry)返回棋盘数组里的坐标 */
 		int get_dst_xy(int rx, int ry);
 		/** 返回棋子所在棋盘数组里的坐标 */
@@ -161,9 +161,9 @@ class Engine {
 		 * @param mv 着法
 		 * @return 棋子代号
 		 */
-		int get_move_eat(int mv){ return (mv >>24)&255;  }
+		int get_move_eat(int mv){ return (int)(mv >>16)&255;  }
 		/** 给着法加入被吃子信息*/
-		int set_move_eat(int mv,int eated) { return mv + (eated <<24) ;}
+		int set_move_eat(int mv,int eated) { return mv + (eated <<16) ;}
 		/** 由目标及起点获得绊相角的位置坐标 */
 		int get_bishop_leg(int f_src,int f_dst)	{ return f_src + (f_dst-f_src)/2;}
 		/** 绊马脚用到的比较函数*/
