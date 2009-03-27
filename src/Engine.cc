@@ -979,6 +979,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 			/** fixed it */
 			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
 #if 1
+
 		{
 			int isblack;
 			if(black_player)
@@ -992,6 +993,15 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 				a_x[i] = get_iccs_x(chessmans[i+27+isblack]);
 				a_y[i] = get_iccs_y(chessmans[i+27+isblack]);
 			}
+			int mark=0;
+			for(int i=0;i<5;i++){
+				DLOG("c_iccs.word[0]=%c , a_x[%d] = %c\n",c_iccs.word[0],i,a_x[i]);
+				if(a_x[i]==c_iccs.word[0])
+					mark++;
+			}
+
+			/**  这表明处于多兵中*/
+			if(mark>1){
 
 			int i;
 			int x_rand[9]={0};
@@ -1015,7 +1025,6 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
 				if(x_rand[i]>1){
 					/**此纵线上有两个以上兵*/
-					DLOG("此纵线有两兵以上\n");
 					for(int j=0;j<5;j++){
 						DLOG("i = %d\n",i);
 						if(i == (a_x[j]-'a')){
@@ -1023,9 +1032,10 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 							n++;
 						}
 					}
+					DLOG("此纵线有两兵以上n=%d\n",n);
 					/** 为纵线上的棋子排序*/
-					for(i=start;i<n-1;i++)
-						for(int j=n-2;j>=i;j--){
+					for(int k=start;k<n-1;k++)
+						for(int j=n-2;j>=k;j--){
 							if(a_y[p1_line[j]]<a_y[ p1_line[j+1] ]){
 								int tmp=p1_line[j];
 								p1_line[j]=p1_line[j+1];
@@ -1054,8 +1064,8 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 						}
 					}
 					/** 为纵线上的棋子排序*/
-					for(i=start;i<n-1;i++)
-						for(int j=n-2;j>=i;j--){
+					for(int k=start;k<n-1;k++)
+						for(int j=n-2;j>=k;j--){
 							if(a_y[p1_line[j]]>a_y[ p1_line[j+1] ]){
 								int tmp=p1_line[j];
 								p1_line[j]=p1_line[j+1];
@@ -1071,7 +1081,7 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 
 			}
 
-			char c='a';
+			char c='c';
 			for(int i=0;i<5;i++){
 				if(a_y[p1_line[i]]==c_iccs.word[1])
 						c_hanzi.word[1]=c;
@@ -1079,19 +1089,20 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 			}
 			/** 转换成前中后或前后 */
 			if(start==2){
-				if(c_hanzi.word[1]=='a')
+				if(c_hanzi.word[1]=='c')
 					c_hanzi.word[1]='q';
 				else
 					c_hanzi.word[1]='h';
 			}
 			else if(start==3){
-				if(c_hanzi.word[1]=='a')
+				if(c_hanzi.word[1]=='c')
 					c_hanzi.word[1]='q';
-				else if(c_hanzi.word[1]=='b')
+				else if(c_hanzi.word[1]=='d')
 					c_hanzi.word[1]='z';
 				else
 					c_hanzi.word[1]='h';
 
+			}
 			}
 
 			
@@ -1193,12 +1204,18 @@ Glib::ustring Engine::digit_to_word(char digit)
 				return Glib::ustring("后");
 				break;
 			case 'c':
-				return Glib::ustring("三");
+				return Glib::ustring("一");
 				break;
 			case 'd':
-				return Glib::ustring("四");
+				return Glib::ustring("二");
 				break;
 			case 'e':
+				return Glib::ustring("三");
+				break;
+			case 'f':
+				return Glib::ustring("四");
+				break;
+			case 'g':
 				return Glib::ustring("五");
 				break;
 			case 'q':
@@ -1250,12 +1267,18 @@ Glib::ustring Engine::digit_to_word(char digit)
 			return Glib::ustring("后");
 			break;
 		case 'c':
-			return Glib::ustring("三");
+			return Glib::ustring("一");
 			break;
 		case 'd':
-			return Glib::ustring("四");
+			return Glib::ustring("二");
 			break;
 		case 'e':
+			return Glib::ustring("三");
+			break;
+		case 'f':
+			return Glib::ustring("四");
+			break;
+		case 'g':
 			return Glib::ustring("五");
 			break;
 		case 'q':

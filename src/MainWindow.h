@@ -65,6 +65,7 @@ class MainWindow:public Gtk::Window
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();
+		void on_menu_save_file();
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
 		void on_menu_war_to_ai();

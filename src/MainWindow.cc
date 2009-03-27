@@ -20,6 +20,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/treeselection.h>
 #include <gtkmm/aboutdialog.h>
+#include <fstream>
 
 #define version "0.10"
 
@@ -28,6 +29,7 @@ Glib::ustring ui_info =
 "	<menubar name='MenuBar'>"
 "		<menu action='FileMenu'>"
 "			<menuitem action='OpenFile'/>"
+"			<menuitem action='SaveAs'/>"
 "			<separator/>"
 "			<menuitem action='FileQuit'/>"
 "        	</menu>"
@@ -193,6 +195,10 @@ void MainWindow::init_ui_manager()
 	action->set_tooltip(_("Open chessman File"));
 	action_group->add(action,
 			sigc::mem_fun(*this, &MainWindow::on_menu_open_file));
+	action = Gtk::Action::create("SaveAs",Gtk::Stock::SAVE,_("Save as"));
+	action->set_tooltip(_("Save as a chess pgn file"));
+	action_group->add(action,
+			sigc::mem_fun(*this,&MainWindow::on_menu_save_file));
 
 	action_group->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 			sigc::mem_fun(*this, &MainWindow::on_menu_file_quit));
@@ -226,6 +232,27 @@ void MainWindow::init_ui_manager()
 
 }
 
+void MainWindow::on_menu_save_file()
+{
+
+	std::ofstream  file("/tmp/chess.pgn");
+	if(!file){
+		DLOG("open /tmp/chess.pgn file error\n");
+		return ;
+	}
+
+	Gtk::TreeModel::Children children =  m_refTreeModel->children();
+	Gtk::TreeModel::iterator iter ;
+	for(iter = children.begin();iter!= children.end();iter++){
+
+	file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] <<std::endl;
+		
+
+	}
+
+	file.close();
+
+}
 
 void MainWindow:: on_menu_open_file()
 {
@@ -355,7 +382,6 @@ void MainWindow::on_menu_about()
 		authors.push_back("lerosua ");
 		authors.push_back("wind");
 		about = new Gtk::AboutDialog ;
-		//Glib::RefPtr<Gdk::Pixbuf> logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
 		about->set_logo(ui_logo);
 		about->set_program_name("GMChess");
 		about->set_version(version);
@@ -370,7 +396,6 @@ void MainWindow::on_menu_about()
 
 	}
 	about->run();
-	//about->hide();
 	delete about;
 	about=0;
 
