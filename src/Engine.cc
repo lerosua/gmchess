@@ -978,30 +978,124 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 		case BLACK_PAWN:
 			/** fixed it */
 			c_hanzi.word[1] = alpha_to_digit(c_iccs.word[0]);
-#if 0
-			int num;
+#if 1
+		{
+			int isblack;
 			if(black_player)
-				num=16;
+				isblack=16;
 			else
-				num=0;
+				isblack=0;
 
 			int a_x[5]={0};
 			int a_y[5]={0};
 			for(int i=0;i<5;i++){
-				a_x[i] = get_iccs_x(chessmans[i+27+num]);
-				a_y[i] = get_iccs_y(chessmans[i+27+num]);
+				a_x[i] = get_iccs_x(chessmans[i+27+isblack]);
+				a_y[i] = get_iccs_y(chessmans[i+27+isblack]);
 			}
 
-			int mark=0;
+			int i;
+			int x_rand[9]={0};
+			int p1_line[5]={0};
+			for(i=0;i<5;i++)
+				p1_line[i]=10;
+
+			/** 五个兵，分好纵线*/
+			for(i=0;i<5;i++){
+				int n = a_x[i] -'a';
+				if(n>=0){
+					x_rand[n]++;
+					DLOG("ax[%d]=%c x_rand[%d]=%d\n",i,a_x[i],n,x_rand[n]);
+				}
+			}
+
+			int n=0;
+			int start=0;
+			if(!black_player){
+			for(i=8;i>=0;i--){
+				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
+				if(x_rand[i]>1){
+					/**此纵线上有两个以上兵*/
+					DLOG("此纵线有两兵以上\n");
+					for(int j=0;j<5;j++){
+						DLOG("i = %d\n",i);
+						if(i == (a_x[j]-'a')){
+							p1_line[n]=j;
+							n++;
+						}
+					}
+					/** 为纵线上的棋子排序*/
+					for(i=start;i<n-1;i++)
+						for(int j=n-2;j>=i;j--){
+							if(a_y[p1_line[j]]<a_y[ p1_line[j+1] ]){
+								int tmp=p1_line[j];
+								p1_line[j]=p1_line[j+1];
+								p1_line[j+1]=tmp;
+						}
+
+					}
+					start=n;
+				}
+
+
+			}
+			}
+			else{
+			for(i=0;i<9;i++){
+				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
+				if(x_rand[i]>1){
+					/**此纵线上有两个以上兵*/
+					DLOG("此纵线有两兵以上\n");
+					for(int j=0;j<5;j++){
+						DLOG("i = %d\n",i);
+						if(i == (a_x[j]-'a')){
+							p1_line[n]=j;
+							n++;
+							printf("xx------p1_line[%d]=%d\n",n,p1_line[n-1]);
+						}
+					}
+					/** 为纵线上的棋子排序*/
+					for(i=start;i<n-1;i++)
+						for(int j=n-2;j>=i;j--){
+							if(a_y[p1_line[j]]>a_y[ p1_line[j+1] ]){
+								int tmp=p1_line[j];
+								p1_line[j]=p1_line[j+1];
+								p1_line[j+1]=tmp;
+						}
+
+					}
+					start=n;
+				}
+
+
+			}
+
+			}
+
+			char c='a';
 			for(int i=0;i<5;i++){
-				if(c_hanzi.word[1]==a_x[i])
-					mark++;
+				if(a_y[p1_line[i]]==c_iccs.word[1])
+						c_hanzi.word[1]=c;
+				c++;
 			}
-			/** 即是如何纵线上有多个兵，就要区分前后三四了*/
-			if(mark>1){
-
+			/** 转换成前中后或前后 */
+			if(start==2){
+				if(c_hanzi.word[1]=='a')
+					c_hanzi.word[1]='q';
+				else
+					c_hanzi.word[1]='h';
+			}
+			else if(start==3){
+				if(c_hanzi.word[1]=='a')
+					c_hanzi.word[1]='q';
+				else if(c_hanzi.word[1]=='b')
+					c_hanzi.word[1]='z';
+				else
+					c_hanzi.word[1]='h';
 
 			}
+
+			
+		}
 #endif
 
 
@@ -1107,6 +1201,15 @@ Glib::ustring Engine::digit_to_word(char digit)
 			case 'e':
 				return Glib::ustring("五");
 				break;
+			case 'q':
+				return Glib::ustring("前");
+				break;
+			case 'z':
+				return Glib::ustring("中");
+				break;
+			case 'h':
+				return Glib::ustring("后");
+				break;
 			default:
 				break;
 			};
@@ -1154,6 +1257,15 @@ Glib::ustring Engine::digit_to_word(char digit)
 			break;
 		case 'e':
 			return Glib::ustring("五");
+			break;
+		case 'q':
+			return Glib::ustring("前");
+			break;
+		case 'z':
+			return Glib::ustring("中");
+			break;
+		case 'h':
+			return Glib::ustring("后");
 			break;
 		default:
 			break;
