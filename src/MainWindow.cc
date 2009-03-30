@@ -426,10 +426,12 @@ void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
 	(*iter)[m_columns.step_line] = f_line;
 	(*iter)[m_columns.step_num] = num;
 	(*iter)[m_columns.step_bout] = (int)((num+1)/2);
-	if((num%2) ==0)
+	if((num%2) ==0){
 		(*iter)[m_columns.player] = _("Black");
-	else
+	}
+	else{
 		(*iter)[m_columns.player] = _("Red");
+	}
 
 }
 
