@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(gmchess, 0.10, lerosua@gmail.com)
+AC_INIT(gmchess, 0.10.2, lerosua@gmail.com)
 AC_CONFIG_SRCDIR([src/Pgnfile.cc])
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE(gmchess,0.10)
+AM_INIT_AUTOMAKE(gmchess,0.10.1)
 
 
 IT_PROG_INTLTOOL([0.35.0])

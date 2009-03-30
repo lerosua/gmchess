@@ -669,7 +669,6 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 		size_t pos = filename.find('\r');
 		if (std::string::npos != pos)
 			filename = filename.substr(7, pos-7);
-		//DLOG("播放 %s###\n",filename.c_str());
 		parent.open_file(filename);
 
 	}

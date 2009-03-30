@@ -22,7 +22,7 @@
 #include <gtkmm/aboutdialog.h>
 #include <fstream>
 
-#define version "0.10"
+#define version "0.10.2"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -235,9 +235,25 @@ void MainWindow::init_ui_manager()
 void MainWindow::on_menu_save_file()
 {
 
-	std::ofstream  file("/tmp/chess.pgn");
+	Gtk::FileChooserDialog dlg(*this,
+			_("Save File"), 
+			Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	dlg.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+
+	std::string filename ;
+	if (Gtk::RESPONSE_OK == dlg.run()) {
+		filename = dlg.get_filename();
+	}
+	if (filename.empty())
+		return;
+
+
+	//std::ofstream  file("/tmp/chess.pgn");
+	std::ofstream  file;
+	file.open(filename.c_str());
 	if(!file){
-		DLOG("open /tmp/chess.pgn file error\n");
+		DLOG("open %s file error\n",filename.c_str());
 		return ;
 	}
 
@@ -245,9 +261,12 @@ void MainWindow::on_menu_save_file()
 	Gtk::TreeModel::iterator iter ;
 	for(iter = children.begin();iter!= children.end();iter++){
 
-	file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] <<std::endl;
-		
-
+		file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] ;
+		iter++;
+		if(iter!=children.end())
+			file<<"  "<<(*iter)[m_columns.step_line]<<std::endl;
+		else
+			file<<std::endl;
 	}
 
 	file.close();
@@ -258,7 +277,7 @@ void MainWindow:: on_menu_open_file()
 {
 	Gtk::FileChooserDialog dlg(*this,
 			_("Choose File"), 
-			Gtk::FILE_CHOOSER_ACTION_SAVE);
+			Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dlg.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 

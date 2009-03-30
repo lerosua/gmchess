@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmchess 0.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-26 09:38+0800\n"
+"POT-Creation-Date: 2009-03-27 11:18+0800\n"
 "PO-Revision-Date: 2009-03-25 18:46+0800\n"
 "Last-Translator:  <lerosua@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -15,100 +15,108 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:113
+#: ../src/MainWindow.cc:115
 msgid "bout"
 msgstr "回合"
 
-#: ../src/MainWindow.cc:115
+#: ../src/MainWindow.cc:117
 msgid "step"
 msgstr "着法"
 
 #. File menu:
-#: ../src/MainWindow.cc:190
+#: ../src/MainWindow.cc:192
 msgid "_File"
 msgstr "文件"
 
-#: ../src/MainWindow.cc:192
+#: ../src/MainWindow.cc:194
 msgid "Open file"
 msgstr "打开文件"
 
-#: ../src/MainWindow.cc:193
+#: ../src/MainWindow.cc:195
 msgid "Open chessman File"
 msgstr "打开棋谱文件"
 
+#: ../src/MainWindow.cc:198
+msgid "Save as"
+msgstr "另存为"
+
+#: ../src/MainWindow.cc:199
+msgid "Save as a chess pgn file"
+msgstr "保存为PGN棋谱"
+
 #. View menu:
-#: ../src/MainWindow.cc:201
+#: ../src/MainWindow.cc:207
 msgid "_View"
 msgstr "查看"
 
 #. Game menu:
-#: ../src/MainWindow.cc:208
+#: ../src/MainWindow.cc:214
 msgid "_Game"
 msgstr "游戏"
 
-#: ../src/MainWindow.cc:209
+#: ../src/MainWindow.cc:215
 msgid "_Fight to AI"
 msgstr "与电脑对战"
 
-#: ../src/MainWindow.cc:211
+#: ../src/MainWindow.cc:217
 msgid "Free Play"
 msgstr "摆棋"
 
 #. Help menu:
-#: ../src/MainWindow.cc:214
+#: ../src/MainWindow.cc:220
 msgid "_Help"
 msgstr "帮助"
 
-#: ../src/MainWindow.cc:233
+#: ../src/MainWindow.cc:260
 msgid "Choose File"
 msgstr "选择文件"
 
-#: ../src/MainWindow.cc:276
+#: ../src/MainWindow.cc:303
 msgid "All Files"
 msgstr "所有文件"
 
-#: ../src/MainWindow.cc:313
+#: ../src/MainWindow.cc:340
 msgid "the file maybe not right format for chess"
-msgstr ""
+msgstr "未支持的棋谱格式"
 
-#: ../src/MainWindow.cc:365
+#: ../src/MainWindow.cc:391
 msgid "GMChess is chinese chess game write by gtkmm"
-msgstr ""
+msgstr "GMChess 是一款用Gtkmm库写成的中国象棋软件"
 
-#: ../src/MainWindow.cc:367
+#: ../src/MainWindow.cc:393
 msgid ""
 "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr ""
 
-#: ../src/MainWindow.cc:386
+#: ../src/MainWindow.cc:411
 msgid "Black"
 msgstr "黑"
 
-#: ../src/MainWindow.cc:388
+#: ../src/MainWindow.cc:413
 msgid "Red"
 msgstr "红"
 
-#: ../src/MainWindow.cc:446
+#: ../src/MainWindow.cc:471
 msgid "Game: "
 msgstr "游戏: "
 
-#: ../src/MainWindow.cc:447
+#: ../src/MainWindow.cc:472
 msgid "Time: "
 msgstr "时间: "
 
-#: ../src/MainWindow.cc:448
+#: ../src/MainWindow.cc:473
 msgid "Site: "
 msgstr "地点: "
 
-#: ../src/MainWindow.cc:449
+#: ../src/MainWindow.cc:474
 msgid "Result: "
 msgstr "结果: "
 
-#: ../src/MainWindow.cc:450
+#: ../src/MainWindow.cc:475
 msgid "Opening: "
 msgstr "开局信息: "
 
-#: ../src/MainWindow.cc:451
+#: ../src/MainWindow.cc:476
 msgid "Variation:  "
 msgstr "变着: "
 
