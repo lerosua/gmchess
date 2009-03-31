@@ -5,16 +5,17 @@
  *
  *    Description:  
  *
- *        Version:  1.0
- *        Created:  2009年03月31日 14时16分14秒
+ *        Version:  0.11
+ *        Created:  2009年03月31日 13时55分18秒
  *       Revision:  none
- *       Compiler:  gcc
+ *       Compiler:  g++
  *
- *         Author:  first_name last_name (fl), fl@my-company.com
- *        Company:  my-company
+ *         Author:  lerosua@gmail.com
+ *        Company:  cyclone
  *
  * =====================================================================================
  */
+
 
 #include "MainWindow.h"
 #include "BookView.h"
