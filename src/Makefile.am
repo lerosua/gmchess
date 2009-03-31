@@ -15,6 +15,7 @@ gmchess_SOURCES= \
 	Board.cc \
 	Engine.cc \
 	Pgnfile.cc \
+	BookView.cc \
 	MainWindow.cc
 
 
@@ -24,6 +25,7 @@ noinst_HEADERS = \
 		 Engine.h \
 		 define.h \
 		 Pgnfile.h \
+		 BookView.h \
 		 MainWindow.h
 
 gmchess_LDFLAGS = 

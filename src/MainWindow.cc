@@ -21,6 +21,7 @@
 #include <gtkmm/treeselection.h>
 #include <gtkmm/aboutdialog.h>
 #include <fstream>
+#include "BookView.h"
 
 #define version "0.10.2"
 
@@ -120,6 +121,12 @@ MainWindow::MainWindow():menubar(NULL)
 				&MainWindow::on_treeview_click),false);
 
 	set_move_button_property();
+
+	Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
+		(ui_xml->get_widget("scrolledwin_book"));
+	m_bookview= new BookView(this);
+	scroll_book->add(*m_bookview);
+
 	show_all();
 
 }

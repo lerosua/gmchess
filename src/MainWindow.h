@@ -29,6 +29,7 @@
 typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
 
 class Board;
+class BookView;
 
 class MainWindow:public Gtk::Window
 {
@@ -105,6 +106,7 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
 		Gtk::TreeView			m_treeview;
+		BookView*			m_bookview;
 		Gtk::ButtonBox*			buttonbox_war;
 		Gtk::TextView*			text_comment;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
