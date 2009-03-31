@@ -40,6 +40,7 @@ class BookView: public Gtk::TreeView
 		/** 添加行内容*/
 		void add_line(const Glib::ustring& groupname,const Glib::ustring& line);
 		bool on_button_press_event(GdkEventButton *);
+		int load_book_dir(char* path);
 	protected:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{

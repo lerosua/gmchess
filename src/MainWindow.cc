@@ -24,6 +24,7 @@
 #include "BookView.h"
 
 #define version "0.10.2"
+#define BOOK_DIR "/home/leros/.gmchess/book"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -127,6 +128,8 @@ MainWindow::MainWindow():menubar(NULL)
 	m_bookview= new BookView(this);
 	scroll_book->add(*m_bookview);
 
+	m_bookview->load_book_dir(BOOK_DIR);
+	
 	show_all();
 
 }

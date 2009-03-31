@@ -20,6 +20,8 @@
 #include "MainWindow.h"
 #include "BookView.h"
 #include <glib/gi18n.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 
 BookView::BookView(MainWindow* parent):m_parent(parent)
@@ -123,3 +125,41 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 }
 
 
+int BookView::load_book_dir(char* Path)
+{
+ 
+	DIR *dirp;
+	struct dirent * node;
+	char cPath[256];
+	struct stat pStat;
+
+	if((dirp= opendir(Path))==NULL){
+		printf("The dir %s is not exit\n",Path);
+		return -1;
+	}
+
+	while(( node = readdir(dirp))!= NULL){
+		if((strcmp(node->d_name, ".") ==0)
+				|| (strcmp(node->d_name, "..") == 0))
+			continue;
+
+		strcpy(cPath,Path);
+		strcat(cPath,"/");
+		strcat(cPath,node->d_name);
+
+		//stat(node->d_name, &pStat);
+		stat(cPath, &pStat);
+		if(S_ISDIR(pStat.st_mode)){
+			//printf(" dir = %s \n",cPath);
+			/** 是目录，继续打开读*/
+			load_book_dir(cPath);
+
+		}else{
+			printf(" add file = %s\n",basename(node->d_name));
+			add_line(basename(Path),node->d_name);
+		}
+	}
+	closedir(dirp);
+
+	return 0;
+}
