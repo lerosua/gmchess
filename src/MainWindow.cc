@@ -64,6 +64,7 @@ MainWindow::MainWindow():menubar(NULL)
 	buttonbox_war = dynamic_cast<Gtk::ButtonBox*>(ui_xml->get_widget("hbuttonbox_war"));
 	text_comment = dynamic_cast<Gtk::TextView*>(ui_xml->get_widget("textview_comment"));
 
+	m_notebook = dynamic_cast<Gtk::Notebook*>(ui_xml->get_widget("notebook"));
 	 btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
 	 btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
 	 btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
@@ -372,6 +373,7 @@ void MainWindow::open_file(const std::string& filename)
 		else{
 			init_move_treeview();
 			set_information();
+			m_notebook->set_current_page(0);
 		}
 
 

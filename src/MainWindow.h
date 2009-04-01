@@ -109,6 +109,7 @@ class MainWindow:public Gtk::Window
 		BookView*			m_bookview;
 		Gtk::ButtonBox*			buttonbox_war;
 		Gtk::TextView*			text_comment;
+		Gtk::Notebook*			m_notebook;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;
