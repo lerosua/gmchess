@@ -47,12 +47,13 @@ Gtk::TreeModel::iterator BookView::add_group(const Glib::ustring& group)
 {
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
 	(*iter)[m_columns.title]=group;
+	(*iter)[m_columns.type] = GROUP;
 
 	return iter;
 }
 
 
-void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& line)
+void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& f_line,const Glib::ustring& f_path)
 {
 	Gtk::TreeModel::Children children = m_refTreeModel->children();
 	Gtk::TreeModel::iterator listiter;
@@ -61,7 +62,9 @@ void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& line
 		listiter = add_group(groupname);
 
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append(listiter->children());
-	(*iter)[m_columns.title] = line;
+	(*iter)[m_columns.title] = f_line;
+	(*iter)[m_columns.type] = MEMBER;
+	(*iter)[m_columns.path]= f_path;
 	
 
 
@@ -96,9 +99,10 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 
 	if ((ev->type == GDK_2BUTTON_PRESS ||
 				ev->type == GDK_3BUTTON_PRESS) && ev->button != 3) {
-#if 0
-		if(GROUP_CHANNEL != (*iter)[m_columns.type]){
-			play_selection_iter(iter);
+		if(GROUP != (*iter)[m_columns.type]){
+			Glib::ustring t_file = (*iter)[m_columns.path];
+			DLOG("open file %s \n",t_file.c_str());
+			m_parent->open_file(t_file.c_str());
 		}
 		else {
 			if(this->row_expanded(path))
@@ -108,7 +112,6 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 				this->scroll_to_row(path);
 			}
 		}
-#endif
 	} else if ((ev->type == GDK_BUTTON_PRESS)
 			&& (ev->button == 3)) {
 		/*
@@ -125,7 +128,7 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 }
 
 
-int BookView::load_book_dir(char* Path)
+int BookView::load_book_dir(const char* Path)
 {
  
 	DIR *dirp;
@@ -155,8 +158,8 @@ int BookView::load_book_dir(char* Path)
 			load_book_dir(cPath);
 
 		}else{
-			printf(" add file = %s\n",basename(node->d_name));
-			add_line(basename(Path),node->d_name);
+			//printf(" add file = %s\n",basename(node->d_name));
+			add_line(basename(Path),node->d_name,cPath);
 		}
 	}
 	closedir(dirp);

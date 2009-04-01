@@ -351,7 +351,7 @@ void MainWindow::open_file(const std::string& filename)
 		size_t pos = filename.find(".pgn");
 		if(pos == std::string::npos){
 			char cmd[1024];
-			//sprintf(cmd,"convert_pgn \"%s\" /tmp/gmchess.pgn",filename.c_str());
+			//remove("/tmp/gmchess.pgn");
 			sprintf(cmd,"convert_pgn \"%s\" ",filename.c_str());
 			if(system(cmd)<0){
 				DLOG("convert pgn file error\n");

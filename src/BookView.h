@@ -25,6 +25,7 @@
 #include <gtkmm/treeselection.h>
 #include <functional>
 
+enum{ GROUP,MEMBER};
 
 class MainWindow;
 class BookView: public Gtk::TreeView
@@ -38,9 +39,9 @@ class BookView: public Gtk::TreeView
 		/** 添加组*/
 		Gtk::TreeModel::iterator add_group(const Glib::ustring& group);
 		/** 添加行内容*/
-		void add_line(const Glib::ustring& groupname,const Glib::ustring& line);
+		void add_line(const Glib::ustring& groupname,const Glib::ustring& f_line,const Glib::ustring& f_path);
 		bool on_button_press_event(GdkEventButton *);
-		int load_book_dir(char* path);
+		int load_book_dir(const char* path);
 	protected:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{
@@ -49,9 +50,11 @@ class BookView: public Gtk::TreeView
 				{
 					add(title);
 					add(path);
+					add(type);
 				}
 				Gtk::TreeModelColumn <Glib::ustring> title;
 				Gtk::TreeModelColumn <Glib::ustring> path;
+				Gtk::TreeModelColumn <int> type;
 		};
 		Columns m_columns;
 		Glib::RefPtr<Gtk::TreeStore>	m_refTreeModel;
