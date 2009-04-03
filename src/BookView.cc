@@ -52,14 +52,48 @@ Gtk::TreeModel::iterator BookView::add_group(const Glib::ustring& group)
 	return iter;
 }
 
+Gtk::TreeModel::iterator BookView::add_group(const Glib::ustring& g_parent,const Glib::ustring& group)
+{
+
+	if(g_parent=="book"){
+		return add_group(group);
+	}
+	Gtk::TreeModel::Children children = m_refTreeModel->children();
+	Gtk::TreeModel::iterator listiter;
+	listiter = getListIter(children,g_parent);
+	if(listiter == children.end())
+		listiter = add_group(g_parent);
+
+	Gtk::TreeModel::iterator iter = m_refTreeModel->append(listiter->children());
+	(*iter)[m_columns.title]=group;
+	(*iter)[m_columns.type] = GROUP;
+
+	return iter;
+}
+
+
 
 void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& f_line,const Glib::ustring& f_path)
 {
 	Gtk::TreeModel::Children children = m_refTreeModel->children();
 	Gtk::TreeModel::iterator listiter;
 	listiter = getListIter(children,groupname);
-	if(listiter == children.end())
-		listiter = add_group(groupname);
+	if(listiter == children.end()){
+		//listiter = add_group(groupname);
+
+		Gtk::TreeModel::iterator t_iter=children.begin();
+		Gtk::TreeModel::Children grandson= (*t_iter)->children();
+		do{
+			listiter = getListIter(grandson,groupname);
+			if(listiter != grandson.end())
+				break;
+			t_iter++;
+			grandson= (*t_iter)->children();
+		}while(t_iter!=children.end());
+
+		if(listiter == grandson.end())
+			return;
+	}
 
 	Gtk::TreeModel::iterator iter = m_refTreeModel->append(listiter->children());
 	(*iter)[m_columns.title] = f_line;
@@ -155,6 +189,7 @@ int BookView::load_book_dir(const char* Path)
 		if(S_ISDIR(pStat.st_mode)){
 			//printf(" dir = %s \n",cPath);
 			/** 是目录，继续打开读*/
+			add_group(basename(Path),basename(cPath));
 			load_book_dir(cPath);
 
 		}else{
