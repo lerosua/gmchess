@@ -23,6 +23,7 @@
 #include <cassert>
 #include "Engine.h"
 #include "MainWindow.h"
+#include "Sound.h"
 
 const int border_width = 32;
 const int chessman_width = 57;
@@ -563,6 +564,7 @@ void Board::next_move()
 	else
 		parent.set_comment(" ");
 
+	CSound::play(SND_MOVE);
 	redraw();
 }
 void Board::back_move()

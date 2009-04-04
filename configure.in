@@ -61,6 +61,7 @@ AC_CONFIG_FILES([Makefile
 	src/engine/Makefile
 	data/Makefile
 	data/wood/Makefile
+	data/sound/Makefile
 	po/Makefile.in
 	])
 

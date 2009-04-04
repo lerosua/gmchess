@@ -48,7 +48,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_gmchess_OBJECTS = main.$(OBJEXT) Board.$(OBJEXT) Engine.$(OBJEXT) \
-	Pgnfile.$(OBJEXT) BookView.$(OBJEXT) MainWindow.$(OBJEXT)
+	Pgnfile.$(OBJEXT) BookView.$(OBJEXT) Sound.$(OBJEXT) \
+	MainWindow.$(OBJEXT)
 gmchess_OBJECTS = $(am_gmchess_OBJECTS)
 gmchess_DEPENDENCIES =
 gmchess_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -238,6 +239,7 @@ gmchess_SOURCES = \
 	Engine.cc \
 	Pgnfile.cc \
 	BookView.cc \
+	Sound.cc   \
 	MainWindow.cc
 
 noinst_HEADERS = \
@@ -247,6 +249,7 @@ noinst_HEADERS = \
 		 define.h \
 		 Pgnfile.h \
 		 BookView.h \
+		 Sound.h    \
 		 MainWindow.h
 
 gmchess_LDFLAGS = 
@@ -327,6 +330,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Engine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MainWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pgnfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cc.o:
