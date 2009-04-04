@@ -259,6 +259,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		if(selected_chessman == -1){
 			/** 之前没选中棋子，现在选择 */
 
+			CSound::play(SND_CHOOSE);
 			if (selected_x != -1) {
 				selected_chessman = m_engine.get_piece(selected_x, selected_y);
 				if(selected_chessman==0){
@@ -277,6 +278,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
 				selected_chessman = dst_chessman;
 				draw_select_frame(true);
+				CSound::play(SND_CHOOSE);
 
 			}
 			else if(dst_chessman == 0){
@@ -584,6 +586,8 @@ void Board::back_move()
 	}
 	else
 		parent.set_comment(" ");
+
+	CSound::play(SND_MOVE);
 	redraw();
 
 }
@@ -614,13 +618,18 @@ int Board::try_move(int dst_x,int dst_y)
 	int dst = m_engine.get_dst_xy(dst_x,dst_y);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
-	DLOG("Board:: src = %x dst = %x mv = %d\n",src,dst,mv);
+	int eat = m_engine.get_move_eat(mv);
+	DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
 	/** 对着法进行逻辑检测*/
 	if(m_engine.logic_move(mv)){
 		m_engine.do_move(mv);
 		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
 		int num = m_engine.how_step();
 		parent.add_step_line(num,mv_chin);
+		if(eat)
+			CSound::play(SND_EAT);
+		else
+			CSound::play(SND_MOVE);
 
 	}
 
