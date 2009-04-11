@@ -129,7 +129,8 @@ MainWindow::MainWindow():menubar(NULL)
 	m_bookview= new BookView(this);
 	scroll_book->add(*m_bookview);
 
-	m_bookview->load_book_dir(BOOK_DIR);
+	init();
+	//m_bookview->load_book_dir(BOOK_DIR);
 	
 	show_all();
 
@@ -139,6 +140,14 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::init()
+{
+	char buf[512];
+	char* homedir = getenv("HOME");
+	snprintf(buf, 512,"%s/.gmchess/book",homedir);
+	m_bookview->load_book_dir(buf);
+
+}
 void MainWindow::set_comment(const std::string& f_comment)
 {
 	text_comment->set_wrap_mode(Gtk::WRAP_WORD);
