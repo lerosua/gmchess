@@ -1,3 +1,4 @@
+#include "robot.h"
 #include <gdk/gdkx.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -7,7 +8,6 @@
 #include "ec_throw.h"
 #include <cassert>
 #include <string>
-#include "robot.h"
 
 void  set_signals()
 {
@@ -110,6 +110,18 @@ void Robot::wait_robot_exit(GPid pid, int)
 		on_robot_exit();
 	}
 
+}
+
+void Robot::start()
+{
+	printf("%s:%d\n",__func__,__LINE__);
+	signal_start().emit();
+	const char* argv[2];
+	argv[0]="eleeye_engine";
+	argv[1]=NULL;
+	my_system((char* const *)argv);
+
+	printf("end %s:%d\n",__func__,__LINE__);
 }
 
 int Robot::my_system(char* const argv[])

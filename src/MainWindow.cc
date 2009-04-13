@@ -23,7 +23,7 @@
 #include <fstream>
 #include "BookView.h"
 
-#define version "0.10.2"
+#define version "0.10.3"
 #define BOOK_DIR "/home/leros/.gmchess/book"
 
 Glib::ustring ui_info =
@@ -545,6 +545,8 @@ void MainWindow::set_move_button_property()
 
 void MainWindow::on_begin_game()
 {
+	btn_begin->set_sensitive(false);
+	board->start_robot();
 
 }
 

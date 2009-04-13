@@ -127,6 +127,7 @@ Board::Board(MainWindow& win) :
 	
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
+	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 	this->show_all();
 
@@ -136,6 +137,7 @@ Board::Board(MainWindow& win) :
 
 Board::~Board()
 {
+	m_robot.stop();
 }
 
 void Board::load_images()
@@ -683,4 +685,26 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 		parent.open_file(filename);
 
 	}
+}
+
+
+void Board::start_robot()
+{
+	printf("%s:%d\n",__func__,__LINE__);
+	m_robot.start();
+	m_robot.send_ctrl_command("ucci\n");
+
+}
+
+bool Board::robot_log(const Glib::IOCondition& condition)
+{
+
+	/*for testing,delete me*/
+	char buf[1024];
+	int len=m_robot.get_robot_log(buf,1023);
+	printf(buf);
+	printf("%s:%d\n",__func__,__LINE__);
+
+	return true;
+
 }

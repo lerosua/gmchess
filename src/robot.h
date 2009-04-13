@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <gtkmm.h>
 
 class Robot {
 	public:
@@ -10,7 +11,8 @@ class Robot {
 		~Robot();
 		void send_ctrl_command(const char* c);
 		void pause(); 
-		virtual void stop();
+		void stop();
+		void start();
 
 		bool running() const;
 		bool pausing() const { return is_pause; }

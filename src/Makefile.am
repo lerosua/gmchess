@@ -17,6 +17,8 @@ gmchess_SOURCES= \
 	Pgnfile.cc \
 	BookView.cc \
 	Sound.cc   \
+	robot.cc   \
+	ec_throw.cpp \
 	MainWindow.cc
 
 
@@ -28,6 +30,8 @@ noinst_HEADERS = \
 		 Pgnfile.h \
 		 BookView.h \
 		 Sound.h    \
+		 robot.h 	\
+		 ec_throw.h 	\
 		 MainWindow.h
 
 gmchess_LDFLAGS = 

@@ -26,6 +26,7 @@
 #include "gmchess.h"
 #include "Engine.h"
 #include "Pgnfile.h"
+#include "robot.h"
 
 class MainWindow;
 
@@ -79,6 +80,8 @@ class Board : public Gtk::DrawingArea
 				guint,guint time);
 	public:
 
+		void start_robot();
+		bool robot_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
 		void start_move();
 		/** 去到最后的局面*/
@@ -107,8 +110,10 @@ class Board : public Gtk::DrawingArea
 		void load_images();
 	private:
 		MainWindow& parent;
-		/** 引擎 */
+		/** 着法引擎 */
 		Engine m_engine;
+		/** AI引擎*/
+		Robot m_robot;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
 
