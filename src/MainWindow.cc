@@ -122,7 +122,7 @@ MainWindow::MainWindow():menubar(NULL)
 	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
 				&MainWindow::on_treeview_click),false);
 
-	set_move_button_property();
+	change_status();
 
 	Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
 		(ui_xml->get_widget("scrolledwin_book"));
@@ -518,12 +518,12 @@ void MainWindow::set_information()
 	text = text + _("Variation:  ")+board_info.variation+"\n";
 	info->set_label(text);
 	info->set_ellipsize(Pango::ELLIPSIZE_END);
-	set_move_button_property();
+	change_status();
 
 }
 
 
-void MainWindow::set_move_button_property()
+void MainWindow::change_status()
 {
 	int f_status = board->get_status();
 	bool f_use=1;

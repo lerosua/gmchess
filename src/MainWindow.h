@@ -80,7 +80,7 @@ class MainWindow:public Gtk::Window
 		/** 设置棋盘相关信息*/
 		void set_information();
 		/** 设置着法按钮可见性*/
-		void set_move_button_property();
+		void change_status();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{

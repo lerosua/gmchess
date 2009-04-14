@@ -299,6 +299,10 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 
 		}
 	}
+	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 2){
+		/** 取消选择*/
+
+	}
 
 	return true;
 }
@@ -690,9 +694,13 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 
 void Board::start_robot()
 {
-	printf("%s:%d\n",__func__,__LINE__);
+	m_status = FIGHT_STATUS;
+
+	m_engine.reset();
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
+
+	redraw();
 
 }
 
