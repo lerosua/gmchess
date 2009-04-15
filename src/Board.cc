@@ -639,13 +639,13 @@ int Board::try_move(int dst_x,int dst_y)
 		if(is_filght_to_robot()){
 			if(eat){
 				moves_lines.clear();
-				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot();
+				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
 			}
 			else{
 				std::string iccs_str=m_engine.move_to_iccs_str(mv);
 				size_t pos = moves_lines.find("moves");
 				if(pos == std::string::npos){
-					moves_lines=moves_lines + " moves "+iccs_str;
+					moves_lines=moves_lines + " -- 0 1  moves "+iccs_str;
 				}else{
 					moves_lines=moves_lines + " "+iccs_str;
 				}
