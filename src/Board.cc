@@ -109,6 +109,7 @@ Board::Board(MainWindow& win) :
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
 	selected_chessman(-1)
+	,postion_str("position fen ")
 	,parent(win)
 {
 
@@ -244,16 +245,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
-#if 0
-		draw_select_frame(false);
-		Gdk::Point p = get_position(ev->x, ev->y);
-		selected_x = p.get_x();
-		selected_y = p.get_y();
-		selected_chessman = m_engine.get_piece(selected_x, selected_y);
-		if (selected_x != -1) {
-			draw_select_frame(true);
-		}
-#endif
 		draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
@@ -285,13 +276,13 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			}
 			else if(dst_chessman == 0){
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
-				draw_select_frame(false);
+				//draw_select_frame(false);
 				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
 			else{
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
-				draw_select_frame(false);
+				//draw_select_frame(false);
 				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
@@ -299,8 +290,11 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 
 		}
 	}
-	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 2){
-		/** 取消选择*/
+	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 3){
+		/** 右键取消选择*/
+		selected_chessman = -1;
+		draw_select_frame(false);
+		redraw();
 
 	}
 
@@ -628,7 +622,9 @@ int Board::try_move(int dst_x,int dst_y)
 	DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
 	/** 对着法进行逻辑检测*/
 	if(m_engine.logic_move(mv)){
+		/** 执行着法*/
 		m_engine.do_move(mv);
+		/** 将着法中文表示加到treeview中*/
 		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
 		int num = m_engine.how_step();
 		parent.add_step_line(num,mv_chin);
@@ -637,9 +633,31 @@ int Board::try_move(int dst_x,int dst_y)
 		else
 			CSound::play(SND_MOVE);
 
+		redraw();
+
+		/** 对战时的处理*/
+		if(is_filght_to_robot()){
+			if(eat){
+				moves_lines.clear();
+				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot();
+			}
+			else{
+				std::string iccs_str=m_engine.move_to_iccs_str(mv);
+				size_t pos = moves_lines.find("moves");
+				if(pos == std::string::npos){
+					moves_lines=moves_lines + " moves "+iccs_str;
+				}else{
+					moves_lines=moves_lines + " "+iccs_str;
+				}
+
+			}
+			/** then send the moves_lines to ucci engine(robot)*/
+			std::cout<<"moves_lines = "<<moves_lines<<std::endl;
+
+
+		}
 	}
 
-	redraw();
 	return 0;
 
 }

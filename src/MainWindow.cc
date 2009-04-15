@@ -390,7 +390,7 @@ void MainWindow::open_file(const std::string& filename)
 
 void MainWindow::on_menu_war_to_ai()
 {
-
+	on_begin_game();
 }
 
 void MainWindow::on_menu_free_play()

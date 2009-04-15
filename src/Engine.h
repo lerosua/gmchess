@@ -135,6 +135,7 @@ class Engine {
 		int get_move_dst(int mv){ return (int) (mv >>8)&255 ; }
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
 		uint32_t move_to_iccs(int mv);
+		std::string move_to_iccs_str(int mv);
 		/** 把ICCS坐标格式转成着法*/
 		int iccs_to_move(uint32_t iccs);
 
@@ -173,10 +174,10 @@ class Engine {
 		/** 清理棋盘及棋子数组*/
 		void clean_board();
 		/** 返回棋局走了多少步*/
-		//int how_step(){ return fen_snapshots.size()-1;}
 		int how_step(){ return fen_snapshots.empty()?0:fen_snapshots.size()-1;}
 		/** 获取最后一个着法的镜像，悔棋用*/
 		int get_last_move_from_snapshot(){return move_snapshots.back(); }
+		const std::string& get_last_fen_from_snapshot(){ return fen_snapshots.back(); }
 		/** 添加着法注释*/
 		void add_comment(const std::string& str);
 		/** 获取某着法的注释，如果有的话*/

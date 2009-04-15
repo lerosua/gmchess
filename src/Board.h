@@ -104,6 +104,7 @@ class Board : public Gtk::DrawingArea
 		/** 返回程序棋盘状态:读谱，与电脑对战，网络对战,自由摆棋*/
 		int get_status(){ return m_status; }
 		int get_step(){ return m_step; }
+		bool is_filght_to_robot(){ return m_status == FIGHT_STATUS;}
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -116,6 +117,8 @@ class Board : public Gtk::DrawingArea
 		Robot m_robot;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
+		std::string moves_lines;
+		const std::string postion_str;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;

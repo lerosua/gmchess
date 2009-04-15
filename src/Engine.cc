@@ -703,6 +703,14 @@ void Engine::undo_move(int mv)
 	fen_snapshots.pop_back();
 	move_chinese.pop_back();
 }
+
+std::string Engine::move_to_iccs_str(int mv)
+{
+	union Hanzi c_iccs;
+	c_iccs.digit=move_to_iccs(mv);
+	return std::string(c_iccs.word[0])+c_iccs.word[1]+c_iccs.word[2]+c_iccs.word[3] ;
+
+}
 uint32_t Engine::move_to_iccs(int mv)
 {
 	union{
