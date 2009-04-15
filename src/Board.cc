@@ -726,12 +726,23 @@ void Board::start_robot()
 
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
-
 	/*for testing,delete me*/
 	char buf[1024];
-	int len=m_robot.get_robot_log(buf,1023);
+	int buf_len = 1024;
+	char* p = buf;
+	for (; buf_len > 0; ) {
+		int len = m_robot.get_robot_log(p, buf_len);
+		if (len <= 0)
+			break;
+		p += len;
+		buf_len -= len;
+	}
+
+	if (buf_len > 0) {
+		*p = 0;
 	printf(buf);
-	//printf("%s:%d\n",__func__,__LINE__);
+		//printf("%s:%d\n",__func__,__LINE__);
+	}
 
 	return true;
 

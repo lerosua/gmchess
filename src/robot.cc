@@ -8,6 +8,9 @@
 #include "ec_throw.h"
 #include <cassert>
 #include <string>
+#include <unistd.h>
+#include <fcntl.h>
+
 
 void  set_signals()
 {
@@ -78,7 +81,8 @@ void Robot::set_m_pipe()
 	FD_SET(child_tem, &fd_set_write);
 
 	EC_THROW( -1 == select (child_tem + 1, NULL, &fd_set_write, NULL, NULL));
-
+	int flags = fcntl(child_tem, F_GETFL, 0);  
+	fcntl(child_tem,  F_SETFL, flags | O_NONBLOCK);
 }
 
 
@@ -87,7 +91,7 @@ void Robot::set_m_pipe()
 	Robot::Robot()
 	:is_running(false)
 	,is_pause(false)
-	,child_pid(-1)
+	 ,child_pid(-1)
 {
 	child_tem = -1;
 	child_tem2 = -1;
