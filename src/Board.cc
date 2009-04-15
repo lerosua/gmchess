@@ -714,10 +714,12 @@ void Board::start_robot()
 {
 	m_status = FIGHT_STATUS;
 
-	m_engine.reset();
+	m_engine.init_snapshot(start_fen);
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
 
+	moves_lines.clear();
+	moves_lines = postion_str + std::string(start_fen);
 	redraw();
 
 }
@@ -729,7 +731,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 	char buf[1024];
 	int len=m_robot.get_robot_log(buf,1023);
 	printf(buf);
-	printf("%s:%d\n",__func__,__LINE__);
+	//printf("%s:%d\n",__func__,__LINE__);
 
 	return true;
 

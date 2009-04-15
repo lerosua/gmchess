@@ -708,8 +708,13 @@ std::string Engine::move_to_iccs_str(int mv)
 {
 	union Hanzi c_iccs;
 	c_iccs.digit=move_to_iccs(mv);
-	return std::string(c_iccs.word[0])+c_iccs.word[1]+c_iccs.word[2]+c_iccs.word[3] ;
+	std::string tmp;
+	tmp.push_back(c_iccs.word[0]);
+	tmp.push_back(c_iccs.word[1]);
+	tmp.push_back(c_iccs.word[2]);
+	tmp.push_back(c_iccs.word[3]);
 
+	return tmp;
 }
 uint32_t Engine::move_to_iccs(int mv)
 {
