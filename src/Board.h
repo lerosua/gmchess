@@ -95,6 +95,7 @@ class Board : public Gtk::DrawingArea
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		void get_board_by_move(int num);
 		int try_move(int x,int y);
+		int try_move(int mv);
 		/** 悔棋*/
 		void rue_move();
 		/** 打开棋谱文件*/
@@ -135,6 +136,7 @@ class Board : public Gtk::DrawingArea
 		int m_step;
 		/** 棋局状态*/
 		int m_status;
+		bool user_player;
 };
 
 #endif // _BOARD_H_

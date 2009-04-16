@@ -136,6 +136,7 @@ class Engine {
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
 		uint32_t move_to_iccs(int mv);
 		std::string move_to_iccs_str(int mv);
+		int iccs_str_to_move(const std::string& iccs_str);
 		/** 把ICCS坐标格式转成着法*/
 		int iccs_to_move(uint32_t iccs);
 

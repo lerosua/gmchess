@@ -105,12 +105,13 @@ Board::Board(MainWindow& win) :
 	selected_x(-1),
 	selected_y(-1),
 	m_step(0),
-	m_status(FIGHT_STATUS),
+	m_status(FREE_STATUS),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
+	,user_player(0)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -243,6 +244,12 @@ void Board::redraw()
 /**处理点击事件*/
 bool Board::on_button_press_event(GdkEventButton* ev)
 {
+	/** 对战状态下，电脑走棋就不响应鼠标事件了*/
+	if(is_filght_to_robot()){
+		if(!user_player)
+			return true;
+
+	}
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
 		draw_select_frame(false);
@@ -261,6 +268,14 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					printf("still no select chessman\n");
 					return true;
 				}
+				/** 对战状态中，选了黑色棋子无效*/
+				if((is_filght_to_robot()) &&
+					(selected_chessman>32)){
+						selected_chessman =-1;
+						draw_select_frame(false); 
+						return true;
+				}
+
 				draw_select_frame(true);
 			}
 		}
@@ -615,11 +630,21 @@ void Board::get_board_by_move(int f_step)
 
 int Board::try_move(int dst_x,int dst_y)
 {
+
 	int dst = m_engine.get_dst_xy(dst_x,dst_y);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
 	int eat = m_engine.get_move_eat(mv);
 	DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
+	return try_move(mv);
+}
+//int Board::try_move(int dst_x,int dst_y)
+int Board::try_move(int mv)
+{
+	//int dst = m_engine.get_dst_xy(dst_x,dst_y);
+	//int src = m_engine.get_chessman_xy(selected_chessman);
+	//int mv =  m_engine.get_move(src,dst);
+	int eat = m_engine.get_move_eat(mv);
 	/** 对着法进行逻辑检测*/
 	if(m_engine.logic_move(mv)){
 		/** 执行着法*/
@@ -653,6 +678,13 @@ int Board::try_move(int dst_x,int dst_y)
 			}
 			/** then send the moves_lines to ucci engine(robot)*/
 			std::cout<<"moves_lines = "<<moves_lines<<std::endl;
+			m_robot.send_ctrl_command(moves_lines.c_str());
+			m_robot.send_ctrl_command("\n");
+			if(user_player){
+				DLOG("send command to tell robot\n");
+				m_robot.send_ctrl_command("go time 295000 increment 0\n");
+			}
+			user_player = 1-user_player;
 
 
 		}
@@ -720,6 +752,7 @@ void Board::start_robot()
 
 	moves_lines.clear();
 	moves_lines = postion_str + std::string(start_fen);
+	user_player =1;
 	redraw();
 
 }
@@ -740,8 +773,15 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 	if (buf_len > 0) {
 		*p = 0;
-	printf(buf);
-		//printf("%s:%d\n",__func__,__LINE__);
+		printf(buf);
+		std::string str_buf(buf);
+		size_t pos=str_buf.find("bestmove");
+		if(pos != std::string::npos){
+			std::string t_mv=str_buf.substr(pos+9,4);
+			std::cout<<"get robot mv = "<<t_mv<<std::endl;
+			int mv = m_engine.iccs_str_to_move(t_mv);
+			try_move(mv);
+		}
 	}
 
 	return true;

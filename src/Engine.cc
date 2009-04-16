@@ -704,6 +704,14 @@ void Engine::undo_move(int mv)
 	move_chinese.pop_back();
 }
 
+int Engine::iccs_str_to_move(const std::string& iccs_str)
+{
+	union Hanzi c_iccs;
+	for(int i =0;i<4;i++)
+		c_iccs.word[i]= iccs_str[i];
+	return iccs_to_move(c_iccs.digit);
+}
+
 std::string Engine::move_to_iccs_str(int mv)
 {
 	union Hanzi c_iccs;
