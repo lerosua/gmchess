@@ -139,6 +139,7 @@ Board::Board(MainWindow& win) :
 
 Board::~Board()
 {
+	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
 }
 
@@ -638,7 +639,6 @@ int Board::try_move(int dst_x,int dst_y)
 	DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
 	return try_move(mv);
 }
-//int Board::try_move(int dst_x,int dst_y)
 int Board::try_move(int mv)
 {
 	//int dst = m_engine.get_dst_xy(dst_x,dst_y);

@@ -122,7 +122,8 @@ int main(void) {
   if (BootLine() != UCCI_COMM_UCCI) {
     return 0;
   }
-  LocatePath(Search.szBookFile, "BOOK.DAT");
+  LocatePath(Search.szBookFile, "../share/gmchess/book.dat");
+  //LocatePath(Search.szBookFile, "book.dat");
   LocatePath(szLibEvalFile, cszLibEvalFile);
   hModule = LoadEvalApi(szLibEvalFile);
   bPonderTime = false;

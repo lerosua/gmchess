@@ -3,6 +3,7 @@ gmchess_ui = \
 	     gmchess.glade \
 	     p1.png \
 	     p2.png \
+	     book.dat \
 	     gmchess.png
 
 
