@@ -1,4 +1,5 @@
 bin_PROGRAMS= eleeye_engine convert_pgn
+lib_LTLIBRARIES = libeval.la
 
 eleeye_engine_CXXFLAGS= $(AM_CPPFLAGS)
 convert_pgn_CXXFLAGS=   $(AM_CPPFLAGS)
@@ -21,6 +22,13 @@ convert_pgn_SOURCES = \
 		      cchess.cpp \
 		      pgnfile.cpp
 
+libeval_la_SOURCES = \
+		     preeval.cpp \
+		     genmoves.cpp \
+		     pregen.cpp \
+		     position.cpp \
+		     evaluate.cpp 
+
 noinst_HEADERS = \
 		base2.h 	\
 		base.h 	\
@@ -39,11 +47,13 @@ noinst_HEADERS = \
 		search.h	\
 		ucci.h		\
 		x86asm.h	\
+		preeval.h 	\
 		xqffile.h
 
 
 eleeye_engine_LDFLAGS= -ldl
 convert_pgn_LDFLAGS= -ldl
+libeval_so_LDFLAGS= -fPIC -shared
 AM_CPPFLAGS =
 
 EXTRA_DIST = $(noinst_HEADERS)

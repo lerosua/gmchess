@@ -35,7 +35,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #else
   #include <dlfcn.h>
   #define WINAPI
-  const char *const cszLibEvalFile = "libeval.so";
+  //const char *const cszLibEvalFile = "libeval.so";
+  const char *const cszLibEvalFile = "../lib/libeval.so";
 #endif
 
 const int INTERRUPT_COUNT = 4096; // 搜索若干结点后调用中断
