@@ -253,6 +253,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	}
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
+		redraw();
 		draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
@@ -271,7 +272,8 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				}
 				/** 对战状态中，选了黑色棋子无效*/
 				if((is_filght_to_robot()) &&
-					(selected_chessman>32)){
+					(selected_chessman>31)){
+						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
 						draw_select_frame(false); 
 						return true;
@@ -645,6 +647,7 @@ int Board::try_move(int mv)
 	//int src = m_engine.get_chessman_xy(selected_chessman);
 	//int mv =  m_engine.get_move(src,dst);
 	int eat = m_engine.get_move_eat(mv);
+	int dst=  m_engine.get_move_dst(mv);
 	/** 对着法进行逻辑检测*/
 	if(m_engine.logic_move(mv)){
 		/** 执行着法*/
@@ -659,6 +662,10 @@ int Board::try_move(int mv)
 			CSound::play(SND_MOVE);
 
 		redraw();
+		selected_chessman = m_engine.get_piece(dst);
+		draw_select_frame(true);
+		printf("sleceted = %d inish move and redraw now\n",selected_chessman);
+		selected_chessman=-1;
 
 		/** 对战时的处理*/
 		if(is_filght_to_robot()){

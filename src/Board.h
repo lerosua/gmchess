@@ -94,7 +94,14 @@ class Board : public Gtk::DrawingArea
 		void redraw();
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		void get_board_by_move(int num);
+		/** 
+		 * 根据x，y坐标获取到达的坐标，与选择的棋子达成着法
+		 * 进行尝试性走棋
+		 */
 		int try_move(int x,int y);
+		/**
+		 * 直接根据着法尝试性走棋
+		 */
 		int try_move(int mv);
 		/** 悔棋*/
 		void rue_move();

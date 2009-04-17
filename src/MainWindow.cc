@@ -454,6 +454,8 @@ void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
 		(*iter)[m_columns.player] = _("Red");
 	}
 
+	Gtk::TreeModel::Path path(iter);
+	m_treeview.scroll_to_row(path);
 }
 
 void MainWindow::del_step_last_line()
@@ -478,6 +480,10 @@ void MainWindow::init_move_treeview()
 
 bool MainWindow::on_treeview_click(GdkEventButton* ev)
 {
+
+	if(board->is_filght_to_robot())
+		return true;
+
 	Glib::RefPtr<Gtk::TreeSelection> selection = m_treeview.get_selection();
 	Gtk::TreeModel::iterator iter  = selection->get_selected();
 	if(!selection->count_selected_rows())
@@ -546,8 +552,8 @@ void MainWindow::change_status()
 void MainWindow::on_begin_game()
 {
 	btn_begin->set_sensitive(false);
+	m_refTreeModel->clear();
 	board->start_robot();
-
 }
 
 void MainWindow::on_lose_game()

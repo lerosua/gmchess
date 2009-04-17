@@ -115,6 +115,10 @@ class Engine {
 		 *  @return 返回棋子代号，如果0表示没有棋子
 		 */
 		int get_piece(int rx,int ry);
+		/**
+		 * @brief 由棋盘数组里的位置返回棋子代号
+		 */
+		int get_piece(int site){ return chessboard[site];}
 		
 		/**着法中的位置坐标全是在棋盘数组里的位置，0x33-0xcb以内*/
 		/**
