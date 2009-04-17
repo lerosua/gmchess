@@ -25,7 +25,9 @@
 #include "MainWindow.h"
 #include "Sound.h"
 
+/** 边界的宽度*/
 const int border_width = 32;
+/** 棋子的宽度*/
 const int chessman_width = 57;
 
 #define	PLACE_LEFT 0x01
@@ -245,7 +247,7 @@ void Board::redraw()
 /**处理点击事件*/
 bool Board::on_button_press_event(GdkEventButton* ev)
 {
-	/** 对战状态下，电脑走棋就不响应鼠标事件了*/
+	/** 对战状态下，电脑走棋时就不响应鼠标事件了*/
 	if(is_filght_to_robot()){
 		if(!user_player)
 			return true;
@@ -254,7 +256,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
 		redraw();
-		draw_select_frame(false);
+		//draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
@@ -275,7 +277,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					(selected_chessman>31)){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
-						draw_select_frame(false); 
+						//draw_select_frame(false); 
 						return true;
 				}
 
@@ -294,13 +296,11 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			}
 			else if(dst_chessman == 0){
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
-				//draw_select_frame(false);
 				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
 			else{
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
-				//draw_select_frame(false);
 				try_move(selected_x,selected_y);
 					selected_chessman = -1;
 			}
@@ -311,7 +311,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 3){
 		/** 右键取消选择*/
 		selected_chessman = -1;
-		draw_select_frame(false);
+		//draw_select_frame(false);
 		redraw();
 
 	}
@@ -488,7 +488,13 @@ void Board::draw_select_frame(bool selected)
 	if (selected_chessman < 0 || selected_x == -1 || selected_y == -1)
 		return;
 
-	Gdk::Point p = get_coordinate(selected_x, selected_y);
+	/** 目前要做的是根据棋子代号，获取它所在的棋盘9x10坐标*/
+	//Gdk::Point p = get_coordinate(selected_x, selected_y);
+	int sx,sy;
+	m_engine.get_xy_from_chess(selected_chessman,sx,sy);
+	Gdk::Point p = get_coordinate(sx, sy);
+
+
 	int px = p.get_x() - 57 / 2;
 	int py = p.get_y() - 57 / 2;
 
@@ -643,9 +649,6 @@ int Board::try_move(int dst_x,int dst_y)
 }
 int Board::try_move(int mv)
 {
-	//int dst = m_engine.get_dst_xy(dst_x,dst_y);
-	//int src = m_engine.get_chessman_xy(selected_chessman);
-	//int mv =  m_engine.get_move(src,dst);
 	int eat = m_engine.get_move_eat(mv);
 	int dst=  m_engine.get_move_dst(mv);
 	/** 对着法进行逻辑检测*/
@@ -664,7 +667,7 @@ int Board::try_move(int mv)
 		redraw();
 		selected_chessman = m_engine.get_piece(dst);
 		draw_select_frame(true);
-		printf("sleceted = %d inish move and redraw now\n",selected_chessman);
+		printf("sleceted = %d finish move and redraw now\n",selected_chessman);
 		selected_chessman=-1;
 
 		/** 对战时的处理*/

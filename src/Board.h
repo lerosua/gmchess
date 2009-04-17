@@ -33,6 +33,7 @@ class MainWindow;
 /**
  * @brief 棋盘类 
  * 负责棋盘和棋子的绘画
+ * 棋盘9x10坐标是由左上角开始0x0- 9x10
  */
 class Board : public Gtk::DrawingArea 
 {
@@ -46,8 +47,11 @@ class Board : public Gtk::DrawingArea
 		bool on_configure_event(GdkEventConfigure* ev);
 		bool on_button_press_event(GdkEventButton* ev);
 
+		/** 由棋盘9x10坐标得到棋盘真实坐标*/
 		Gdk::Point get_coordinate(int pos_x, int pos_y);
+		/** 由棋盘真实坐标得到棋盘9x10坐标*/
 		Gdk::Point get_position(int pos_x, int pos_y);
+		/** 获取棋盘格子的长与宽*/
 		void get_grid_size(int& width, int& height);
 
 		/**
@@ -55,7 +59,7 @@ class Board : public Gtk::DrawingArea
 		 */
 		void draw_bg();
 		/**
-		 * @brief 画棋子
+		 * @brief 画棋子 坐标为棋盘9x10坐标
 		 * @param x x坐标
 		 * @param y y坐标
 		 * @param chess_type 棋子的类型
@@ -80,7 +84,9 @@ class Board : public Gtk::DrawingArea
 				guint,guint time);
 	public:
 
+		/** 启动AI对战*/
 		void start_robot();
+		/** 读取AI的输出，并根据输出的着法走棋*/
 		bool robot_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
 		void start_move();
@@ -95,7 +101,7 @@ class Board : public Gtk::DrawingArea
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		void get_board_by_move(int num);
 		/** 
-		 * 根据x，y坐标获取到达的坐标，与选择的棋子达成着法
+		 * 根据x，y坐标(棋盘9x10坐标)获取到达的坐标，与选择的棋子达成着法
 		 * 进行尝试性走棋
 		 */
 		int try_move(int x,int y);
@@ -112,6 +118,7 @@ class Board : public Gtk::DrawingArea
 		/** 返回程序棋盘状态:读谱，与电脑对战，网络对战,自由摆棋*/
 		int get_status(){ return m_status; }
 		int get_step(){ return m_step; }
+		/** 标识是否与电脑AI对战*/
 		bool is_filght_to_robot(){ return m_status == FIGHT_STATUS;}
 		
 	private:
@@ -125,7 +132,9 @@ class Board : public Gtk::DrawingArea
 		Robot m_robot;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
+		/** 传递给AI的着法状态*/
 		std::string moves_lines;
+		/** 着法状态开头序列，potions fen xxx*/
 		const std::string postion_str;
 
 		/** 背景图像 */
@@ -136,13 +145,16 @@ class Board : public Gtk::DrawingArea
 		Glib::RefPtr<Gdk::Pixbuf> chessman_images[18];
 		/** 选中图像*/
 		Glib::RefPtr<Gdk::Image> selected_chessman_image;
+		/** 选中的棋盘9x10坐标*/
 		int selected_x;
 		int selected_y;
+		/** 选中的棋子,值为代号,16-31红，32-47黑*/
 		int selected_chessman;
 		/** 步时 */
 		int m_step;
 		/** 棋局状态*/
 		int m_status;
+		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		bool user_player;
 };
 

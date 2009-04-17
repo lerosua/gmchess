@@ -237,6 +237,13 @@ int Engine::get_dst_xy(int rx, int ry)
 	return get_coord(rx+3,ry+3);
 }
 
+void Engine::get_xy_from_chess(int f_chess,int& x,int& y)
+{
+	int xy=get_chessman_xy(f_chess);
+	x=RANK_X(xy)-3;
+	y=RANK_Y(xy)-3;
+}
+
 char Engine::get_iccs_y(int nArg)
 {
 	int tmp = (nArg&240)>>4;

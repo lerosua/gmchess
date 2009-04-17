@@ -30,7 +30,11 @@
 /**
  * @brief 处理棋盘数据结构
  * 暂时来说是保存FEN串为历史局面，把当前局面保存到棋盘数组并输出
- *
+ * 此处的x,y坐标相对于棋盘数组chessboard[256]来说，而这个数组中有效位置见
+ * 棋盘区域表chessInBoard[256].
+ * 获取的x，y坐标是数组序号的两个十六进制位，比如0xa3,x坐标是3,y坐标是a
+ * 而它的9x10棋盘坐标就是0,7
+ * 
  */
 class Engine {
 	public:
@@ -76,12 +80,14 @@ class Engine {
 		/** 数字转换成iccs坐标的横坐标 */
 		char digit_to_alpha(int nArg);
 		char alpha_to_digit(int nArg);
-		/** 由x，y位置获得棋盘数组的位置*/
+		/** 由x，y位置获得棋盘数组中的序号（它所在的位置）*/
 		int get_coord(int x,int y){ return x+(y<<4);};
-		/** 获取y坐标*/
+		/** 由棋子代号获取9x10棋盘坐标的x，y*/
+		void get_xy_from_chess(int f_chess,int& x,int& y);
+		/** 获取y坐标位*/
 		inline int RANK_Y(int sq) {	  return sq >> 4;};
 
-		/**获取x坐标*/
+		/**获取x坐标位*/
 		inline int RANK_X(int sq) {
 			  return sq & 15;
 		}
@@ -109,7 +115,7 @@ class Engine {
 		void change_side(){black_player = 1-black_player;};
 		/** 引擎重置 */
 		void reset();
-		/** @brief 返回x，y位置上的棋子 为真实棋盘的坐标，
+		/** @brief 返回x，y位置上的棋子 为8x9棋盘的坐标，
 		 *  @param rx x 坐标
 		 *  @param ry y 坐标
 		 *  @return 返回棋子代号，如果0表示没有棋子
@@ -128,10 +134,10 @@ class Engine {
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
 		int get_move(int p_src,int p_dst){  return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<16);}
-		/** 从真实棋盘坐标(rx,ry)返回棋盘数组里的坐标 */
+		/** 从棋盘9x10坐标(rx,ry)返回棋盘数组里的序号,通常用于获取着法的落点 */
 		int get_dst_xy(int rx, int ry);
-		/** 返回棋子所在棋盘数组里的坐标 */
-		int get_chessman_xy(int f_chess){return chessmans[f_chess] ; }
+		/** 返回棋子所在棋盘数组里的坐标(序号) */
+		inline int get_chessman_xy(int f_chess){return chessmans[f_chess] ; }
 
 		/** 得到着法的起点 */
 		int get_move_src(int mv){ return (int)mv & 255 ;}
