@@ -23,8 +23,7 @@
 #include <fstream>
 #include "BookView.h"
 
-#define version "0.10.3"
-#define BOOK_DIR "/home/leros/.gmchess/book"
+#define version "0.20"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -130,7 +129,6 @@ MainWindow::MainWindow():menubar(NULL)
 	scroll_book->add(*m_bookview);
 
 	init();
-	//m_bookview->load_book_dir(BOOK_DIR);
 	
 	show_all();
 
@@ -354,6 +352,29 @@ void MainWindow:: on_menu_open_file()
 
 void MainWindow::open_file(const std::string& filename)
 {
+	if(board->is_filght_to_robot()){
+		Gtk::MessageDialog dialog(*this, _("AI Warn"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+		Glib::ustring msg =_("Open book view will close the AI game,Are you sure?");
+		dialog.set_secondary_text(msg);
+		int result = dialog.run();
+		switch (result) {
+			case (Gtk::RESPONSE_OK): {
+                	        break;
+                	}
+
+			case (Gtk::RESPONSE_CANCEL): {
+				return;
+                	        break;
+                	}
+
+			default: {
+				return;
+                	        break;
+                	}
+		}
+	}
 
 	/** 获取文件后先它将它转换成pgn文件才能打开*/
 		int out;
@@ -551,6 +572,33 @@ void MainWindow::change_status()
 
 void MainWindow::on_begin_game()
 {
+	/** 已经在对战中，则询问是否开始新游戏*/
+	if(board->is_filght_to_robot()){
+
+		Gtk::MessageDialog dialog(*this, _("new game"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+		Glib::ustring msg =_("Will you  start a new game?");
+		dialog.set_secondary_text(msg);
+		int result = dialog.run();
+		switch (result) {
+			case (Gtk::RESPONSE_OK): {
+				m_refTreeModel->clear();
+				board->new_game();
+                	        break;
+                	}
+
+			case (Gtk::RESPONSE_CANCEL): {
+                	        break;
+                	}
+
+			default: {
+                	        break;
+                	}
+		}
+		return;
+
+	}
 	btn_begin->set_sensitive(false);
 	m_refTreeModel->clear();
 	board->start_robot();

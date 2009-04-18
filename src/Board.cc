@@ -767,6 +767,20 @@ void Board::start_robot()
 
 }
 
+void Board::new_game()
+{
+	m_status = FIGHT_STATUS;
+
+	m_engine.init_snapshot(start_fen);
+	m_robot.send_ctrl_command("setoption newgame\n");
+
+	moves_lines.clear();
+	moves_lines = postion_str + std::string(start_fen);
+	user_player =1;
+	redraw();
+
+}
+
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
 	/*for testing,delete me*/

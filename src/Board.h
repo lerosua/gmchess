@@ -84,8 +84,10 @@ class Board : public Gtk::DrawingArea
 				guint,guint time);
 	public:
 
-		/** 启动AI对战*/
+		/** 启动AI对战,将会启动引擎进程*/
 		void start_robot();
+		/** 开启新游戏，即在引擎已启动的情况下重新游戏*/
+		void new_game();
 		/** 读取AI的输出，并根据输出的着法走棋*/
 		bool robot_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
