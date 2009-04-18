@@ -122,6 +122,7 @@ class Board : public Gtk::DrawingArea
 		int get_step(){ return m_step; }
 		/** 标识是否与电脑AI对战*/
 		bool is_filght_to_robot(){ return m_status == FIGHT_STATUS;}
+		bool is_human_player(){ return user_player; }
 		
 	private:
 		/** 加载所需要图片进内存*/

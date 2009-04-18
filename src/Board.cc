@@ -249,7 +249,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	/** 对战状态下，电脑走棋时就不响应鼠标事件了*/
 	if(is_filght_to_robot()){
-		if(!user_player)
+		if(!is_human_player())
 			return true;
 
 	}
@@ -690,11 +690,11 @@ int Board::try_move(int mv)
 			std::cout<<"moves_lines = "<<moves_lines<<std::endl;
 			m_robot.send_ctrl_command(moves_lines.c_str());
 			m_robot.send_ctrl_command("\n");
-			if(user_player){
+			user_player = 1-user_player;
+			if(!is_human_player()){
 				DLOG("send command to tell robot\n");
 				m_robot.send_ctrl_command("go time 295000 increment 0\n");
 			}
-			user_player = 1-user_player;
 
 
 		}
@@ -717,6 +717,13 @@ void Board::rue_move()
 
 	redraw();
 
+		if(is_filght_to_robot()){
+				moves_lines.clear();
+				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
+				m_robot.send_ctrl_command(moves_lines.c_str());
+				m_robot.send_ctrl_command("\n");
+				user_player = 1-user_player;
+		}
 }
 
 int Board::open_file(const std::string& filename)

@@ -618,6 +618,21 @@ void MainWindow::on_draw_game()
 void MainWindow::on_rue_game()
 {
 	/** 如果是网络对战，则需要确认信息*/
-	board->rue_move();
+	/** 设置成只有用户走时才能悔棋，一次撤销两步，即ai的一步，用户的一步，再次轮到用户走
+	 * 这么做是为了防止ai在思考中撤销着法会产生冲突*/
+
+	if(board->is_filght_to_robot()){
+		if(board->is_human_player()){
+			board->rue_move();
+			board->rue_move();
+		}else{
+			Gtk::MessageDialog dialog(*this, _("Warning"), false);
+			Glib::ustring msg =_("Only rue game when you are go,so wait a minute!");
+			dialog.set_secondary_text(msg);
+			int result = dialog.run();
+		}
+
+
+	}
 
 }
