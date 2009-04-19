@@ -422,11 +422,43 @@ int Engine::get_knight_leg(int f_src, int f_dst)
 
 }
 
+int Engine::checked_by(void)
+{
+	return checked_by(black_player);
+}
+
+/**
+ * 将对方棋子连接到帅/将上的着法依次做逻辑检测，如果通过则说明将军
+ * @param player false 表示红方，即检测红是否被黑将车，true表示红将军黑
+ * @return 返回true即被将军，false即没事
+ */
+int Engine::checked_by(bool player)
+{
+	/** 获取本方的将/帅*/
+	int dst= chessmans[side_tag(player)+KING_FROM];
+	int src;
+	int i;
+
+	for (i = KNIGHT_FROM; i <= PAWN_TO; i ++) {
+		if(src = chessmans[side_tag(1-player)+i]){
+			int mv = get_move(src,dst);
+			if(logic_move(mv)){
+				DLOG("将军\n");
+				return 1;
+			}
+		}
+	  }
+	return 0;
+}
+
+
 /** 目前只做基本检测，将军之类的走棋暂不考虑
  * 着法的合法化有两种，
  * 一是先根据棋子生成合法的着法，然后检测目标着法是否
  * 匹配，如果不匹配则为非法的着法。
  * 二是只判断目标着法是否合法的着法即可，以下函数目前使用此方法
+ *
+ * 还要考虑将帅碰头的情景,即此着法会造成将帅面对面不
  **/
 bool Engine::logic_move(int mv)
 {
@@ -628,6 +660,24 @@ bool Engine::logic_move(int mv)
 	return false;
 
 }
+
+bool Engine::make_move(int mv)
+{
+	if(logic_move(mv)){
+		do_move(mv);
+		/** 检测走子后是否仍被将车，如是则撤销走法*/
+		if(checked_by(1-black_player)){
+			undo_move(mv);
+			return false;
+		}
+			
+		return true;
+
+	}
+
+	return false;
+
+}
 /**
  * @brief 
  * 执行了mv着法，将生成的棋盘数组转成FEN串添加到FEN快照里
@@ -676,17 +726,6 @@ int Engine::do_move(int mv)
 
 	add_move_chinese(mv_line);
 
-	/*
-	printf("\n ==after do move ==\n");
-	int i,j;
-	for(i=0;i<16;i++)
-	{
-		for(j=0;j<16;j++)
-			printf(" %2d ",chessboard[i*16+j]);
-		printf("\n");
-	}
-	*/
-	
 	return 0;
 }
 

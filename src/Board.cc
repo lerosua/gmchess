@@ -113,7 +113,7 @@ Board::Board(MainWindow& win) :
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
-	,user_player(0)
+	//,user_player(0)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -652,9 +652,10 @@ int Board::try_move(int mv)
 	int eat = m_engine.get_move_eat(mv);
 	int dst=  m_engine.get_move_dst(mv);
 	/** 对着法进行逻辑检测*/
-	if(m_engine.logic_move(mv)){
+	//if(m_engine.logic_move(mv)){
+	if(m_engine.make_move(mv)){
 		/** 执行着法*/
-		m_engine.do_move(mv);
+		//m_engine.do_move(mv);
 		/** 将着法中文表示加到treeview中*/
 		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
 		int num = m_engine.how_step();
@@ -690,7 +691,7 @@ int Board::try_move(int mv)
 			std::cout<<"moves_lines = "<<moves_lines<<std::endl;
 			m_robot.send_ctrl_command(moves_lines.c_str());
 			m_robot.send_ctrl_command("\n");
-			user_player = 1-user_player;
+			//user_player = 1-user_player;
 			if(!is_human_player()){
 				DLOG("send command to tell robot\n");
 				m_robot.send_ctrl_command("go time 295000 increment 0\n");
@@ -698,6 +699,8 @@ int Board::try_move(int mv)
 
 
 		}
+		if(m_engine.checked_by())
+			CSound::play(SND_CHECK);
 	}
 
 	return 0;
@@ -722,7 +725,7 @@ void Board::rue_move()
 				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
 				m_robot.send_ctrl_command(moves_lines.c_str());
 				m_robot.send_ctrl_command("\n");
-				user_player = 1-user_player;
+				//user_player = 1-user_player;
 		}
 }
 
@@ -769,7 +772,7 @@ void Board::start_robot()
 
 	moves_lines.clear();
 	moves_lines = postion_str + std::string(start_fen);
-	user_player =1;
+	//user_player =1;
 	redraw();
 
 }
@@ -783,7 +786,7 @@ void Board::new_game()
 
 	moves_lines.clear();
 	moves_lines = postion_str + std::string(start_fen);
-	user_player =1;
+	//user_player =1;
 	redraw();
 
 }

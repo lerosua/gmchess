@@ -112,7 +112,9 @@ class Engine {
 		/** 测试位置sq是否在九宫格内 */
 		bool in_fort(int sq) { return chessInFort[sq]; }
 		/** 交换走棋方*/
-		void change_side(){black_player = 1-black_player;};
+		inline void change_side(){black_player = 1-black_player;}
+		/** 是否红方走棋 */
+		inline bool red_player() { return 1-black_player ; }
 		/** 引擎重置 */
 		void reset();
 		/** @brief 返回x，y位置上的棋子 为8x9棋盘的坐标，
@@ -159,10 +161,19 @@ class Engine {
 		Glib::ustring action_to_word(char action);
 		Glib::ustring code_to_word(char code);
 
-		/** 执行着法 */
+		/** 
+		 * @brief 高级着法执行,被外部调用，本身调用do_move及logic_move
+		 * @param mv 着法
+		 * @return 真即执行着法成功，false 执行失败
+		 */
+		bool make_move(int mv);
+		/** 无检测执行着法 */
 		int do_move(int mv);
-		/** 检测着法是否合逻辑(合法）*/
+		/** 检测着法是否合逻辑(合法）--基本着法检测*/
 		bool logic_move(int mv);
+		/** 将军检测*/
+		int checked_by(bool player);
+		int checked_by(void);
 		/** 
 		 * @brief 撤消此着法 
 		 * @param mv 着法,已包含了被吃子信息
@@ -218,7 +229,7 @@ class Engine {
 		std::map<int,std::string> move_comment;
 		/** 
 		 * @brief 谁走子的信息
-		 * 0 是红方先走，1是黑方先走
+		 * 0 是红方走，1是黑方走
 		 */
 		bool black_player;
 

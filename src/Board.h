@@ -122,7 +122,7 @@ class Board : public Gtk::DrawingArea
 		int get_step(){ return m_step; }
 		/** 标识是否与电脑AI对战*/
 		bool is_filght_to_robot(){ return m_status == FIGHT_STATUS;}
-		bool is_human_player(){ return user_player; }
+		bool is_human_player(){ return m_engine.red_player(); }
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -158,7 +158,7 @@ class Board : public Gtk::DrawingArea
 		/** 棋局状态*/
 		int m_status;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
-		bool user_player;
+		//bool user_player;
 };
 
 #endif // _BOARD_H_
