@@ -666,12 +666,38 @@ bool Engine::logic_move(int mv)
 
 }
 
+/** 检测当前状态是否将帅对头，返回真即是面对面，是非法状态，用于检测着法的
+ * 合法性
+ */
+bool Engine::king_meet()
+{
+	int red_king_locate  = chessmans[side_tag(0)+KING_FROM];
+	int black_king_locate =chessmans[side_tag(1)+KING_FROM];
+
+	int red_x = RAND_X(red_king_locate);
+	int black_x = RAND_X(black_king_locate);
+	/** 如果将帅在同一x轴上，则检测此轴上是否无棋子，如是则碰头了*/
+	if(red_x == black_x ){
+		for(int i = black_king_locate+16;i<red_king_locate;i=i+16){
+			if(chessboard[i] != 0)
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
+
 bool Engine::make_move(int mv)
 {
 	if(logic_move(mv)){
 		do_move(mv);
 		/** 检测走子后是否仍被将车，如是则撤销走法*/
 		if(checked_by(1-black_player)){
+			undo_move(mv);
+			return false;
+		}
+		/** 如果导致将帅碰头，则着法非法*/
+		if(king_meet()){
 			undo_move(mv);
 			return false;
 		}

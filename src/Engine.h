@@ -171,6 +171,8 @@ class Engine {
 		int do_move(int mv);
 		/** 检测着法是否合逻辑(合法）--基本着法检测*/
 		bool logic_move(int mv);
+		/** 将帅碰面检测*/
+		bool king_meet();
 		/** 
 		 * @brief 将军检测
 		 * @param player true表示检测红方是否被将，false表示检测黑方是否被将
