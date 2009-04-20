@@ -171,9 +171,20 @@ class Engine {
 		int do_move(int mv);
 		/** 检测着法是否合逻辑(合法）--基本着法检测*/
 		bool logic_move(int mv);
-		/** 将军检测*/
+		/** 
+		 * @brief 将军检测
+		 * @param player true表示检测红方是否被将，false表示检测黑方是否被将
+		 * @return 返回0即没被将，非0则将军，不用bool是为了以后检测多重将军作扩展*/
 		int checked_by(bool player);
+		/**
+		 * @brief 同将军检测
+		 * 默认根据black_player的值来检测
+		 */
 		int checked_by(void);
+		/** 
+		 * @brief 检测是否被将死
+		 */
+		bool mate();
 		/** 
 		 * @brief 撤消此着法 
 		 * @param mv 着法,已包含了被吃子信息

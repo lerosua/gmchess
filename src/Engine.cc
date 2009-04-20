@@ -422,6 +422,11 @@ int Engine::get_knight_leg(int f_src, int f_dst)
 
 }
 
+bool Engine::mate()
+{
+
+}
+
 int Engine::checked_by(void)
 {
 	return checked_by(black_player);
