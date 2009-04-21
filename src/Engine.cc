@@ -674,8 +674,8 @@ bool Engine::king_meet()
 	int red_king_locate  = chessmans[side_tag(0)+KING_FROM];
 	int black_king_locate =chessmans[side_tag(1)+KING_FROM];
 
-	int red_x = RAND_X(red_king_locate);
-	int black_x = RAND_X(black_king_locate);
+	int red_x = RANK_X(red_king_locate);
+	int black_x = RANK_X(black_king_locate);
 	/** 如果将帅在同一x轴上，则检测此轴上是否无棋子，如是则碰头了*/
 	if(red_x == black_x ){
 		for(int i = black_king_locate+16;i<red_king_locate;i=i+16){
