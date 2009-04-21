@@ -283,8 +283,10 @@ void MainWindow::on_menu_save_file()
 		iter++;
 		if(iter!=children.end())
 			file<<"  "<<(*iter)[m_columns.step_line]<<std::endl;
-		else
+		else{
 			file<<std::endl;
+			break;
+		}
 	}
 
 	file.close();
