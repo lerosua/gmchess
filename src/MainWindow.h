@@ -114,8 +114,8 @@ class MainWindow:public Gtk::Window
 		Gtk::TextView*			text_comment;
 		Gtk::Notebook*			m_notebook;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
-		Gtk::HBox*			p1_box;
-		Gtk::HBox*			p2_box;
+		Gtk::Image*			p1_image;
+		Gtk::Image*			p2_image;
 
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;

@@ -113,9 +113,6 @@ Board::Board(MainWindow& win) :
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
-	,p1_image(NULL)
-	,p2_image(NULL)
-	//,user_player(0)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -149,8 +146,6 @@ Board::~Board()
 
 void Board::load_images()
 {
-	p1_image = Gtk::manage(new Gtk::Image(Gdk::Pixbuf::create_from_file(IMGAGE_DIR"play.png")));
-	p2_image = Gtk::manage(new Gtk::Image(Gdk::Pixbuf::create_from_file(IMGAGE_DIR"play.png")));
 	bg_image = Gdk::Pixbuf::create_from_file(IMGAGE_DIR"bg.png");
 	this->set_size_request(521,577);
 	chessman_images[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(IMGAGE_DIR"black_advisor.png");
@@ -700,7 +695,7 @@ int Board::try_move(int mv)
 			}
 
 
-			parent.change_play(m_engine.red_player());
+			parent.change_play(is_human_player());
 		}
 		if(m_engine.checked_by())
 			CSound::play(SND_CHECK);

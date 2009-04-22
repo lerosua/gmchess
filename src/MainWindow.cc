@@ -128,15 +128,13 @@ MainWindow::MainWindow():menubar(NULL)
 	m_bookview= new BookView(this);
 	scroll_book->add(*m_bookview);
 
-	p1_box = dynamic_cast<Gtk::HBox*>(ui_xml->get_widget("hbox_p1_play"));
-	p2_box = dynamic_cast<Gtk::HBox*>(ui_xml->get_widget("hbox_p2_play"));
-	p1_box->add(*(board->get_p1_image()));
-	p2_box->add(*(board->get_p2_image()));
-	p1_box->hide();
-	p2_box->hide();
+	p1_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p1"));
+	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
 	init();
 	
 	show_all();
+	p1_image->hide();
+	p2_image->hide();
 
 }
 
@@ -148,19 +146,19 @@ void MainWindow::change_play(bool player)
 {
 	/*
 	if( FIGHT_STATUS != board->get_status()){
-		p1_box->remove(*(board->get_p1_image()));
-		p2_box->remove(*(board->get_p2_image()));
+		p1_image->remove(*(board->get_p1_image()));
+		p2_image->remove(*(board->get_p2_image()));
 		return ;
 	}
 	*/
 	DLOG("xxx\n");
 	if(player){
-		p1_box->hide();
-		p2_box->show();
+		p1_image->hide();
+		p2_image->show();
 	}
 	else{
-		p2_box->hide();
-		p1_box->show();
+		p2_image->hide();
+		p1_image->show();
 	}
 }
 

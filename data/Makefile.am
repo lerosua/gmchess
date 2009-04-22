@@ -4,6 +4,7 @@ gmchess_ui = \
 	     p1.png \
 	     p2.png \
 	     book.dat \
+	     play.png \
 	     gmchess.png
 
 

@@ -181,7 +181,13 @@
                           <widget class="GtkHBox" id="hbox_p1_play">
                             <property name="visible">True</property>
                             <child>
-                              <placeholder/>
+                              <widget class="GtkImage" id="image_p1">
+                                <property name="visible">True</property>
+                                <property name="pixbuf">play.png</property>
+                              </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                           </widget>
                           <packing>
@@ -360,7 +366,13 @@
                           <widget class="GtkHBox" id="hbox_p2_play">
                             <property name="visible">True</property>
                             <child>
-                              <placeholder/>
+                              <widget class="GtkImage" id="image_p2">
+                                <property name="visible">True</property>
+                                <property name="pixbuf">play.png</property>
+                              </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                           </widget>
                           <packing>
