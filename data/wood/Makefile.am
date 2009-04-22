@@ -2,6 +2,7 @@
 gmchessimagedir= $(pkgdatadir)/wood
 gmchessimage_DATA= \
 		   bg.png 	\
+		   play.png 	\
 		   select.png   \
 		   null.png 	\
 		   red_king.png \

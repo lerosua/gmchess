@@ -65,6 +65,7 @@ class MainWindow:public Gtk::Window
 		void open_file(const std::string& filename);
 		/** 初始化*/
 		void init();
+		void change_play(bool player);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();
@@ -113,6 +114,9 @@ class MainWindow:public Gtk::Window
 		Gtk::TextView*			text_comment;
 		Gtk::Notebook*			m_notebook;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
+		Gtk::HBox*			p1_box;
+		Gtk::HBox*			p2_box;
+
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;
 		Gtk::Button*			btn_end ;

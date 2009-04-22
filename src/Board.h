@@ -123,6 +123,8 @@ class Board : public Gtk::DrawingArea
 		/** 标识是否与电脑AI对战*/
 		bool is_filght_to_robot(){ return m_status == FIGHT_STATUS;}
 		bool is_human_player(){ return m_engine.red_player(); }
+		Gtk::Image*  get_p1_image(){return p1_image;}
+		Gtk::Image*  get_p2_image(){return p2_image;}
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -148,6 +150,8 @@ class Board : public Gtk::DrawingArea
 		Glib::RefPtr<Gdk::Pixbuf> chessman_images[18];
 		/** 选中图像*/
 		Glib::RefPtr<Gdk::Image> selected_chessman_image;
+		Gtk::Image*  p1_image;
+		Gtk::Image*  p2_image;
 		/** 选中的棋盘9x10坐标*/
 		int selected_x;
 		int selected_y;
