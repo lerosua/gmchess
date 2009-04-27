@@ -128,6 +128,13 @@ union Hanzi{
 		uint32_t digit;
 	};
 
+/** 用于生成一些着法的数组
+ * 这四个数组用来判断棋子的走子方向，以马为例就是：dst = src + KnightMoveTab[i]
+ */
+static const int KingMoveTab[4]    = {-0x10, -0x01, +0x01, +0x10};
+static const int AdvisorMoveTab[4] = {-0x11, -0x0f, +0x0f, +0x11};
+static const int BishopMoveTab[4]  = {-0x22, -0x1e, +0x1e, +0x22};
+static const int KnightMoveTab[8]  = {-0x21, -0x1f, -0x12, -0x0e, +0x0e, +0x12, +0x1f, +0x21};
 
 #endif   /* ----- #ifndef GMCHESS_FILE_HEADER_INC  ----- */
 

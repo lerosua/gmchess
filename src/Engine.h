@@ -217,6 +217,8 @@ class Engine {
 		void add_comment(const std::string& str);
 		/** 获取某着法的注释，如果有的话*/
 		std::string* get_comment(int f_step);
+		/** 返回将军标识，最好是在mate()调用后使用*/
+		inline bool get_checkby(){ return m_checked;}
 
 	private:
 		/**
@@ -245,6 +247,7 @@ class Engine {
 		 * 0 是红方走，1是黑方走
 		 */
 		bool black_player;
+		bool m_checked;
 
 
 

@@ -649,7 +649,6 @@ int Board::try_move(int mv)
 	int eat = m_engine.get_move_eat(mv);
 	int dst=  m_engine.get_move_dst(mv);
 	/** 对着法进行逻辑检测*/
-	//if(m_engine.logic_move(mv)){
 	if(m_engine.make_move(mv)){
 		/** 执行着法*/
 		//m_engine.do_move(mv);
@@ -697,8 +696,16 @@ int Board::try_move(int mv)
 
 			parent.change_play(is_human_player());
 		}
-		if(m_engine.checked_by())
+		/**被将死了*/
+		if(m_engine.mate()){
+			parent.on_mate_game();
+			DLOG("将军死棋\n");
+		}
+
+		if(m_engine.get_checkby()){
 			CSound::play(SND_CHECK);
+			DLOG("将军===============\n");
+		}
 	}
 
 	return 0;

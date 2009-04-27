@@ -663,3 +663,30 @@ void MainWindow::on_rue_game()
 	}
 
 }
+void MainWindow::on_mate_game()
+{
+	Gtk::MessageDialog dialog(*this, _("Game End"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+		Glib::ustring msg =_("Mate!\n Are you want to start a new game?");
+		dialog.set_secondary_text(msg);
+		int result = dialog.run();
+		switch (result) {
+			case (Gtk::RESPONSE_OK): {
+				m_refTreeModel->clear();
+				board->new_game();
+                	        break;
+                	}
+
+			case (Gtk::RESPONSE_CANCEL): {
+				return;
+                	        break;
+                	}
+
+			default: {
+				return;
+                	        break;
+                	}
+		}
+
+}

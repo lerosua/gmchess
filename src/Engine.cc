@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 Engine::Engine():black_player(0)
+		 ,m_checked(0)
 {
 	clean_board();
 }
@@ -45,6 +46,7 @@ void Engine::reset()
 	clean_board();
 
 	black_player = 0;
+	m_checked=0;
 	fen_snapshots.clear();
 	move_snapshots.clear();
 	move_chinese.clear();
@@ -422,11 +424,154 @@ int Engine::get_knight_leg(int f_src, int f_dst)
 
 }
 
+/** 
+ * 目前所有棋子的着法，检测走后是否能解除将军状态，如果都不行，则死棋
+ * 死棋检测耗资源巨大，最好设定一个将军标识，在被将军状态下再检测
+ * 这是在将军前提下检测死棋，没子走的情况暂不检测,公头被困死应该只剩下一个
+ * 公的状态下，这种状态另外搞吧，应该很简单。
+ */
 bool Engine::mate()
 {
+	/** 没被将军，那就没事，有棋,bug是将/帅被困死 */
+	m_checked = checked_by();
+	if(!m_checked)
+		return false;
+	/** 
+	 * 轮到黑方走，则生成黑方所有的着法，并一一检测，如果都不能通过，
+	 * 则死棋,如果遇到一个能通过的，则马上返回false吧
+	 */
+	DLOG("mate function\n");
+		int src;
+		int i;
+		int dst;
+		for (i = KING_FROM; i <= PAWN_TO; i++) {
+			if(src = chessmans[side_tag(black_player)+i]){
+				int chess_t =get_chessman_type(get_piece(src));
+				switch(chess_t){
+				case RED_KING:
+				case BLACK_KING:
+					for(int k=0;k<4;k++){
+						dst=src+KingMoveTab[k];
+						if(in_fort(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+						}
+					}
+					break;
+				case RED_ADVISOR:
+				case BLACK_ADVISOR:
+					for(int k=0;k<4;k++){
+						dst=src+AdvisorMoveTab[k];
+						if(in_fort(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+						}
+					}
+					break;
+				case RED_BISHOP:
+				case BLACK_BISHOP:
+					for(int k=0;i<4;i++){
+						dst=src+BishopMoveTab[k];
+						if(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+						}
+					}
+					break;
+				case RED_KNIGHT:
+				case BLACK_KNIGHT:
+					for(int k=0;k<8;k++){
+						dst=src+ KingMoveTab[k];
+						if(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+						}
+					}
+					break;
+				case RED_ROOK:
+				case BLACK_ROOK:
+				case RED_CANNON:
+				case BLACK_CANNON:
+					/** 向右移动*/
+					dst=src+1;
+					while(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+							dst++;
+					}
+					/** 向左移动*/
+					dst=src-1;
+					while(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+							dst--;
+					}
+					/** 向下移动*/
+					dst=src+16;
+					while(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+							dst=dst+16;
+					}
+					/** 向上移动*/
+					dst=src-16;
+					while(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+							dst=dst-16;
+					}
+
+					break;
+				case RED_PAWN:
+				case BLACK_PAWN:
+					/** 兵的移动借助了将/帅的走法*/
+					for(int k=0;k<4;k++){
+						dst=src+KingMoveTab[k];
+						if(in_board(dst)){
+							int mv = get_move(src,dst);
+							if(make_move(mv)){
+								undo_move(mv);
+								return false;
+							}
+						}
+					}
+					break;
+				default:
+					break;
+
+
+				};
+				}
+			}
+		return true;
 
 }
 
+/**检测当前局面是否有将军出现，并设置相应的状态位*/
 int Engine::checked_by(void)
 {
 	return checked_by(black_player);
@@ -473,7 +618,14 @@ bool Engine::logic_move(int mv)
 
 	if(!in_board(dst))
 		return false;
-	/** 判断是否过时的方法，dst & 0x80,在下方是非0, 上方是0 */
+	/** 检测是否同为红方的笨办法 */
+	if((chessboard[src]&16) && (chessboard[eated]&16))
+			return false;
+	/** 检测是否同为黑方的笨办法 */
+	if((chessboard[src]&32) && (chessboard[eated]&32))
+			return false;
+
+	/** 判断是否过河的方法，dst & 0x80,在下方是非0, 上方是0 */
 	/** 获取要移动棋子的类型*/
 	int chess_t = get_chessman_type(chessboard[src]);
 	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
