@@ -23,7 +23,7 @@
 #include <fstream>
 #include "BookView.h"
 
-#define version "0.20"
+#define version "0.20.1"
 
 Glib::ustring ui_info =
 "<ui>"
