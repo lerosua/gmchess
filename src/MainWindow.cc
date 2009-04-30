@@ -151,7 +151,6 @@ void MainWindow::change_play(bool player)
 		return ;
 	}
 	*/
-	DLOG("xxx\n");
 	if(player){
 		p1_image->hide();
 		p2_image->show();
@@ -443,7 +442,9 @@ void MainWindow::on_menu_war_to_ai()
 
 void MainWindow::on_menu_free_play()
 {
-
+	board->free_game();
+	m_refTreeModel->clear();
+	change_status();
 }
 
 void MainWindow::on_menu_file_quit()
@@ -583,7 +584,7 @@ void MainWindow::change_status()
 	bool f_use=1;
 	if( READ_STATUS != f_status){
 		f_use = 0;
-		buttonbox_war->hide();
+		//buttonbox_war->hide();
 	}
 	btn_next->set_sensitive(f_use);
 	btn_prev->set_sensitive(f_use);

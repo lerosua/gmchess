@@ -766,6 +766,15 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 	}
 }
 
+void Board::free_game()
+{
+	m_robot.send_ctrl_command("quit\n");
+	m_robot.stop();
+	m_status = FREE_STATUS;
+
+	m_engine.init_snapshot(start_fen);
+	redraw();
+}
 
 void Board::start_robot()
 {
@@ -773,13 +782,6 @@ void Board::start_robot()
 
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
-	//m_engine.init_snapshot(start_fen);
-
-	//moves_lines.clear();
-	//moves_lines = postion_str + std::string(start_fen);
-	////user_player =1;
-	//redraw();
-
 	new_game();
 }
 
