@@ -387,6 +387,7 @@ void MainWindow::open_file(const std::string& filename)
 		int result = dialog.run();
 		switch (result) {
 			case (Gtk::RESPONSE_OK): {
+				board->free_game();
                 	        break;
                 	}
 
@@ -456,10 +457,12 @@ void MainWindow::on_menu_file_quit()
 void MainWindow::on_menu_view_preferences()
 {
 
+	printf("not realize yet\n");
 }
 
 void MainWindow::on_menu_help()
 {
+	printf("not realize yet\n");
 
 }
 
@@ -582,6 +585,7 @@ void MainWindow::change_status()
 {
 	int f_status = board->get_status();
 	bool f_use=1;
+#if 0
 	if( READ_STATUS != f_status){
 		f_use = 0;
 		//buttonbox_war->hide();
@@ -595,6 +599,44 @@ void MainWindow::change_status()
 	btn_lose->set_sensitive(1-f_use);
 	btn_draw->set_sensitive(1-f_use);
 	btn_rue->set_sensitive(1-f_use);
+#endif
+	switch(f_status){
+		case READ_STATUS:
+			btn_next->set_sensitive(f_use);
+			btn_prev->set_sensitive(f_use);
+			btn_start->set_sensitive(f_use);
+			btn_end->set_sensitive(f_use);
+
+			btn_begin->set_sensitive(f_use);
+			btn_lose->set_sensitive(1-f_use);
+			btn_draw->set_sensitive(1-f_use);
+			btn_rue->set_sensitive(1-f_use);
+			break;
+		case FIGHT_STATUS:
+			btn_next->set_sensitive(1-f_use);
+			btn_prev->set_sensitive(1-f_use);
+			btn_start->set_sensitive(1-f_use);
+			btn_end->set_sensitive(1-f_use);
+
+			btn_begin->set_sensitive(1-f_use);
+			btn_lose->set_sensitive(f_use);
+			btn_draw->set_sensitive(f_use);
+			btn_rue->set_sensitive(f_use);
+			break;
+		case FREE_STATUS:
+			btn_next->set_sensitive(f_use);
+			btn_prev->set_sensitive(f_use);
+			btn_start->set_sensitive(f_use);
+			btn_end->set_sensitive(f_use);
+
+			btn_begin->set_sensitive(f_use);
+			btn_lose->set_sensitive(1-f_use);
+			btn_draw->set_sensitive(1-f_use);
+			btn_rue->set_sensitive(1-f_use);
+			break;
+		case NETWORK_STATUS:
+			break;
+	};
 
 }
 
@@ -627,9 +669,10 @@ void MainWindow::on_begin_game()
 		return;
 
 	}
-	btn_begin->set_sensitive(false);
 	m_refTreeModel->clear();
 	board->start_robot();
+	change_status();
+	btn_begin->set_sensitive(false);
 }
 
 void MainWindow::on_lose_game()
