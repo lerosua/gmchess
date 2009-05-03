@@ -7,118 +7,157 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmchess 0.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-27 11:18+0800\n"
-"PO-Revision-Date: 2009-03-25 18:46+0800\n"
+"POT-Creation-Date: 2009-05-03 22:27+0800\n"
+"PO-Revision-Date: 2009-05-03 22:29+0800\n"
 "Last-Translator:  <lerosua@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:115
+#: ../src/MainWindow.cc:117
 msgid "bout"
 msgstr "回合"
 
-#: ../src/MainWindow.cc:117
+#: ../src/MainWindow.cc:119
 msgid "step"
 msgstr "着法"
 
 #. File menu:
-#: ../src/MainWindow.cc:192
+#: ../src/MainWindow.cc:234
 msgid "_File"
 msgstr "文件"
 
-#: ../src/MainWindow.cc:194
+#: ../src/MainWindow.cc:236
 msgid "Open file"
 msgstr "打开文件"
 
-#: ../src/MainWindow.cc:195
+#: ../src/MainWindow.cc:237
 msgid "Open chessman File"
 msgstr "打开棋谱文件"
 
-#: ../src/MainWindow.cc:198
+#: ../src/MainWindow.cc:240
 msgid "Save as"
 msgstr "另存为"
 
-#: ../src/MainWindow.cc:199
+#: ../src/MainWindow.cc:241
 msgid "Save as a chess pgn file"
 msgstr "保存为PGN棋谱"
 
 #. View menu:
-#: ../src/MainWindow.cc:207
+#: ../src/MainWindow.cc:249
 msgid "_View"
 msgstr "查看"
 
 #. Game menu:
-#: ../src/MainWindow.cc:214
+#: ../src/MainWindow.cc:256
 msgid "_Game"
 msgstr "游戏"
 
-#: ../src/MainWindow.cc:215
+#: ../src/MainWindow.cc:257
 msgid "_Fight to AI"
 msgstr "与电脑对战"
 
-#: ../src/MainWindow.cc:217
+#: ../src/MainWindow.cc:259
 msgid "Free Play"
 msgstr "摆棋"
 
 #. Help menu:
-#: ../src/MainWindow.cc:220
+#: ../src/MainWindow.cc:262
 msgid "_Help"
 msgstr "帮助"
 
-#: ../src/MainWindow.cc:260
+#: ../src/MainWindow.cc:281
+#, fuzzy
+msgid "Save File"
+msgstr "另存为"
+
+#: ../src/MainWindow.cc:323
 msgid "Choose File"
 msgstr "选择文件"
 
-#: ../src/MainWindow.cc:303
+#: ../src/MainWindow.cc:366
 msgid "All Files"
 msgstr "所有文件"
 
-#: ../src/MainWindow.cc:340
+#: ../src/MainWindow.cc:382
+msgid "AI Warn"
+msgstr "AI警告"
+
+#: ../src/MainWindow.cc:385
+msgid "Open book view will close the AI game,Are you sure?"
+msgstr ""
+
+#: ../src/MainWindow.cc:427
 msgid "the file maybe not right format for chess"
 msgstr "未支持的棋谱格式"
 
-#: ../src/MainWindow.cc:391
+#: ../src/MainWindow.cc:483
 msgid "GMChess is chinese chess game write by gtkmm"
 msgstr "GMChess 是一款用Gtkmm库写成的中国象棋软件"
 
-#: ../src/MainWindow.cc:393
+#: ../src/MainWindow.cc:485
 msgid ""
 "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr ""
 
-#: ../src/MainWindow.cc:411
+#: ../src/MainWindow.cc:503
 msgid "Black"
 msgstr "黑"
 
-#: ../src/MainWindow.cc:413
+#: ../src/MainWindow.cc:506
 msgid "Red"
 msgstr "红"
 
-#: ../src/MainWindow.cc:471
+#: ../src/MainWindow.cc:571
 msgid "Game: "
 msgstr "游戏: "
 
-#: ../src/MainWindow.cc:472
+#: ../src/MainWindow.cc:572
 msgid "Time: "
 msgstr "时间: "
 
-#: ../src/MainWindow.cc:473
+#: ../src/MainWindow.cc:573
 msgid "Site: "
 msgstr "地点: "
 
-#: ../src/MainWindow.cc:474
+#: ../src/MainWindow.cc:574
 msgid "Result: "
 msgstr "结果: "
 
-#: ../src/MainWindow.cc:475
+#: ../src/MainWindow.cc:575
 msgid "Opening: "
 msgstr "开局信息: "
 
-#: ../src/MainWindow.cc:476
+#: ../src/MainWindow.cc:576
 msgid "Variation:  "
 msgstr "变着: "
+
+#: ../src/MainWindow.cc:648
+msgid "new game"
+msgstr "新游戏"
+
+#: ../src/MainWindow.cc:651
+msgid "Will you  start a new game?"
+msgstr "你确定要开始新游戏吗？"
+
+#: ../src/MainWindow.cc:700
+msgid "Warning"
+msgstr "警告"
+
+#: ../src/MainWindow.cc:701
+msgid "Only rue game when you are go,so wait a minute!"
+msgstr "只有在您走的时候才能悔棋，请等会!"
+
+#: ../src/MainWindow.cc:712
+msgid "Game End"
+msgstr "游戏结束 "
+
+#: ../src/MainWindow.cc:715
+msgid ""
+"Mate!\n"
+" Are you want to start a new game?"
+msgstr ""
 
 #: ../data/gmchess.glade.h:1
 msgid " "
@@ -169,90 +208,90 @@ msgid "<b>Comment</b>"
 msgstr "<b>注释</b>"
 
 #: ../data/gmchess.glade.h:13
+msgid "<b>Engine status</b>"
+msgstr "引擎状态"
+
+#: ../data/gmchess.glade.h:14
 msgid "Board Information"
 msgstr "棋盘信息"
 
-#: ../data/gmchess.glade.h:14
+#: ../data/gmchess.glade.h:15
+msgid "Book"
+msgstr "棋书"
+
+#: ../data/gmchess.glade.h:16
 msgid ""
 "Chinese chess for linux \n"
 "gmchess by lerosua and wind"
 msgstr ""
 
-#: ../data/gmchess.glade.h:16
+#: ../data/gmchess.glade.h:18
 msgid "Draw"
 msgstr "和棋"
 
-#: ../data/gmchess.glade.h:17
+#: ../data/gmchess.glade.h:19
 msgid "Engine"
 msgstr "引擎"
 
-#: ../data/gmchess.glade.h:18
+#: ../data/gmchess.glade.h:20
 msgid "Information"
 msgstr "信息"
 
-#: ../data/gmchess.glade.h:19
+#: ../data/gmchess.glade.h:21
 msgid "Lost"
 msgstr "认输"
 
-#: ../data/gmchess.glade.h:20
+#: ../data/gmchess.glade.h:22
 msgid "Rue"
 msgstr "悔棋"
 
-#: ../data/gmchess.glade.h:21
+#: ../data/gmchess.glade.h:23
 msgid "Start"
 msgstr "开始"
 
-#: ../data/gmchess.glade.h:22
+#: ../data/gmchess.glade.h:24
 msgid "chess"
 msgstr ""
 
-#: ../data/gmchess.glade.h:23
+#: ../data/gmchess.glade.h:25
 msgid "eight"
 msgstr "八"
 
-#: ../data/gmchess.glade.h:24
+#: ../data/gmchess.glade.h:26
 msgid "first station"
 msgstr "初始局面"
 
-#: ../data/gmchess.glade.h:25
+#: ../data/gmchess.glade.h:27
 msgid "five"
 msgstr "五"
 
-#: ../data/gmchess.glade.h:26
+#: ../data/gmchess.glade.h:28
 msgid "four"
 msgstr "四"
 
-#: ../data/gmchess.glade.h:27
-msgid "label"
-msgstr ""
-
-#: ../data/gmchess.glade.h:28
+#: ../data/gmchess.glade.h:29
 msgid "last move"
 msgstr "最后一着法"
 
-#: ../data/gmchess.glade.h:29
+#: ../data/gmchess.glade.h:30
 msgid "next move"
 msgstr "下一着法"
 
-#: ../data/gmchess.glade.h:30
+#: ../data/gmchess.glade.h:31
 msgid "nickname:"
 msgstr "昵称: "
 
-#: ../data/gmchess.glade.h:31
+#: ../data/gmchess.glade.h:32
 msgid "nickname: "
 msgstr "昵称: "
 
-#: ../data/gmchess.glade.h:32
+#: ../data/gmchess.glade.h:33
 msgid "nine"
 msgstr "九"
 
-#: ../data/gmchess.glade.h:33
+#: ../data/gmchess.glade.h:34
 msgid "one"
 msgstr "一"
-
-#: ../data/gmchess.glade.h:34
-msgid "page 3"
-msgstr ""
 
 #: ../data/gmchess.glade.h:35
 msgid "play time: "
