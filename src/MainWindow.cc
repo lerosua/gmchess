@@ -683,6 +683,7 @@ void MainWindow::on_lose_game()
 /** draw 是打平局面的意思*/
 void MainWindow::on_draw_game()
 {
+	board->draw_move();
 
 }
 

@@ -115,6 +115,8 @@ class Board : public Gtk::DrawingArea
 		int try_move(int mv);
 		/** 悔棋*/
 		void rue_move();
+		/** 和棋处理*/
+		void draw_move();
 		/** 打开棋谱文件*/
 		int open_file(const std::string& filename);
 		/** 返回中文着法表达示快照集*/
