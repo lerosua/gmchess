@@ -831,6 +831,18 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		*p = 0;
 		printf(buf);
 		std::string str_buf(buf);
+		size_t pos_=str_buf.find("draw");
+		if(pos_ != std::string::npos){
+
+
+			return true;
+		}
+		size_t pos_=str_buf.find("resign");
+		if(pos_ != std::string::npos){
+
+			parent.on_mate_game();
+			return true;
+		}
 		size_t pos=str_buf.find("bestmove");
 		if(pos != std::string::npos){
 			std::string t_mv=str_buf.substr(pos+9,4);
