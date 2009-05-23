@@ -65,7 +65,7 @@ CATALOGS =
 CATOBJEXT = .gmo
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2 -DDEBUG -g
+CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
@@ -199,8 +199,7 @@ gmchess_sound_DATA = \
 		    check.wav \
 		    move.wav \
 		    choose.wav \
-		    eat.wav \
-		    CountDown.wav 
+		    eat.wav
 
 EXTRA_DIST = $(gmchess_sound_DATA)
 all: all-am
