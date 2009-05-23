@@ -706,9 +706,9 @@ void Board::draw_move()
 	if(is_filght_to_robot()){
 
 		if(is_human_player())
-			m_robot->send_ctrl_command("go draw\n");
+			m_robot.send_ctrl_command("go draw\n");
 		else
-			m_robot->send_ctrl_command("ponderhit draw\n");
+			m_robot.send_ctrl_command("ponderhit draw\n");
 
 	}
 
@@ -734,6 +734,7 @@ void Board::rue_move()
 		m_robot.send_ctrl_command("\n");
 		//user_player = 1-user_player;
 	}
+}
 
 
 int Board::open_file(const std::string& filename)
@@ -825,7 +826,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 			return true;
 		}
-		size_t pos_=str_buf.find("resign");
+		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
 
 			parent.on_mate_game();

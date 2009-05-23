@@ -678,6 +678,31 @@ void MainWindow::on_begin_game()
 void MainWindow::on_lose_game()
 {
 
+    if(board->is_filght_to_robot()){
+        Gtk::MessageDialog dialog(*this, _("end game"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+        Glib::ustring msg =_("Will you end this game?");
+        dialog.set_secondary_text(msg);
+        int result =dialog.run();
+        switch (result) {
+            case (Gtk::RESPONSE_OK): {
+                m_refTreeModel->clear();
+                board->free_game();
+                change_status();
+                            break;
+                    }
+
+            case (Gtk::RESPONSE_CANCEL): {
+                            break;
+                    }
+
+            default: {
+                            break;
+                    }
+        }
+        return;
+    }
 }
 
 /** draw 是打平局面的意思*/
