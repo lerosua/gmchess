@@ -118,6 +118,8 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
 		Gtk::Image*			p1_image;
 		Gtk::Image*			p2_image;
+		Gtk::Label*			p1_war_time;
+		Gtk::Label*			p2_war_time;
 
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;

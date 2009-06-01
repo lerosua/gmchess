@@ -98,7 +98,7 @@
                             <child>
                               <widget class="GtkLabel" id="P1_name">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes"> </property>
+                                <property name="label" translatable="yes">  Computer </property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -128,7 +128,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="P1_war_time">
+                              <widget class="GtkLabel" id="P1_step_time">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes"> </property>
                               </widget>
@@ -160,7 +160,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="P1_step_time">
+                              <widget class="GtkLabel" id="P1_war_time">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes"> </property>
                               </widget>
@@ -283,7 +283,7 @@
                             <child>
                               <widget class="GtkLabel" id="P2_name">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes"> </property>
+                                <property name="label" translatable="yes"> Human </property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -313,7 +313,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="P2_war_time">
+                              <widget class="GtkLabel" id="P2_step_time">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes"> </property>
                               </widget>
@@ -345,7 +345,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="P2_step_time">
+                              <widget class="GtkLabel" id="P2_war_time">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes"> </property>
                               </widget>
@@ -760,7 +760,6 @@
                                   <widget class="GtkImage" id="image4">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-media-rewind</property>
-                                    <property name="icon-size">4</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -780,7 +779,6 @@
                                   <widget class="GtkImage" id="image7">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-go-back</property>
-                                    <property name="icon-size">4</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -800,7 +798,6 @@
                                   <widget class="GtkImage" id="image6">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-go-forward</property>
-                                    <property name="icon-size">4</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -820,7 +817,6 @@
                                   <widget class="GtkImage" id="image5">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-media-forward</property>
-                                    <property name="icon-size">4</property>
                                   </widget>
                                 </child>
                               </widget>

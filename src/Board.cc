@@ -101,6 +101,8 @@ Board::Board(MainWindow& win) :
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
+	,red_time(500)
+	,black_time(500)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -800,6 +802,9 @@ void Board::new_game()
 	redraw();
 
 	parent.change_play(m_engine.red_player());
+
+	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
+
 }
 
 bool Board::robot_log(const Glib::IOCondition& condition)
@@ -823,6 +828,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		size_t pos_=str_buf.find("draw");
 		if(pos_ != std::string::npos){
 
+			printf("计算机同意和棋\n");
 
 			return true;
 		}
@@ -843,4 +849,12 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 	return true;
 
+}
+
+bool Board::go_time()
+{
+	red_time--;
+	printf("red_time : %d\n",red_time);
+
+	return true;
 }

@@ -130,8 +130,14 @@ MainWindow::MainWindow():menubar(NULL)
 
 	p1_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p1"));
 	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
+	p1_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_war_time"));
+	p2_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_war_time"));
 	init();
 	
+	/** test for rgba */
+	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
+	this->set_default_colormap(colormap_);
+
 	show_all();
 	p1_image->hide();
 	p2_image->hide();
@@ -140,6 +146,7 @@ MainWindow::MainWindow():menubar(NULL)
 
 MainWindow::~MainWindow()
 {
+	this->pop_colormap();
 }
 
 void MainWindow::change_play(bool player)
