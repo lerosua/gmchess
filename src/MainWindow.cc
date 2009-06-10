@@ -482,7 +482,8 @@ void MainWindow::on_menu_about()
 		authors.push_back("wind");
 		about = new Gtk::AboutDialog ;
 		about->set_logo(ui_logo);
-		about->set_program_name("GMChess");
+		if(GTKMM_MAJOR_VERSION==2 && GTKMM_MINOR_VERSION>=12)
+			about->set_program_name("GMChess");
 		about->set_version(version);
 		about->set_website("http://lerosua.org");
 		//about->set_website_label("lerosua");
