@@ -132,6 +132,8 @@ MainWindow::MainWindow():menubar(NULL)
 	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
 	p1_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_war_time"));
 	p2_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_war_time"));
+	p1_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_step_time"));
+	p2_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_step_time"));
 	init();
 	
 	/** test for rgba */
@@ -772,10 +774,12 @@ void MainWindow::on_mate_game()
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
 	p2_war_time->set_text(f_time);
+	p2_step_time->set_text(c_time);
 
 
 }
 void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
 	p1_war_time->set_text(f_time);
+	p1_step_time->set_text(c_time);
 }
