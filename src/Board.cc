@@ -103,6 +103,7 @@ Board::Board(MainWindow& win) :
 	,parent(win)
 	,red_time(500)
 	,black_time(500)
+	,count_time(0)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -130,6 +131,8 @@ Board::Board(MainWindow& win) :
 
 Board::~Board()
 {
+	if(timer.connected())
+		timer.disconnect();
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
 }
@@ -685,6 +688,7 @@ int Board::try_move(int mv)
 
 
 			parent.change_play(is_human_player());
+			count_time=0;
 		}
 		/**被将死了*/
 		if(m_engine.mate()){
@@ -773,9 +777,14 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 
 void Board::free_game()
 {
+	if(timer.connected())
+		timer.disconnect();
+
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
 	m_status = FREE_STATUS;
+	red_time=500;
+	black_time=500;
 
 	m_engine.init_snapshot(start_fen);
 	redraw();
@@ -851,10 +860,28 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 }
 
+Glib::ustring Board::IntToUString(int ival)
+{
+	std::ostringstream ssIn;
+	ssIn <<ival;
+	Glib::ustring strOut=ssIn.str();
+	return strOut;
+}
+
 bool Board::go_time()
 {
-	red_time--;
-	printf("red_time : %d\n",red_time);
+	if(is_human_player()){
+		count_time++;
+		red_time--;
+		parent.set_red_war_time(IntToUString(red_time),IntToUString(count_time));
+		//printf("red_time : %d\n",red_time);
+	}
+	else{
+		black_time--;
+		count_time++;
+		parent.set_black_war_time(IntToUString(black_time),IntToUString(count_time));
+		//printf("black_time: %d\n",black_time);
+	}
 
 	return true;
 }

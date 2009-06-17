@@ -68,6 +68,8 @@ class MainWindow:public Gtk::Window
 		/** 初始化*/
 		void init();
 		void change_play(bool player);
+		void set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
+		void set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

@@ -117,6 +117,7 @@ class Board : public Gtk::DrawingArea
 		bool is_human_player(){ return m_engine.red_player(); }
 		/** 走时函数*/
 		bool go_time();
+		Glib::ustring IntToUString(int);
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -151,10 +152,14 @@ class Board : public Gtk::DrawingArea
 		int m_step;
 		/** 棋局状态*/
 		int m_status;
-		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
+		/** 红方的局时*/
 		int red_time;
+		/** 黑方的局时*/
 		int black_time;
+		/** 计时，走秒*/
+		int count_time;
 		sigc::connection timer;
+		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		//bool user_player;
 };
 

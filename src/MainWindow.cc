@@ -768,3 +768,14 @@ void MainWindow::on_mate_game()
 		}
 
 }
+
+void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
+{
+	p2_war_time->set_text(f_time);
+
+
+}
+void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
+{
+	p1_war_time->set_text(f_time);
+}
