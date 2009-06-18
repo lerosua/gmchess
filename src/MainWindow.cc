@@ -773,8 +773,11 @@ void MainWindow::on_mate_game()
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
-	p2_war_time->set_text(f_time);
-	p2_step_time->set_text(c_time);
+	printf(" f_time =%s\n",f_time.c_str());
+	p2_war_time->set_label(f_time);
+	p2_step_time->set_label(c_time);
+	//p2_war_time->set_text(f_time);
+	//p2_step_time->set_text(c_time);
 
 
 }

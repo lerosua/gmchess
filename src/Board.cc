@@ -860,11 +860,15 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 }
 
-Glib::ustring Board::IntToUString(int ival)
+Glib::ustring Board::to_time_ustring(int ival)
 {
-	std::ostringstream ssIn;
-	ssIn <<ival;
-	Glib::ustring strOut=ssIn.str();
+	char sp[5];
+	sprintf(sp,"%d:%d\n", ival/60,ival%60);
+	//std::ostringstream ssIn;
+	//ssIn <<ival;
+	//Glib::ustring strOut=ssIn.str();
+	Glib::ustring strOut(sp);
+	printf("conver time %s\n",strOut.c_str());
 	return strOut;
 }
 
@@ -873,13 +877,13 @@ bool Board::go_time()
 	if(is_human_player()){
 		count_time++;
 		red_time--;
-		parent.set_red_war_time(IntToUString(red_time),IntToUString(count_time));
+		parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(count_time));
 		//printf("red_time : %d\n",red_time);
 	}
 	else{
 		black_time--;
 		count_time++;
-		parent.set_black_war_time(IntToUString(black_time),IntToUString(count_time));
+		parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(count_time));
 		//printf("black_time: %d\n",black_time);
 	}
 
