@@ -862,14 +862,9 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 Glib::ustring Board::to_time_ustring(int ival)
 {
-	char sp[5];
+	char sp[32];
 	sprintf(sp,"%d:%d\n", ival/60,ival%60);
-	//std::ostringstream ssIn;
-	//ssIn <<ival;
-	//Glib::ustring strOut=ssIn.str();
-	Glib::ustring strOut(sp);
-	printf("conver time %s\n",strOut.c_str());
-	return strOut;
+	return Glib::ustring(sp);
 }
 
 bool Board::go_time()
