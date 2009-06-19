@@ -315,7 +315,7 @@
                             <child>
                               <widget class="GtkLabel" id="P2_step_time">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes"> </property>
+                                <property name="justify">center</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -348,6 +348,7 @@
                               <widget class="GtkLabel" id="P2_war_time">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes"> </property>
+                                <property name="justify">center</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>

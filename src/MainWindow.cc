@@ -22,6 +22,7 @@
 #include <gtkmm/aboutdialog.h>
 #include <fstream>
 #include "BookView.h"
+#include "ConfWindow.h"
 
 #define version "0.20.1"
 
@@ -53,6 +54,7 @@ Glib::ustring ui_info =
 
 
 MainWindow::MainWindow():menubar(NULL)
+			 ,confwindow(NULL)
 {
 	ui_xml = Gnome::Glade::Xml::create(main_ui,"main_window");
 	if(!ui_xml)
@@ -465,6 +467,10 @@ void MainWindow::on_menu_file_quit()
 
 void MainWindow::on_menu_view_preferences()
 {
+	if(NULL == confwindow){
+		confwindow = new ConfWindow(this);
+	}else
+		confwindow->raise();
 
 	printf("not realize yet\n");
 }
@@ -773,11 +779,8 @@ void MainWindow::on_mate_game()
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
-	printf(" f_time =%s\n",f_time.c_str());
-	p2_war_time->set_label(f_time);
-	p2_step_time->set_label(c_time);
-	//p2_war_time->set_text(f_time);
-	//p2_step_time->set_text(c_time);
+	p2_war_time->set_text(f_time);
+	p2_step_time->set_text(c_time);
 
 
 }

@@ -19,6 +19,7 @@ gmchess_SOURCES= \
 	Sound.cc   \
 	robot.cc   \
 	ec_throw.cpp \
+	ConfWindow.cc \
 	MainWindow.cc
 
 
@@ -32,6 +33,7 @@ noinst_HEADERS = \
 		 Sound.h    \
 		 robot.h 	\
 		 ec_throw.h 	\
+		 ConfWindow.h  \
 		 MainWindow.h
 
 gmchess_LDFLAGS = 

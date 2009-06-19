@@ -30,6 +30,7 @@ typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
 
 class Board;
 class BookView;
+class ConfWindow;
 
 class MainWindow:public Gtk::Window
 {
@@ -117,6 +118,7 @@ class MainWindow:public Gtk::Window
 		Gtk::ButtonBox*			buttonbox_war;
 		Gtk::TextView*			text_comment;
 		Gtk::Notebook*			m_notebook;
+		ConfWindow*			confwindow;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;
 		Gtk::Image*			p1_image;
 		Gtk::Image*			p2_image;
