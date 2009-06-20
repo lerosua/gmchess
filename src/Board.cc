@@ -863,7 +863,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 Glib::ustring Board::to_time_ustring(int ival)
 {
 	char sp[32];
-	sprintf(sp,"%d:%d\n", ival/60,ival%60);
+	sprintf(sp,"%d:%d", ival/60,ival%60);
 	return Glib::ustring(sp);
 }
 
