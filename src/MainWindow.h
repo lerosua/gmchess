@@ -71,6 +71,7 @@ class MainWindow:public Gtk::Window
 		void change_play(bool player);
 		void set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 		void set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
+		void on_conf_window_close();
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

@@ -28,6 +28,7 @@ class ConfWindow: public Gtk::Window
 		~ConfWindow();
 		void on_button_save();
 		void on_button_cancel();
+		bool on_delete_event(GdkEventAny*);
 	private:
 		MainWindow* parent;
 

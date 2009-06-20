@@ -117,7 +117,10 @@ class Board : public Gtk::DrawingArea
 		bool is_human_player(){ return m_engine.red_player(); }
 		/** 走时函数*/
 		bool go_time();
+		/** 将数字转成时间显示*/
 		Glib::ustring to_time_ustring(int);
+		/** 设置AI等级*/
+		void set_level();
 		
 	private:
 		/** 加载所需要图片进内存*/

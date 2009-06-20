@@ -39,6 +39,11 @@ void ConfWindow::on_button_save()
 void ConfWindow::on_button_cancel()
 {
 	//delete this;
-	//parent->on_conf_window_close(this);
+	parent->on_conf_window_close();
 }
 
+bool ConfWindow::on_delete_event(GdkEventAny*)
+{
+	on_button_cancel();
+
+}

@@ -469,12 +469,19 @@ void MainWindow::on_menu_view_preferences()
 {
 	if(NULL == confwindow){
 		confwindow = new ConfWindow(this);
+		confwindow->raise();
 	}else
 		confwindow->raise();
-
-	printf("not realize yet\n");
 }
 
+void MainWindow::on_conf_window_close()
+{
+	if(NULL !=confwindow){
+		delete confwindow;
+		confwindow=NULL;
+	}
+
+}
 void MainWindow::on_menu_help()
 {
 	printf("not realize yet\n");

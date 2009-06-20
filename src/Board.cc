@@ -799,12 +799,26 @@ void Board::start_robot()
 	new_game();
 }
 
+void Board::set_level()
+{
+
+	/** test simple*/
+	m_robot.send_ctrl_command("setoption idle large\n");
+	m_robot.send_ctrl_command("setoption style risky\n");
+	m_robot.send_ctrl_command("setoption knowledge none\n");
+	m_robot.send_ctrl_command("setoption pruning  large\n");
+	m_robot.send_ctrl_command("setoption randomness large\n");
+	m_robot.send_ctrl_command("ucci\n");
+}
+
 void Board::new_game()
 {
 	m_status = FIGHT_STATUS;
 
 	m_engine.init_snapshot(start_fen);
+	set_level();
 	m_robot.send_ctrl_command("setoption newgame\n");
+
 
 	moves_lines.clear();
 	moves_lines = postion_str + std::string(start_fen);
@@ -863,7 +877,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 Glib::ustring Board::to_time_ustring(int ival)
 {
 	char sp[32];
-	sprintf(sp,"%d:%d", ival/60,ival%60);
+	sprintf(sp,"%02d:%02d", ival/60,ival%60);
 	return Glib::ustring(sp);
 }
 
