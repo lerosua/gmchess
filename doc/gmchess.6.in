@@ -1,0 +1,48 @@
+.TH GMCHESS "08 july 2009" "" ""
+.RS
+\fBGMCHESS\fP(6)
+Vern Sun <s5unty@gmail.com>
+.RE
+.RE
+.PP
+
+.SH NAME
+\fBgmchess \fP- a Chinese Chess game
+\fB
+.RE
+\fB
+.SH SYNOPSIS
+.nf
+.fam C
+\fBgmchess\fP
+
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+\fBgmchess\fP is a game of conventional chinese chess. 
+The AI isn't wonderful, but provides a challenging enough game to all but the
+most highly skilled players.
+.RE
+.PP
+
+.SH USAGE
+\fBgmchess\fP
+.RE
+.PP
+
+.SH AUTHOR
+Written by wind <xihels@gmail.com>, lerosua <lerosua@gmail.com>
+.RE
+.PP
+
+.SH RESOURCES
+Main web site: http://gmchess.googlecode.com
+.RE
+.PP
+
+.SH COPYING
+Free use of this software is granted under the terms of the GNU General Public
+License (GPL).

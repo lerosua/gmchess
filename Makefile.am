@@ -1,4 +1,4 @@
-SUBDIRS =src data po
+SUBDIRS =src data po doc
 
 
 EXTRA_DIST =                    \

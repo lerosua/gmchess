@@ -1,0 +1,57 @@
+.TH convert_pgn 6 "16 july 2009" "" ""
+.RE
+.RE
+.PP
+
+.SH NAME
+\fBconvert_pgn \fP- Convert format of given chess book from one format to another
+\fB
+.RE
+\fB
+.SH SYNOPSIS
+.nf
+.fam C
+\fBconvert_pgn\fP \fIinput-file\fP [\fIoutput-file\fP]
+
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+The \fBconvert_pgn\fP program converts the format of characters in \fIinput-file\fP, from
+one formated character set to another. The result is written to default file
+"/tmp/gmchess.pgn" unless otherwise specified by the \fIoutput-file\fP option.
+.RE
+.PP
+
+.SH FORMATS
+The following table lists the formats supported by \fBconvert_pgn\fP:
+.IP \(bu 3
+ccm
+.IP \(bu 3
+che
+.IP \(bu 3
+chn
+.IP \(bu 3
+mxq
+.IP \(bu 3
+xqf
+.RE
+.PP
+
+.SH AUTHOR
+Written by wind <xihels@gmail.com>, lerosua <lerosua@gmail.com>.
+MANUAL by Vern Sun <s5unty@gmail.com>
+.RE
+.PP
+
+.SH RESOURCES
+Main web site: <http://gmchess.googlecode.com>
+.RE
+.PP
+
+.SH COPYING
+Free use of this software is granted under the terms of the GNU General Public
+License (GPL).
+.PP

@@ -1,0 +1,58 @@
+.TH eleeye_engine 6  "16 july 2009" "" ""
+.RS
+.RE
+.RE
+.PP
+
+.SH NAME
+\fBeleeye_engine \fP- a chess program engine to communicate with its user interface
+\fB
+.RE
+\fB
+.SH SYNOPSIS
+.nf
+.fam C
+eleeye_engine is a command-line client for UCCI (based on \fIUCI\fP) protocol. It
+provides full support of basic \fIUCI\fP \fIcommand\fP, such as \fIposition\fP, \fIgo\fP, banmoves or
+bestmove and much more.
+
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+The Universal Chess Interface (\fIUCI\fP) is an open communication protocol that
+enables a chess program engine to communicate with its user interface.
+.PP
+It was designed and released by Rudolf Huber and Stefan Meyer-Kahlen, the
+author of Shredder, in November 2000, and can be seen as a rival to the older
+XBoard/WinBoard Communication protocol. Like the latter, it is free to use
+without license fees.
+.PP
+Customarily, \fIUCI\fP assigns some tasks to the user interface that have
+traditionally been handled by the engine itself. Most notably, the opening book
+is usually expected to be handled by the interface, by simply selecting moves
+to play until it is out of book, and only then starting up the engine for
+calculation in the resulting \fIposition\fP. (\fIUCI\fP does not specify any on-disk format
+for the opening book; different UIs -- user interfaces -- usually have their own,
+proprietary formats.) Also, the user interface may handle endgame tablebases if
+the engine does not support it itself, although this is often better handled in
+the engine, as having tablebase information can be useful to consider a
+possible future \fIposition\fP.
+.RE
+.PP
+
+
+.SH AUTHOR
+Written by www.elephantbase.net
+.RE
+.PP
+
+.SH RESOURCES
+Universal Chess Interface Protocol: <http://wbec-ridderkerk.nl/html/UCIProtocol.html>
+.PP
+Universal Chinese Chess Interface Protocol: <http://www.elephantbase.net/protocol/cchess_ucci.htm>
+.SH COPYING
+Free use of this software is granted under the terms of the GNU General Public
+License (GPL).
