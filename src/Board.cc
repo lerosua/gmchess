@@ -682,8 +682,11 @@ int Board::try_move(int mv)
 			m_robot.send_ctrl_command("\n");
 			//user_player = 1-user_player;
 			if(!is_human_player()){
+				Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
 				DLOG("send command to tell robot\n");
-				m_robot.send_ctrl_command("go time 295000 increment 0\n");
+				DLOG("%s\n",str_cmd.c_str());
+				m_robot.send_ctrl_command(str_cmd.c_str());
+				//m_robot.send_ctrl_command("go time 295000 increment 0\n");
 			}
 
 
@@ -808,7 +811,7 @@ void Board::set_level()
 	m_robot.send_ctrl_command("setoption knowledge none\n");
 	m_robot.send_ctrl_command("setoption pruning  large\n");
 	m_robot.send_ctrl_command("setoption randomness large\n");
-	m_robot.send_ctrl_command("ucci\n");
+	//m_robot.send_ctrl_command("ucci\n");
 }
 
 void Board::new_game()
@@ -878,6 +881,13 @@ Glib::ustring Board::to_time_ustring(int ival)
 {
 	char sp[32];
 	sprintf(sp,"%02d:%02d", ival/60,ival%60);
+	return Glib::ustring(sp);
+}
+
+Glib::ustring Board::to_msec_ustring(int ival)
+{
+	char sp[32];
+	sprintf(sp,"%d000",ival);
 	return Glib::ustring(sp);
 }
 

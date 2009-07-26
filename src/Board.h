@@ -119,6 +119,8 @@ class Board : public Gtk::DrawingArea
 		bool go_time();
 		/** 将数字转成时间显示*/
 		Glib::ustring to_time_ustring(int);
+		/** 将秒转成毫秒的string显示*/
+		Glib::ustring to_msec_ustring(int);
 		/** 设置AI等级*/
 		void set_level();
 		
