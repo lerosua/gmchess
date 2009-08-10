@@ -18,7 +18,7 @@ AC_PROG_CC
 AC_PROG_CPP
 
 # Checks for libraries.
-pkg_modules="gtkmm-2.4 >= 2.6.0 libglademm-2.4 >= 2.4.0"
+pkg_modules="gtkmm-2.4 >= 2.6.0"
 PKG_CHECK_MODULES(PACKAGE, $pkg_modules)
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
