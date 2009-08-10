@@ -56,9 +56,27 @@ Glib::ustring ui_info =
 MainWindow::MainWindow():menubar(NULL)
 			 ,confwindow(NULL)
 {
-	ui_xml = Gnome::Glade::Xml::create(main_ui,"main_window");
+	//ui_xml = Gnome::Glade::Xml::create(main_ui,"main_window");
+	ui_xml = Gtk::Builder::create_from_file(main_ui,"main_window");
 	if(!ui_xml)
 		exit(271);
+	Gtk::VBox* main_window =0;
+	Gtk::VBox* box_board=0;
+
+	ui_xml->get_widget("main_window",main_window);
+	ui_xml->get_widget("vbox_board",box_board);
+	ui_xml->get_widget("hbuttonbox_war",buttonbox_war);
+	ui_xml->get_widget("textview_comment",text_comment);
+	ui_xml->get_widget("notebook",m_notebook);
+	ui_xml->get_widget("button_start",btn_start);
+	ui_xml->get_widget("button_end",btn_end);
+	ui_xml->get_widget("button_prev",btn_prev);
+	ui_xml->get_widget("button_next",btn_next);
+	ui_xml->get_widget("button_begin",btn_begin);
+	ui_xml->get_widget("button_lose",btn_lose);
+	ui_xml->get_widget("button_draw",btn_draw);
+	ui_xml->get_widget("button_rue",btn_rue);
+#if 0
 	Gtk::VBox* main_window = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("main_window"));
 
 	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
@@ -76,6 +94,7 @@ MainWindow::MainWindow():menubar(NULL)
 	 btn_lose  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_lose"));
 	 btn_draw   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_draw"));
 	 btn_rue  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_rue"));
+#endif
 
 	btn_start->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_start_move));
@@ -106,13 +125,16 @@ MainWindow::MainWindow():menubar(NULL)
 	/** 设置菜单*/
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
-	Gtk::VBox* menu_tool_box = dynamic_cast<Gtk::VBox*>
-		(ui_xml->get_widget("box_menu_toolbar"));
+	//Gtk::VBox* menu_tool_box	= dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("box_menu_toolbar"));
+	Gtk::VBox* menu_tool_box=0;
+	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
 
 	/** 设置Treeview区*/
-	Gtk::ScrolledWindow* scrolwin=dynamic_cast<Gtk::ScrolledWindow*>
-		(ui_xml->get_widget("scrolledwindow"));
+	//Gtk::ScrolledWindow* scrolwin=dynamic_cast<Gtk::ScrolledWindow*>
+	//	(ui_xml->get_widget("scrolledwindow"));
+	Gtk::ScrolledWindow* scrolwin= 0;
+	ui_xml->get_widget("scrolledwindow",scrolwin);
 	m_refTreeModel = Gtk::ListStore::create(m_columns);
 	m_treeview.set_model( m_refTreeModel);
 	scrolwin->add(m_treeview);
@@ -125,17 +147,28 @@ MainWindow::MainWindow():menubar(NULL)
 
 	change_status();
 
-	Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
-		(ui_xml->get_widget("scrolledwin_book"));
+	//Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
+	//	(ui_xml->get_widget("scrolledwin_book"));
+	Gtk::ScrolledWindow* scroll_book=0;
+	ui_xml->get_widget("scrolledwin_book",scroll_book);
 	m_bookview= new BookView(this);
 	scroll_book->add(*m_bookview);
 
+	ui_xml->get_widget("image_p1",p1_image);
+	ui_xml->get_widget("image_p2",p2_image);
+	ui_xml->get_widget("P1_war_time",p1_war_time);
+	ui_xml->get_widget("P2_war_time",p2_war_time);
+	ui_xml->get_widget("P1_step_time",p1_step_time);
+	ui_xml->get_widget("P2_step_time",p2_step_time);
+#if 0
 	p1_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p1"));
 	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
 	p1_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_war_time"));
 	p2_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_war_time"));
 	p1_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_step_time"));
 	p2_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_step_time"));
+#endif
+
 	init();
 	
 	/** test for rgba */
@@ -584,9 +617,14 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 
 void MainWindow::set_information()
 {
+	Gtk::Label* p1_name= 0;ui_xml->get_widget("P1_name",p1_name);
+	Gtk::Label* p2_name= 0;ui_xml->get_widget("P2_name",p2_name);
+	Gtk::Label* info   = 0;ui_xml->get_widget("info_label",info);
+#if 0
 	Gtk::Label* p1_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_name"));
 	Gtk::Label* p2_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_name"));
 	Gtk::Label* info   = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("info_label"));
+#endif
 	
 	const Board_info& board_info = board->get_board_info();
 	p1_name->set_label(board_info.black);

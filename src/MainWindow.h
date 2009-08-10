@@ -21,12 +21,13 @@
 
 #include <gtkmm.h>
 #include <gtkmm/window.h>
-#include <libglademm/xml.h>
+//#include <libglademm/xml.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include "Board.h"
 #define main_ui  DATA_DIR"/gmchess.glade"
-typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
+//typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
+typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 
 class Board;
 class BookView;
@@ -110,7 +111,8 @@ class MainWindow:public Gtk::Window
 		
 	private:
 		Board*				board;
-		GlademmXML			ui_xml;
+		//GlademmXML			ui_xml;
+		GBuilderXML			ui_xml;
 		Glib::RefPtr<Gtk::UIManager>	ui_manager;
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
 		Gtk::Widget*			menubar;
