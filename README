@@ -1,0 +1,7 @@
+GMChess program is write by gtkmm and c++.
+it release under GPLv2 .
+and the chess engine base on xqwizard, which on http://sourceforge.net/projects/xqwizard/.
+the xqwizard also release by GPLv2.
+and gmchess copy some picture and some files(example like book.dat).
+
+you can see the GPLv2 detail on file which name COPYING in source code.
