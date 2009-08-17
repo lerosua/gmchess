@@ -43,6 +43,7 @@ class Engine {
 
 		/**
 		 * @brief 初始化棋局快照，设置开始的局面
+		 * initial the first board station
 		 * @param fen 局面FEN串
 		 */
 		void init_snapshot(const char* fen);

@@ -21,6 +21,8 @@
 
 ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 {
+	Gtk::Label*  tmp_label= Gtk::manage(new Gtk::Label("Not implement yet"));
+	this->add(*tmp_label);
 	this->set_size_request(521,577);
 	show_all();
 
