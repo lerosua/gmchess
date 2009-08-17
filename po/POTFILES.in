@@ -1,4 +1,3 @@
-src/main.cc 
 src/MainWindow.cc
 src/Board.cc
 src/Engine.cc

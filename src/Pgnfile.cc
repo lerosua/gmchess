@@ -1,3 +1,8 @@
+/*
+ * Pgnfile.h
+ * Copyright (C) lerosua 2009 <lerosua@gmail.com>
+ * 
+ */
 #include <iostream> 
 #include <string> 
 #include <locale.h> 
@@ -171,6 +176,7 @@ int Pgnfile::read(const std::string & filename)
 			comment = true;
 
 			/** 注释在一行内结束*/
+			/** the comment will end in one line*/
 			size_t s_pos = line.find_last_of("}");
 			if(s_pos != std::string::npos){
 				comment_str += line;
@@ -181,6 +187,7 @@ int Pgnfile::read(const std::string & filename)
 			}
 
 			/** 注释有多行*/
+			/** the comment has multi line*/
 			comment_str += line;
 			continue;
 		}

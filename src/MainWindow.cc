@@ -24,7 +24,7 @@
 #include "BookView.h"
 #include "ConfWindow.h"
 
-#define version "0.20.1"
+#define version "0.20.2"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -122,7 +122,7 @@ MainWindow::MainWindow():menubar(NULL)
 
 	ui_logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
 	this->set_icon(ui_logo);
-	/** 设置菜单*/
+	/** 设置菜单, set the menu*/
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
 	//Gtk::VBox* menu_tool_box	= dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("box_menu_toolbar"));
@@ -130,7 +130,7 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
 
-	/** 设置Treeview区*/
+	/** 设置Treeview区, set the treeview*/
 	//Gtk::ScrolledWindow* scrolwin=dynamic_cast<Gtk::ScrolledWindow*>
 	//	(ui_xml->get_widget("scrolledwindow"));
 	Gtk::ScrolledWindow* scrolwin= 0;
@@ -422,7 +422,7 @@ void MainWindow:: on_menu_open_file()
 
 void MainWindow::open_file(const std::string& filename)
 {
-	if(board->is_filght_to_robot()){
+	if(board->is_fight_to_robot()){
 		Gtk::MessageDialog dialog(*this, _("AI Warn"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
@@ -448,6 +448,7 @@ void MainWindow::open_file(const std::string& filename)
 	}
 
 	/** 获取文件后先它将它转换成pgn文件才能打开*/
+	/** get the file,and convert it to pgn file */
 		int out;
 
 		size_t pos = filename.find(".pgn");
@@ -589,7 +590,7 @@ void MainWindow::init_move_treeview()
 bool MainWindow::on_treeview_click(GdkEventButton* ev)
 {
 
-	if(board->is_filght_to_robot())
+	if(board->is_fight_to_robot())
 		return true;
 
 	Glib::RefPtr<Gtk::TreeSelection> selection = m_treeview.get_selection();
@@ -704,7 +705,8 @@ void MainWindow::change_status()
 void MainWindow::on_begin_game()
 {
 	/** 已经在对战中，则询问是否开始新游戏*/
-	if(board->is_filght_to_robot()){
+	/** ask if start new game */
+	if(board->is_fight_to_robot()){
 
 		Gtk::MessageDialog dialog(*this, _("new game"), false,
                                   Gtk::MESSAGE_QUESTION,
@@ -739,7 +741,7 @@ void MainWindow::on_begin_game()
 void MainWindow::on_lose_game()
 {
 
-    if(board->is_filght_to_robot()){
+    if(board->is_fight_to_robot()){
         Gtk::MessageDialog dialog(*this, _("end game"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
@@ -779,7 +781,7 @@ void MainWindow::on_rue_game()
 	/** 设置成只有用户走时才能悔棋，一次撤销两步，即ai的一步，用户的一步，再次轮到用户走
 	 * 这么做是为了防止ai在思考中撤销着法会产生冲突*/
 
-	if(board->is_filght_to_robot()){
+	if(board->is_fight_to_robot()){
 		if(board->is_human_player()){
 			board->rue_move();
 			board->rue_move();

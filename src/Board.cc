@@ -14,14 +14,16 @@
 #include "Sound.h"
 
 /** 边界的宽度*/
+/**  width of border */
 const int border_width = 32;
 /** 棋子的宽度*/
+/** width of chessman */
 const int chessman_width = 57;
 
 #define	PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
-#define PIECE_START 16  //棋子开始数字
-#define PIECE_END   48  //棋子结束数字
+#define PIECE_START 16  //棋子开始数字 start number of chessman
+#define PIECE_END   48  //棋子结束数字 end number of chessman
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
 #define IMGAGE_DIR DATA_DIR"/wood/"
 #define HEX_ESCAPE '%'
@@ -54,6 +56,7 @@ int unescape_character (const char *scanner)
 }
 
 /** 用于在拖放时得到的文件名的转码*/
+/** get the code of when drag the filename*/
 std::string  wind_unescape_string (const char *escaped_string, 
 		const gchar *illegal_characters)
 {
@@ -236,11 +239,12 @@ void Board::redraw()
 			x,y);
 }
 
-/**处理点击事件*/
+/**处理点击事件, handle the click events*/
 bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	/** 对战状态下，电脑走棋时就不响应鼠标事件了*/
-	if(is_filght_to_robot()){
+	/** if fight with AI, the compute doesn't handle the events */
+	if(is_fight_to_robot()){
 		if(!is_human_player())
 			return true;
 
@@ -254,18 +258,20 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		selected_y = p.get_y();
 		if(selected_chessman == -1){
 			/** 之前没选中棋子，现在选择 */
+			/** there is not select chessman,now select*/
 
 			CSound::play(SND_CHOOSE);
 			if (selected_x != -1) {
 				selected_chessman = m_engine.get_piece(selected_x, selected_y);
 				if(selected_chessman==0){
-					/** 仍然没选中*/
+					/** 仍然没选中, still not select */
 					selected_chessman = -1;
 					printf("still no select chessman\n");
 					return true;
 				}
 				/** 对战状态中，选了黑色棋子无效*/
-				if((is_filght_to_robot()) &&
+				/** choose the black chessman is useless on war */
+				if((is_fight_to_robot()) &&
 					(selected_chessman>31)){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
@@ -278,9 +284,11 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		}
 		else{
 			/** 之前已经选中棋子，现在是生成着法或取消*/
+			/** there has a selecter, now buider the moves or canel */
 			int dst_chessman = m_engine.get_piece(selected_x,selected_y);
 			if( (dst_chessman!=0) && ((selected_chessman &16)==(dst_chessman&16))){
 				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
+				/** change the select */
 				selected_chessman = dst_chessman;
 				draw_select_frame(true);
 				CSound::play(SND_CHOOSE);
@@ -300,6 +308,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	}
 	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 3){
 		/** 右键取消选择*/
+		/** the right click canel the choose*/
 		selected_chessman = -1;
 		//draw_select_frame(false);
 		redraw();
@@ -539,6 +548,7 @@ void Board::start_move()
 	m_engine.get_snapshot(m_step);
 
 	/** 设置此步的注释*/
+	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
 	if(str != NULL){
 		parent.set_comment(*str);
@@ -555,6 +565,7 @@ void Board::end_move()
 	m_engine.get_snapshot(m_step);
 
 	/** 设置此步的注释*/
+	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
 	if(str != NULL){
 		parent.set_comment(*str);
@@ -573,6 +584,7 @@ void Board::next_move()
 	m_engine.get_snapshot(m_step);
 
 	/** 设置此步的注释*/
+	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
 	if(str != NULL){
 		parent.set_comment(*str);
@@ -594,6 +606,7 @@ void Board::back_move()
 
 
 	/** 设置此步的注释*/
+	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
 	if(str != NULL){
 		parent.set_comment(*str);
@@ -618,6 +631,7 @@ void Board::get_board_by_move(int f_step)
 	m_step = f_step;
 
 	/** 设置此步的注释*/
+	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(f_step);
 	if(str != NULL){
 		parent.set_comment(*str);
@@ -642,10 +656,12 @@ int Board::try_move(int mv)
 	int eat = m_engine.get_move_eat(mv);
 	int dst=  m_engine.get_move_dst(mv);
 	/** 对着法进行逻辑检测*/
+	/** check the logic of the move */
 	if(m_engine.make_move(mv)){
 		/** 执行着法*/
 		//m_engine.do_move(mv);
 		/** 将着法中文表示加到treeview中*/
+		/**  and the chinese moves to treeview */
 		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
 		int num = m_engine.how_step();
 		parent.add_step_line(num,mv_chin);
@@ -661,7 +677,7 @@ int Board::try_move(int mv)
 		selected_chessman=-1;
 
 		/** 对战时的处理*/
-		if(is_filght_to_robot()){
+		if(is_fight_to_robot()){
 			if(eat){
 				moves_lines.clear();
 				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
@@ -694,6 +710,7 @@ int Board::try_move(int mv)
 			count_time=0;
 		}
 		/**被将死了*/
+		/** is it  mate */
 		if(m_engine.mate()){
 			parent.on_mate_game();
 			DLOG("将军死棋\n");
@@ -712,7 +729,7 @@ int Board::try_move(int mv)
 void Board::draw_move()
 {
 
-	if(is_filght_to_robot()){
+	if(is_fight_to_robot()){
 
 		if(is_human_player())
 			m_robot.send_ctrl_command("go draw\n");
@@ -736,7 +753,7 @@ void Board::rue_move()
 
 	redraw();
 
-	if(is_filght_to_robot()){
+	if(is_fight_to_robot()){
 		moves_lines.clear();
 		moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
 		m_robot.send_ctrl_command(moves_lines.c_str());

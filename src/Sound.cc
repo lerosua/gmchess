@@ -1,3 +1,9 @@
+/*
+ * Sound.cc
+ * Copyright (C) lerosua 2009 <lerosua@gmail.com>
+ * 
+ */
+
 #include "Sound.h"
 #include <string>
 #include <glib.h>

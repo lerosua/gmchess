@@ -189,6 +189,7 @@ int BookView::load_book_dir(const char* Path)
 		if(S_ISDIR(pStat.st_mode)){
 			//printf(" dir = %s \n",cPath);
 			/** 是目录，继续打开读*/
+			/**  it is a directory,continue read */
 			add_group(basename(Path),basename(cPath));
 			load_book_dir(cPath);
 

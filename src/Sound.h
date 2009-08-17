@@ -1,3 +1,10 @@
+/*
+ * Sound.h
+ * Copyright (C) lerosua 2009 <lerosua@gmail.com>
+ * 
+ */
+
+
 #ifndef __GM_SOUND_H__
 #define __GM_SOUND_H__
 

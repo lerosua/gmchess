@@ -12,6 +12,7 @@
  * 
  *         Author:  lerosua (), lerosua@gmail.com
  *        Company:  Cyclone
+ *        Copyright (C) lerosua 2009 <lerosua@gmail.com>
  * 
  * =====================================================================================
  */
@@ -23,6 +24,7 @@
 #include <stdint.h>
 #include "define.h"
 //保存的最大历史局面数
+//save the max number of history chess station
 const int MAX_COUNT=512;
 
 // 每种子力的开始序号和结束序号
@@ -60,7 +62,7 @@ const int PieceTypes[48] = {
 };
 
 /**
- * 棋子的类型
+ * 棋子的类型, type of chess
  *0-6 是红方棋子，分别是 帅仕相马车炮兵
  *7-13是黑方棋子，分别是 将士象马车炮卒
  *		英文字符是K A B N R C P
@@ -74,6 +76,7 @@ enum {
 
 /** 
  * 程序棋局状态，分别为读谱，电脑对战，网络对战,自由摆棋
+ * board station mode
  */
 enum { READ_STATUS , FIGHT_STATUS, NETWORK_STATUS,FREE_STATUS };
 
@@ -85,6 +88,7 @@ const int PieceExample[48] = {
 };
 
 /** 棋盘区域表 */
+/** the area of chess in board */
 const bool chessInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -105,6 +109,7 @@ const bool chessInBoard[256] = {
 };
 
 /** 九宫格表*/
+/** Fort array */
 const bool chessInFort[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

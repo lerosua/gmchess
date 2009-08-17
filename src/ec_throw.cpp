@@ -4,6 +4,7 @@
  *       Filename:  ec_throw.cpp
  *
  *    Description:  检查一个系统调用，如果有错误，抛出一个异常。
+ *			check error when throw
  *
  *        Version:  1.0
  *        Created:  2007年11月28日 20时30分02秒 CST
@@ -13,6 +14,7 @@
  *         Author:  wind (xihe), xihels@gmail.com
  *        Company:  cyclone
  *
+ * Copyright (C) wind 2009 <xihels@gmail.com>
  * =====================================================================================
  */
 

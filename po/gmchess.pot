@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-03 22:27+0800\n"
+"POT-Creation-Date: 2009-08-17 14:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,144 +16,152 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:117
+#: ../src/MainWindow.cc:141
 msgid "bout"
 msgstr ""
 
-#: ../src/MainWindow.cc:119
+#: ../src/MainWindow.cc:143
 msgid "step"
 msgstr ""
 
 #. File menu:
-#: ../src/MainWindow.cc:234
+#: ../src/MainWindow.cc:278
 msgid "_File"
 msgstr ""
 
-#: ../src/MainWindow.cc:236
+#: ../src/MainWindow.cc:280
 msgid "Open file"
 msgstr ""
 
-#: ../src/MainWindow.cc:237
+#: ../src/MainWindow.cc:281
 msgid "Open chessman File"
 msgstr ""
 
-#: ../src/MainWindow.cc:240
+#: ../src/MainWindow.cc:284
 msgid "Save as"
 msgstr ""
 
-#: ../src/MainWindow.cc:241
+#: ../src/MainWindow.cc:285
 msgid "Save as a chess pgn file"
 msgstr ""
 
 #. View menu:
-#: ../src/MainWindow.cc:249
+#: ../src/MainWindow.cc:293
 msgid "_View"
 msgstr ""
 
 #. Game menu:
-#: ../src/MainWindow.cc:256
+#: ../src/MainWindow.cc:300
 msgid "_Game"
 msgstr ""
 
-#: ../src/MainWindow.cc:257
+#: ../src/MainWindow.cc:301
 msgid "_Fight to AI"
 msgstr ""
 
-#: ../src/MainWindow.cc:259
+#: ../src/MainWindow.cc:303
 msgid "Free Play"
 msgstr ""
 
 #. Help menu:
-#: ../src/MainWindow.cc:262
+#: ../src/MainWindow.cc:306
 msgid "_Help"
 msgstr ""
 
-#: ../src/MainWindow.cc:281
+#: ../src/MainWindow.cc:325
 msgid "Save File"
 msgstr ""
 
-#: ../src/MainWindow.cc:323
+#: ../src/MainWindow.cc:367
 msgid "Choose File"
 msgstr ""
 
-#: ../src/MainWindow.cc:366
+#: ../src/MainWindow.cc:410
 msgid "All Files"
 msgstr ""
 
-#: ../src/MainWindow.cc:382
+#: ../src/MainWindow.cc:426
 msgid "AI Warn"
 msgstr ""
 
-#: ../src/MainWindow.cc:385
+#: ../src/MainWindow.cc:429
 msgid "Open book view will close the AI game,Are you sure?"
 msgstr ""
 
-#: ../src/MainWindow.cc:427
+#: ../src/MainWindow.cc:471
 msgid "the file maybe not right format for chess"
 msgstr ""
 
-#: ../src/MainWindow.cc:483
+#: ../src/MainWindow.cc:539
 msgid "GMChess is chinese chess game write by gtkmm"
 msgstr ""
 
-#: ../src/MainWindow.cc:485
+#: ../src/MainWindow.cc:541
 msgid ""
 "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr ""
 
-#: ../src/MainWindow.cc:503
+#: ../src/MainWindow.cc:559
 msgid "Black"
 msgstr ""
 
-#: ../src/MainWindow.cc:506
+#: ../src/MainWindow.cc:562
 msgid "Red"
 msgstr ""
 
-#: ../src/MainWindow.cc:571
+#: ../src/MainWindow.cc:632
 msgid "Game: "
 msgstr ""
 
-#: ../src/MainWindow.cc:572
+#: ../src/MainWindow.cc:633
 msgid "Time: "
 msgstr ""
 
-#: ../src/MainWindow.cc:573
+#: ../src/MainWindow.cc:634
 msgid "Site: "
 msgstr ""
 
-#: ../src/MainWindow.cc:574
+#: ../src/MainWindow.cc:635
 msgid "Result: "
 msgstr ""
 
-#: ../src/MainWindow.cc:575
+#: ../src/MainWindow.cc:636
 msgid "Opening: "
 msgstr ""
 
-#: ../src/MainWindow.cc:576
+#: ../src/MainWindow.cc:637
 msgid "Variation:  "
 msgstr ""
 
-#: ../src/MainWindow.cc:648
+#: ../src/MainWindow.cc:709
 msgid "new game"
 msgstr ""
 
-#: ../src/MainWindow.cc:651
+#: ../src/MainWindow.cc:712
 msgid "Will you  start a new game?"
 msgstr ""
 
-#: ../src/MainWindow.cc:700
+#: ../src/MainWindow.cc:743
+msgid "end game"
+msgstr ""
+
+#: ../src/MainWindow.cc:746
+msgid "Will you end this game?"
+msgstr ""
+
+#: ../src/MainWindow.cc:787
 msgid "Warning"
 msgstr ""
 
-#: ../src/MainWindow.cc:701
+#: ../src/MainWindow.cc:788
 msgid "Only rue game when you are go,so wait a minute!"
 msgstr ""
 
-#: ../src/MainWindow.cc:712
+#: ../src/MainWindow.cc:799
 msgid "Game End"
 msgstr ""
 
-#: ../src/MainWindow.cc:715
+#: ../src/MainWindow.cc:802
 msgid ""
 "Mate!\n"
 " Are you want to start a new game?"
@@ -168,61 +176,63 @@ msgid "          "
 msgstr ""
 
 #: ../data/gmchess.glade.h:3
-msgid "1"
+msgid "  Computer "
 msgstr ""
 
 #: ../data/gmchess.glade.h:4
-msgid "2"
+msgid " Human "
 msgstr ""
 
 #: ../data/gmchess.glade.h:5
-msgid "3"
+msgid "1"
 msgstr ""
 
 #: ../data/gmchess.glade.h:6
-msgid "4"
+msgid "2"
 msgstr ""
 
 #: ../data/gmchess.glade.h:7
-msgid "5"
+msgid "3"
 msgstr ""
 
 #: ../data/gmchess.glade.h:8
-msgid "6"
+msgid "4"
 msgstr ""
 
 #: ../data/gmchess.glade.h:9
-msgid "7"
+msgid "5"
 msgstr ""
 
 #: ../data/gmchess.glade.h:10
-msgid "8"
+msgid "6"
 msgstr ""
 
 #: ../data/gmchess.glade.h:11
-msgid "9"
+msgid "7"
 msgstr ""
 
 #: ../data/gmchess.glade.h:12
-msgid "<b>Comment</b>"
+msgid "8"
 msgstr ""
 
 #: ../data/gmchess.glade.h:13
-msgid "<b>Engine status</b>"
+msgid "9"
 msgstr ""
 
 #: ../data/gmchess.glade.h:14
-msgid "Board Information"
+msgid "<b>Comment</b>"
 msgstr ""
 
 #: ../data/gmchess.glade.h:15
-msgid "Book"
+msgid "<b>Engine status</b>"
 msgstr ""
 
 #: ../data/gmchess.glade.h:16
-msgid ""
-"Chinese chess for linux \n"
-"gmchess by lerosua and wind"
+msgid "Board Information"
+msgstr ""
+
+#: ../data/gmchess.glade.h:17
+msgid "Book"
 msgstr ""
 
 #: ../data/gmchess.glade.h:18

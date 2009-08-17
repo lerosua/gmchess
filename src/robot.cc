@@ -1,3 +1,20 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  robot.cc
+ *
+ *    Description:  the ai handle
+ *
+ *        Version:  0.20
+ *        Created:  2009年03月31日 13时55分18秒
+ *       Revision:  none
+ *       Compiler:  g++
+ *
+ *         Author:  lerosua@gmail.com
+ *        Company:  cyclone
+ *
+ * =====================================================================================
+ */
 #include "robot.h"
 #include <gdk/gdkx.h>
 #include <sys/types.h>

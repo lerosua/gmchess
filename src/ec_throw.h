@@ -13,6 +13,8 @@
  *         Author:  wind (xihe), xihels@gmail.com
  *        Company:  cyclone
  *
+ * Copyright (C) wind 2009 <xihels@gmail.com>
+ *
  * =====================================================================================
  */
 #ifndef _EC_THROW_H_
