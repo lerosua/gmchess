@@ -37,9 +37,11 @@ class BookView: public Gtk::TreeView
 		Gtk::TreeModel::iterator getListIter(Gtk::TreeModel::
 				Children children, const std::string& groupname);
 		/** 添加组*/
+		/** add group */
 		Gtk::TreeModel::iterator add_group(const Glib::ustring& group);
 		Gtk::TreeModel::iterator add_group(const Glib::ustring& g_parent,const Glib::ustring& group);
 		/** 添加行内容*/
+		/** add line context */
 		void add_line(const Glib::ustring& groupname,const Glib::ustring& f_line,const Glib::ustring& f_path);
 		bool on_button_press_event(GdkEventButton *);
 		int load_book_dir(const char* path);
