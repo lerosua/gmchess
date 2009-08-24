@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkTextBuffer" id="textbuffer1">
     <property name="text">Chinese chess for linux 
 gmchess by lerosua and wind</property>
   </object>
-  <!-- interface-requires gtk+ 2.16 -->
-  <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkWindow" id="gmchess">
     <property name="visible">True</property>
     <property name="title" translatable="yes">chess</property>
@@ -14,9 +14,11 @@ gmchess by lerosua and wind</property>
     <child>
       <object class="GtkVBox" id="main_window">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkVBox" id="box_menu_toolbar">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <child>
               <placeholder/>
             </child>
@@ -32,12 +34,15 @@ gmchess by lerosua and wind</property>
             <child>
               <object class="GtkVBox" id="vbox6">
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
+                <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkHBox" id="hbox4">
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkVBox" id="vbox8">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label11">
                             <property name="visible">True</property>
@@ -76,6 +81,7 @@ gmchess by lerosua and wind</property>
                     <child>
                       <object class="GtkVBox" id="vbox7">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkImage" id="P1_image">
                             <property name="visible">True</property>
@@ -223,6 +229,7 @@ gmchess by lerosua and wind</property>
                     <child>
                       <object class="GtkVBox" id="vbox9">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label16">
                             <property name="visible">True</property>
@@ -261,6 +268,7 @@ gmchess by lerosua and wind</property>
                     <child>
                       <object class="GtkVBox" id="vbox10">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkImage" id="image9">
                             <property name="visible">True</property>
@@ -392,12 +400,15 @@ gmchess by lerosua and wind</property>
                 </child>
               </object>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
               <object class="GtkVBox" id="vbox_board">
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkHBox" id="hbox13">
                     <property name="visible">True</property>
@@ -701,6 +712,7 @@ gmchess by lerosua and wind</property>
                 <child>
                   <object class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="info_label">
                         <property name="visible">True</property>
@@ -714,6 +726,7 @@ gmchess by lerosua and wind</property>
                     <child>
                       <object class="GtkVBox" id="vbox5">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow">
                             <property name="visible">True</property>
@@ -756,7 +769,7 @@ gmchess by lerosua and wind</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip-text" translatable="yes">first station</property>
+                                <property name="tooltip_text" translatable="yes">first station</property>
                                 <child>
                                   <object class="GtkImage" id="image4">
                                     <property name="visible">True</property>
@@ -775,7 +788,7 @@ gmchess by lerosua and wind</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip-text" translatable="yes">preview move</property>
+                                <property name="tooltip_text" translatable="yes">preview move</property>
                                 <child>
                                   <object class="GtkImage" id="image7">
                                     <property name="visible">True</property>
@@ -794,7 +807,7 @@ gmchess by lerosua and wind</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip-text" translatable="yes">next move</property>
+                                <property name="tooltip_text" translatable="yes">next move</property>
                                 <child>
                                   <object class="GtkImage" id="image6">
                                     <property name="visible">True</property>
@@ -813,7 +826,7 @@ gmchess by lerosua and wind</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip-text" translatable="yes">last move</property>
+                                <property name="tooltip_text" translatable="yes">last move</property>
                                 <child>
                                   <object class="GtkImage" id="image5">
                                     <property name="visible">True</property>
@@ -895,6 +908,7 @@ gmchess by lerosua and wind</property>
                 <child>
                   <object class="GtkVBox" id="vbox11">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwin_book">
                         <property name="visible">True</property>
@@ -916,6 +930,9 @@ gmchess by lerosua and wind</property>
                       <placeholder/>
                     </child>
                   </object>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
                 <child type="tab">
                   <object class="GtkLabel" id="label4">
@@ -930,6 +947,7 @@ gmchess by lerosua and wind</property>
                 <child>
                   <object class="GtkVBox" id="vbox12">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="label46">
                         <property name="visible">True</property>
@@ -991,6 +1009,9 @@ gmchess by lerosua and wind</property>
                       </packing>
                     </child>
                   </object>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
                 </child>
                 <child type="tab">
                   <object class="GtkLabel" id="label5">
@@ -1004,6 +1025,8 @@ gmchess by lerosua and wind</property>
                 </child>
               </object>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">2</property>
               </packing>
             </child>

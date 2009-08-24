@@ -158,6 +158,7 @@ class Board : public Gtk::DrawingArea
 		/** 设置AI等级*/
 		/** set the level of AI */
 		void set_level();
+		void configure_board(int _width);
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -202,6 +203,10 @@ class Board : public Gtk::DrawingArea
 		sigc::connection timer;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		//bool user_player;
+		/** 棋子的宽度,大的57,小的29*/
+		/** width of chessman */
+		int chessman_width ;
+		bool is_small_board;
 };
 
 #endif // _BOARD_H_

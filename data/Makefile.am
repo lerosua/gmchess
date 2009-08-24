@@ -1,4 +1,4 @@
-SUBDIRS=wood sound
+SUBDIRS=wood wood-small sound
 gmchess_ui = \
 	     gmchess.glade \
 	     p1.png \

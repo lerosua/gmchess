@@ -73,6 +73,9 @@ class MainWindow:public Gtk::Window
 		void set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 		void set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 		void on_conf_window_close();
+		/** 根据大小调整棋盘*/
+		/** resize the chess by board*/
+		void on_size_change();
 	protected:
 		void init_ui_manager();
 		void on_menu_open_file();

@@ -24,7 +24,7 @@
 #include "BookView.h"
 #include "ConfWindow.h"
 
-#define version "0.20.2"
+#define version "0.20.3"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -169,6 +169,8 @@ MainWindow::MainWindow():menubar(NULL)
 	p2_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_step_time"));
 #endif
 
+	this->signal_check_resize().connect(
+			sigc::mem_fun(*this,&MainWindow::on_size_change));
 	init();
 	
 	/** test for rgba */
@@ -184,6 +186,22 @@ MainWindow::MainWindow():menubar(NULL)
 MainWindow::~MainWindow()
 {
 	this->pop_colormap();
+}
+
+void MainWindow::on_size_change()
+{
+	int _wid = 	board->get_width();
+	board->configure_board(_wid);
+#if 0
+	if(_wid>521){
+		printf("become big\n");
+	}
+	else{
+		printf("become small\n");
+	}
+#endif
+
+
 }
 
 void MainWindow::change_play(bool player)
