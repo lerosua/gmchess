@@ -118,7 +118,7 @@ Board::Board(MainWindow& win) :
 	listTargets.push_back(Gtk::TargetEntry("text/plain"));
 
 	//this->set_size_request(521,577);
-	this->set_size_request(241,270);
+	this->set_size_request(241,200);
 	//this->set_size_default(521,577);
 
 	this->drag_dest_set(listTargets);

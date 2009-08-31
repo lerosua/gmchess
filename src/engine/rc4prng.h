@@ -1,5 +1,11 @@
 #include "base.h"
-#include "x86asm.h"
+#if defined (__i386__)
+	#include "x86asm.h"
+#elif defined (__mips__)
+	#include "mips.h"
+#else
+	#error "what's your plantform?"
+#endif
 
 #ifndef RC4PRNG_H
 #define RC4PRNG_H

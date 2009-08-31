@@ -47,6 +47,7 @@ noinst_HEADERS = \
 		search.h	\
 		ucci.h		\
 		x86asm.h	\
+		mips.h 		\
 		preeval.h 	\
 		xqffile.h
 

@@ -21,7 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "base.h"
-#include "x86asm.h"
+#if defined (__i386__)
+	#include "x86asm.h"
+#elif defined (__mips__)
+	#include "mips.h"
+#else
+	#error "what's your plantform?"
+#endif
 #include "pregen.h"
 #include "position.h"
 
