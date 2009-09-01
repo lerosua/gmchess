@@ -32,8 +32,10 @@ void Engine::clean_board()
 {
 	int i,j;
 	for(i=0;i<16;i++)
-		for(j=0;j<16;j++)
+		for(j=0;j<16;j++){
 			chessboard[i*16+j] =0;
+			revchessboard[i*16+j] =0;
+			}
 
 	for(i=0;i<3;i++)
 		for(j=0;j<16;j++)
@@ -208,6 +210,7 @@ void Engine::init_snapshot(const char* fen)
 	fen_snapshots.push_back(std::string(fen));
 	move_snapshots.push_back(0);
 
+	sync_board();
 	/*
 	int i,j;
 	for(i=0;i<16;i++)
@@ -226,12 +229,22 @@ void Engine::get_snapshot(int num)
 	clean_board();
 	from_fens(fens.c_str());
 
+	sync_board();
+
 }
 int Engine::get_piece(int rx,int ry)
 {
 	int site=0;
 	site = get_coord(rx + 3,ry + 3);
 	return chessboard[site];
+
+}
+
+int Engine::get_rev_piece(int rx,int ry)
+{
+	int site=0;
+	site = get_coord(rx + 3,ry + 3);
+	return revchessboard[site];
 
 }
 int Engine::get_dst_xy(int rx, int ry)
@@ -628,7 +641,7 @@ bool Engine::logic_move(int mv)
 	/** 判断是否过河的方法，dst & 0x80,在下方是非0, 上方是0 */
 	/** 获取要移动棋子的类型*/
 	int chess_t = get_chessman_type(chessboard[src]);
-	DLOG("逻辑判断棋子chesboard[src] = %d  %d\n",chessboard[src],chess_t);
+	DLOG("逻辑判断棋子chessboard[src] = %d  %d\n",chessboard[src],chess_t);
 	switch(chess_t){
 		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
 		case RED_KING:
@@ -909,6 +922,8 @@ int Engine::do_move(int mv)
 
 	add_move_chinese(mv_line);
 
+	/** 同步反转棋盘*/
+	sync_board();
 	return 0;
 }
 
@@ -931,6 +946,9 @@ void Engine::undo_move(int mv)
 	move_snapshots.pop_back();
 	fen_snapshots.pop_back();
 	move_chinese.pop_back();
+
+	/** 同步反转棋盘*/
+	sync_board();
 }
 
 int Engine::iccs_str_to_move(const std::string& iccs_str)
@@ -2144,4 +2162,12 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 error_out:
 	printf(" %s error\n",__FUNCTION__);
 	return 0;
+}
+
+void Engine::sync_board()
+{
+	int i;
+	for(i=0;i<255;i++)
+		revchessboard[i]=chessboard[254-i];
+	revchessboard[255]=0;
 }

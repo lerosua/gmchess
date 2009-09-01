@@ -159,6 +159,8 @@ class Board : public Gtk::DrawingArea
 		/** set the level of AI */
 		void set_level();
 		void configure_board(int _width);
+		/** 反转棋盘*/
+		void rev_game();
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -206,7 +208,10 @@ class Board : public Gtk::DrawingArea
 		/** 棋子的宽度,大的57,小的29*/
 		/** width of chessman */
 		int chessman_width ;
+		/** 是否小棋盘*/
 		bool is_small_board;
+		/** 是否反转棋盘*/
+		bool is_rev_board;
 };
 
 #endif // _BOARD_H_

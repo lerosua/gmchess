@@ -111,6 +111,7 @@ Board::Board(MainWindow& win) :
 	,count_time(0)
 	,chessman_width(29)
 	,is_small_board(true)
+	,is_rev_board(false)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -582,11 +583,20 @@ void Board::draw_pieces()
 
 void Board::draw_board()
 {
+    if(!is_rev_board){
 	for (int i = 0; i < 9; i++) {
 		for (int j = 0; j < 10; j++) {
 			draw_chessman(i, j, m_engine.get_piece(i, j));
 		}
 	}
+    }else{
+	for (int i = 0; i < 9; i++) {
+		for (int j = 0; j < 10; j++) {
+			draw_chessman(i, j, m_engine.get_rev_piece(i, j));
+		}
+	}
+
+    }
 }
 
 void Board::start_move()
@@ -854,6 +864,11 @@ void Board::free_game()
 	black_time=500;
 
 	m_engine.init_snapshot(start_fen);
+	redraw();
+}
+void Board::rev_game()
+{
+	is_rev_board=1-is_rev_board;
 	redraw();
 }
 

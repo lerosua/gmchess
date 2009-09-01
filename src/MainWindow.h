@@ -84,6 +84,7 @@ class MainWindow:public Gtk::Window
 		void on_menu_view_preferences();
 		void on_menu_war_to_ai();
 		void on_menu_free_play();
+		void on_menu_rev_play();
 		void on_menu_help();
 		void on_menu_about();
 		/** 初始化着法treeview */

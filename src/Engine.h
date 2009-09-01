@@ -141,6 +141,11 @@ class Engine {
 		 *  @return 返回棋子代号，如果0表示没有棋子
 		 */
 		int get_piece(int rx,int ry);
+		/** @brief 返回反转棋盘的棋子
+		 * return the reverse board chess
+		 * other like get_piece
+		 */
+		int get_rev_piece(int rx,int ry);
 		/**
 		 * @brief 由棋盘数组里的位置返回棋子代号
 		 */
@@ -265,10 +270,15 @@ class Engine {
 		 * @param szFen Fen串
 		 */
 		void from_fens(const char *szFen);
+		/** 同步棋盘与反转棋盘*/
+		/** sync revchessboard[] to chessboard[] */
+		void sync_board();
 
 	private:
 		/** 当前局面的棋盘数组 current board array*/
 		int chessboard[256];
+		/** 反转的棋盘数组,黑棋在下 reverse board array,the black chess down*/
+		int revchessboard[256];
 		/** 当前局面的棋子数组，相应棋子的值为棋盘上的坐标,0表示被吃了
 		 * 16-31表示红方棋子  32-47 表示黑方棋子
 		 **/

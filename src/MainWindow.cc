@@ -41,6 +41,7 @@ Glib::ustring ui_info =
 "		<menu action='GameMenu'>"
 "			<menuitem action='WarAI'/>"
 "			<menuitem action='FreePlay'/>"
+"			<menuitem action='RevPlay'/>"
 "		</menu>"
 "		<menu action='HelpMenu'>"
 "			<menuitem action='Help'/>"
@@ -320,6 +321,8 @@ void MainWindow::init_ui_manager()
 			sigc::mem_fun(*this, &MainWindow::on_menu_war_to_ai));
 	action_group->add(Gtk::Action::create("FreePlay",Gtk::Stock::MEDIA_PLAY,_("Free Play")),
 			sigc::mem_fun(*this, &MainWindow::on_menu_free_play));
+	action_group->add(Gtk::Action::create("RevPlay",Gtk::Stock::MEDIA_PLAY,_("Get Black plyaer")),
+			sigc::mem_fun(*this, &MainWindow::on_menu_rev_play));
 	//Help menu:
 	action_group->add(Gtk::Action::create("HelpMenu", _("_Help")));
 	action_group->add(Gtk::Action::create("Help", Gtk::Stock::HELP),
@@ -509,6 +512,12 @@ void MainWindow::on_menu_free_play()
 	board->free_game();
 	m_refTreeModel->clear();
 	change_status();
+}
+void MainWindow::on_menu_rev_play()
+{
+	board->rev_game();
+	printf("反转棋盘\n");
+
 }
 
 void MainWindow::on_menu_file_quit()
