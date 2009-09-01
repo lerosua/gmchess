@@ -232,11 +232,14 @@ void Engine::get_snapshot(int num)
 	sync_board();
 
 }
-int Engine::get_piece(int rx,int ry)
+int Engine::get_piece(int rx,int ry,bool rev)
 {
 	int site=0;
 	site = get_coord(rx + 3,ry + 3);
-	return chessboard[site];
+	if(rev)
+		return revchessboard[site];
+	else
+		return chessboard[site];
 
 }
 
@@ -247,16 +250,24 @@ int Engine::get_rev_piece(int rx,int ry)
 	return revchessboard[site];
 
 }
-int Engine::get_dst_xy(int rx, int ry)
+int Engine::get_dst_xy(int rx, int ry,bool rev)
 {
-	return get_coord(rx+3,ry+3);
+	if(rev)
+		return get_coord(11-rx,12-ry);
+	else
+		return get_coord(rx+3,ry+3);
 }
 
-void Engine::get_xy_from_chess(int f_chess,int& x,int& y)
+void Engine::get_xy_from_chess(int f_chess,int& x,int& y,bool rev)
 {
 	int xy=get_chessman_xy(f_chess);
-	x=RANK_X(xy)-3;
-	y=RANK_Y(xy)-3;
+	if(rev){
+		x=11-RANK_X(xy);
+		y=12-RANK_Y(xy);
+	}else{
+		x=RANK_X(xy)-3;
+		y=RANK_Y(xy)-3;
+	}
 }
 
 char Engine::get_iccs_y(int nArg)
@@ -2171,3 +2182,4 @@ void Engine::sync_board()
 		revchessboard[i]=chessboard[254-i];
 	revchessboard[255]=0;
 }
+

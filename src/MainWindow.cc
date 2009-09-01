@@ -182,6 +182,7 @@ MainWindow::MainWindow():menubar(NULL)
 	p1_image->hide();
 	p2_image->hide();
 
+	set_default_size(851,727);
 }
 
 MainWindow::~MainWindow()

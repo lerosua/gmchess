@@ -94,8 +94,8 @@ class Engine {
 		char alpha_to_digit(int nArg);
 		/** 由x，y位置获得棋盘数组中的序号（它所在的位置）*/
 		int get_coord(int x,int y){ return x+(y<<4);};
-		/** 由棋子代号获取9x10棋盘坐标的x，y*/
-		void get_xy_from_chess(int f_chess,int& x,int& y);
+		/** 由棋子代号获取9x10棋盘坐标的x，y, rev 标识是否反转棋盘*/
+		void get_xy_from_chess(int f_chess,int& x,int& y,bool rev=false);
 		/** 获取y坐标位*/
 		inline int RANK_Y(int sq) {	  return sq >> 4;};
 
@@ -138,9 +138,10 @@ class Engine {
 		 *		return the chess of 9x10 by (x,y)
 		 *  @param rx x 坐标
 		 *  @param ry y 坐标
+		 *  @param rev 标识是否反转棋盘,默认是false,true表示返回反转棋盘中的棋子
 		 *  @return 返回棋子代号，如果0表示没有棋子
 		 */
-		int get_piece(int rx,int ry);
+		int get_piece(int rx,int ry,bool rev=false);
 		/** @brief 返回反转棋盘的棋子
 		 * return the reverse board chess
 		 * other like get_piece
@@ -159,9 +160,9 @@ class Engine {
 		 * @return 返回着法，着法表示：高位是终点，低位是起点
 		 */
 		int get_move(int p_src,int p_dst){  return  p_src + (p_dst<<8)+ (chessboard[p_dst] <<16);}
-		/** 从棋盘9x10坐标(rx,ry)返回棋盘数组里的序号,通常用于获取着法的落点 */
+		/** 从棋盘9x10坐标(rx,ry)返回棋盘数组里的序号,通常用于获取着法的落点 rev 表示当前反转棋盘*/
 		/** get the location of chess by 9x10(rx,ry) */
-		int get_dst_xy(int rx, int ry);
+		int get_dst_xy(int rx, int ry,bool rev=false);
 		/** 返回棋子所在棋盘数组里的坐标(序号) */
 		inline int get_chessman_xy(int f_chess){return chessmans[f_chess] ; }
 
