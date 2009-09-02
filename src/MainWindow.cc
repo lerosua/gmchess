@@ -36,12 +36,12 @@ Glib::ustring ui_info =
 "			<menuitem action='FileQuit'/>"
 "        	</menu>"
 "		<menu action='ViewMenu'>"
+"			<menuitem action='RevPlay'/>"
 "			<menuitem action='ViewPreferences'/>"
 "		</menu>"
 "		<menu action='GameMenu'>"
 "			<menuitem action='WarAI'/>"
 "			<menuitem action='FreePlay'/>"
-"			<menuitem action='RevPlay'/>"
 "		</menu>"
 "		<menu action='HelpMenu'>"
 "			<menuitem action='Help'/>"
@@ -517,7 +517,6 @@ void MainWindow::on_menu_free_play()
 void MainWindow::on_menu_rev_play()
 {
 	board->rev_game();
-	printf("反转棋盘\n");
 
 }
 
