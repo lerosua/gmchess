@@ -141,5 +141,6 @@ static const int AdvisorMoveTab[4] = {-0x11, -0x0f, +0x0f, +0x11};
 static const int BishopMoveTab[4]  = {-0x22, -0x1e, +0x1e, +0x22};
 static const int KnightMoveTab[8]  = {-0x21, -0x1f, -0x12, -0x0e, +0x0e, +0x12, +0x1f, +0x21};
 
+enum BOARDSIZE {BIG_BOARD=0, SMALL_BOARD};
 #endif   /* ----- #ifndef GMCHESS_FILE_HEADER_INC  ----- */
 

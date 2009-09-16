@@ -166,6 +166,7 @@ class Board : public Gtk::DrawingArea
 		/** 加载所需要图片进内存*/
 		/** load all images in memory */
 		void load_images();
+		void set_board_size(BOARDSIZE sizemode);
 	private:
 		MainWindow& parent;
 		/** 着法引擎 */

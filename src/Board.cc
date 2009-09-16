@@ -880,6 +880,7 @@ void Board::set_level()
 	m_robot.send_ctrl_command("setoption knowledge none\n");
 	m_robot.send_ctrl_command("setoption pruning  large\n");
 	m_robot.send_ctrl_command("setoption randomness large\n");
+	m_robot.send_ctrl_command("setoption usebook false\n");
 	//m_robot.send_ctrl_command("ucci\n");
 }
 
@@ -976,4 +977,19 @@ bool Board::go_time()
 	}
 
 	return true;
+}
+
+void Board::set_board_size(BOARDSIZE sizemode)
+{
+	switch(sizemode){
+		case BIG_BOARD:
+			this->set_size_default(521,577);
+			break;
+		case SMALL_BOARD:
+			this->set_size_request(241,200);
+			break;
+		default:
+			g_warn_if_reached();
+			break;
+	}
 }

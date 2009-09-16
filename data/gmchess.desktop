@@ -11,16 +11,3 @@ Type=Application
 Categories=GNOME;GTK;Game;BoardGame;
 StartupNotify=true
 Encoding=UTF-8
-
-[Desktop Entry]
-Name=Chinese chess
-Name[zh_CN]=天书棋谈
-Comment=Play the popular chinese chess game
-Comment[zh_CN]=玩流行的中国象棋游戏
-Exec=gmchess
-Icon=gmchess
-Terminal=false
-Type=Application
-Categories=GNOME;GTK;Game;BoardGame;
-StartupNotify=true
-Encoding=UTF-8
