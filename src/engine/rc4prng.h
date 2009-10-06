@@ -4,7 +4,8 @@
 #elif defined (__mips__)
 	#include "mips.h"
 #else
-	#error "what's your plantform?"
+	#include "mips.h"
+/*#error "what's your plantform?"*/
 #endif
 
 #ifndef RC4PRNG_H

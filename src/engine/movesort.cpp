@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #elif defined (__mips__)
 	#include "mips.h"
 #else
-	#error "what's your plantform?"
+	#include "mips.h"
+//#error "what's your plantform?"
 #endif
 #include "position.h"
 #include "movesort.h"
