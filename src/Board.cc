@@ -112,6 +112,7 @@ Board::Board(MainWindow& win) :
 	,chessman_width(29)
 	,is_small_board(true)
 	,is_rev_board(false)
+	,search_depth(8)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -134,12 +135,6 @@ Board::Board(MainWindow& win) :
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 
-#if 0
-	if(atoi(GMConf["desktop_size"].c_str()) == 1)
-		set_board_size(BIG_BOARD);
-	else
-		set_board_size(SMALL_BOARD);
-#endif
 	this->show_all();
 
 
@@ -754,10 +749,10 @@ int Board::try_move(int mv)
 			//user_player = 1-user_player;
 			if(!is_human_player()){
 				//Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
-				Glib::ustring str_cmd="go depth 12\n";
-				DLOG("send command to tell robot\n");
-				DLOG("%s\n",str_cmd.c_str());
-				m_robot.send_ctrl_command(str_cmd.c_str());
+				//Glib::ustring str_cmd=Glib::ustring("go depth ")+search_depth+"\n";
+				char str_cmd[256];
+				sprintf(str_cmd,"go depth %d \n",search_depth);
+				m_robot.send_ctrl_command(str_cmd);
 				//m_robot.send_ctrl_command("go time 295000 increment 0\n");
 			}
 

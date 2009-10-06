@@ -162,6 +162,8 @@ class Board : public Gtk::DrawingArea
 		/** 反转棋盘*/
 		void rev_game();
 		void set_board_size(BOARDSIZE sizemode);
+		/** 设置引擎搜索深度*/
+		void set_search_depth(int depth){ search_depth=depth;}
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -213,6 +215,8 @@ class Board : public Gtk::DrawingArea
 		bool is_small_board;
 		/** 是否反转棋盘*/
 		bool is_rev_board;
+		/** 搜索深度-- search depth */
+		int search_depth;
 };
 
 #endif // _BOARD_H_

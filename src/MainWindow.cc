@@ -184,11 +184,14 @@ MainWindow::MainWindow():menubar(NULL)
 	p1_image->hide();
 	p2_image->hide();
 
-	set_default_size(851,727);
+	//set_default_size(851,727);
 	if(atoi(GMConf["desktop_size"].c_str()) == 1)
 		board->set_board_size(BIG_BOARD);
 	else
 		board->set_board_size(SMALL_BOARD);
+	int _depth = atoi(GMConf["engine_depth"].c_str());
+	g_log("Mainwindow",G_LOG_LEVEL_INFO,"depth %d",_depth);
+	board->set_search_depth(_depth);
 }
 
 MainWindow::~MainWindow()
@@ -611,6 +614,11 @@ void MainWindow::on_menu_view_preferences()
 void MainWindow::on_conf_window_quit()
 {
 	save_conf();
+
+	if(atoi(GMConf["desktop_size"].c_str()) == 1)
+		board->set_board_size(BIG_BOARD);
+	else
+		board->set_board_size(SMALL_BOARD);
 }
 void MainWindow::on_conf_window_close()
 {
