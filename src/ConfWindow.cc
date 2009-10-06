@@ -21,8 +21,23 @@
 
 ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 {
-	Gtk::Label*  tmp_label= Gtk::manage(new Gtk::Label("Not implement yet"));
-	this->add(*tmp_label);
+	vbox_xml = Gtk::Builder::create_from_file(conf_ui,"conf_vbox");
+	if(!vbox_xml)
+		exit(271);
+
+	Gtk::VBox * vBox = 0;
+	vbox_xml->get_widget("conf_vbox", vBox);
+
+#if 0
+	Glib::RefPtr<Glib::Object > adjust =
+	vbox_xml->get_object("adjustment_depth");
+	Gtk::SpinButton* spinbt =0;
+	vbox_xml->get_widget("sb_depth",spinbt);
+	spinbt->set_adjustment(adjust);
+#endif
+
+	this->add(*vBox);
+	this->set_transient_for(*parent);
 	this->set_size_request(521,577);
 	show_all();
 

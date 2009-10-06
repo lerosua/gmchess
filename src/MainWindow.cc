@@ -322,7 +322,7 @@ void MainWindow::init_ui_manager()
 			sigc::mem_fun(*this, &MainWindow::on_menu_war_to_ai));
 	action_group->add(Gtk::Action::create("FreePlay",Gtk::Stock::MEDIA_PLAY,_("Free Play")),
 			sigc::mem_fun(*this, &MainWindow::on_menu_free_play));
-	action_group->add(Gtk::Action::create("RevPlay",Gtk::Stock::MEDIA_PLAY,_("Get Black plyaer")),
+	action_group->add(Gtk::Action::create("RevPlay",Gtk::Stock::MEDIA_PLAY,_("Change Side")),
 			sigc::mem_fun(*this, &MainWindow::on_menu_rev_play));
 	//Help menu:
 	action_group->add(Gtk::Action::create("HelpMenu", _("_Help")));
