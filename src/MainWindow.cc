@@ -149,7 +149,7 @@ MainWindow::MainWindow():menubar(NULL)
 	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
 				&MainWindow::on_treeview_click),false);
 
-	change_status();
+	set_status();
 
 	//Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
 	//	(ui_xml->get_widget("scrolledwin_book"));
@@ -185,6 +185,10 @@ MainWindow::MainWindow():menubar(NULL)
 	p2_image->hide();
 
 	set_default_size(851,727);
+	if(atoi(GMConf["desktop_size"].c_str()) == 1)
+		board->set_board_size(BIG_BOARD);
+	else
+		board->set_board_size(SMALL_BOARD);
 }
 
 MainWindow::~MainWindow()
@@ -580,7 +584,7 @@ void MainWindow::on_menu_free_play()
 {
 	board->free_game();
 	m_refTreeModel->clear();
-	change_status();
+	set_status();
 }
 void MainWindow::on_menu_rev_play()
 {
@@ -738,12 +742,12 @@ void MainWindow::set_information()
 	text = text + _("Variation:  ")+board_info.variation+"\n";
 	info->set_label(text);
 	info->set_ellipsize(Pango::ELLIPSIZE_END);
-	change_status();
+	set_status();
 
 }
 
 
-void MainWindow::change_status()
+void MainWindow::set_status()
 {
 	int f_status = board->get_status();
 	bool f_use=1;
@@ -834,7 +838,7 @@ void MainWindow::on_begin_game()
 	}
 	m_refTreeModel->clear();
 	board->start_robot();
-	change_status();
+	set_status();
 	btn_begin->set_sensitive(false);
 }
 
@@ -852,7 +856,7 @@ void MainWindow::on_lose_game()
             case (Gtk::RESPONSE_OK): {
                 m_refTreeModel->clear();
                 board->free_game();
-                change_status();
+                set_status();
                             break;
                     }
 

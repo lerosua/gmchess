@@ -993,9 +993,11 @@ void Board::set_board_size(BOARDSIZE sizemode)
 {
 	switch(sizemode){
 		case BIG_BOARD:
+			is_small_board=false;
 			this->set_size_request(521,577);
 			break;
 		case SMALL_BOARD:
+			is_small_board=true;
 			this->set_size_request(241,200);
 			break;
 		default:
