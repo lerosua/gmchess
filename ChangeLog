@@ -1,4 +1,8 @@
 
+2009年 10月 06日 星期二 19:24:42 CST
+给首选项添加配置界面。
+把配置目录改到 ~/.config/gmchess下面了
+
 2009年 08月 10日 星期一 20:14:27 CST
 把libglade格式改成gtkbuilder格式，减少了libglademm的依赖
 

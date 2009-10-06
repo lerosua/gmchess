@@ -28,13 +28,23 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	Gtk::VBox * vBox = 0;
 	vbox_xml->get_widget("conf_vbox", vBox);
 
-#if 0
-	Glib::RefPtr<Glib::Object > adjust =
-	vbox_xml->get_object("adjustment_depth");
 	Gtk::SpinButton* spinbt =0;
 	vbox_xml->get_widget("sb_depth",spinbt);
-	spinbt->set_adjustment(adjust);
-#endif
+	Gtk::Adjustment* adjust = spinbt->get_adjustment();
+	adjust->set_lower(1.0);
+	adjust->set_upper(15.0);
+	adjust->set_step_increment(1.0);
+
+
+
+
+	Gtk::Button* bt = 0;
+	vbox_xml->get_widget("button_ok", bt);
+	bt->signal_clicked().connect(sigc::mem_fun(*this,&ConfWindow::on_button_save));
+	bt = 0;
+	vbox_xml->get_widget("button_cancel", bt);
+	bt->signal_clicked().connect(sigc::mem_fun(*this,&ConfWindow::on_button_cancel));
+
 
 	this->add(*vBox);
 	this->set_transient_for(*parent);
@@ -49,6 +59,7 @@ ConfWindow::~ConfWindow()
 
 void ConfWindow::on_button_save()
 {
+	signal_quit_.emit();
 	on_button_cancel();
 }
 

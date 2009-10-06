@@ -20,6 +20,8 @@
 #  include <libintl.h>
 #endif
 
+TGMConf GMConf;
+
 int main (int argc, char *argv[])
 {
 

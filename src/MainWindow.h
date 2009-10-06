@@ -67,16 +67,18 @@ class MainWindow:public Gtk::Window
 		void show_treeview_step();
 		bool on_foreach_iter(const Gtk::TreeModel::iterator iter);
 		void open_file(const std::string& filename);
-		/** 初始化*/
-		void init();
 		void change_play(bool player);
 		void set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 		void set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time);
 		void on_conf_window_close();
+		void on_conf_window_quit();
 		/** 根据大小调整棋盘*/
 		/** resize the chess by board*/
 		void on_size_change();
+		void save_conf();
 	protected:
+		/** 初始化配置文件*/
+		void init_conf();
 		void init_ui_manager();
 		void on_menu_open_file();
 		void on_menu_save_file();
@@ -91,7 +93,7 @@ class MainWindow:public Gtk::Window
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/
 		void set_information();
-		/** 设置着法按钮可见性*/
+		/** 红黑棋换边*/
 		void change_status();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
