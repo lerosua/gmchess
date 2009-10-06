@@ -116,6 +116,8 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
+	init_conf();
+
 	board= Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
 
@@ -173,7 +175,6 @@ MainWindow::MainWindow():menubar(NULL)
 
 	this->signal_check_resize().connect(
 			sigc::mem_fun(*this,&MainWindow::on_size_change));
-	init_conf();
 	
 	/** test for rgba */
 	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
@@ -260,6 +261,7 @@ void MainWindow::init_conf()
 		GMConf["usebook"]="1";
 		GMConf["desktop_size"] = "1"; //0--small,1--big
 		GMConf["engine_depth"] ="8";
+		save_conf();
 		return;
 	}
 	

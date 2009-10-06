@@ -19,6 +19,7 @@
 #ifndef  CONFWINDOW_FILE_HEADER_INC
 #define  CONFWINDOW_FILE_HEADER_INC
 #include <gtkmm.h>
+#include "variablesmap.h"
 
 #define conf_ui DATA_DIR"/confwin.glade"
 
@@ -35,11 +36,15 @@ class ConfWindow: public Gtk::Window
 		typedef sigc::signal<void> type_signal_quit;
 		type_signal_quit signal_quit()
 		{ return signal_quit_; }
+		void write_to_GMConf();
 	private:
 		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 		GBuilderXML			vbox_xml;
 		MainWindow* parent;
 		type_signal_quit signal_quit_;
+		VariablesMap* m_pVariablesMap;
+		bool				m_size_big;
+		Glib::ustring			m_level;
 
 };
 

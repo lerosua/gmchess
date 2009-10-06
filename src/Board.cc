@@ -118,8 +118,9 @@ Board::Board(MainWindow& win) :
 	listTargets.push_back(Gtk::TargetEntry("STRING"));
 	listTargets.push_back(Gtk::TargetEntry("text/plain"));
 
+
 	this->set_size_request(241,200);
-	//this->set_size_default(521,577);
+	//this->set_size_request(521,577);
 
 	this->drag_dest_set(listTargets);
 	this->signal_drag_data_received().connect(
@@ -132,6 +133,13 @@ Board::Board(MainWindow& win) :
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
+
+#if 0
+	if(atoi(GMConf["desktop_size"].c_str()) == 1)
+		set_board_size(BIG_BOARD);
+	else
+		set_board_size(SMALL_BOARD);
+#endif
 	this->show_all();
 
 

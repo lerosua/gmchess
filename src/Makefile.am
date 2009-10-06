@@ -20,6 +20,7 @@ gmchess_SOURCES= \
 	robot.cc   \
 	ec_throw.cpp \
 	ConfWindow.cc \
+	variablesmap.cc \
 	MainWindow.cc
 
 
@@ -34,6 +35,7 @@ noinst_HEADERS = \
 		 robot.h 	\
 		 ec_throw.h 	\
 		 ConfWindow.h  \
+		 variablesmap.h \
 		 MainWindow.h
 
 gmchess_LDFLAGS = 
