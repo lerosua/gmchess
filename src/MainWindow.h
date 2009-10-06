@@ -93,8 +93,8 @@ class MainWindow:public Gtk::Window
 		void init_move_treeview();
 		/** 设置棋盘相关信息*/
 		void set_information();
-		/** 红黑棋换边*/
-		void change_status();
+		/**各种模式转换 --- 设置着法按钮可见性*/
+		void set_status();
 	public:
 		class Columns:public Gtk::TreeModel::ColumnRecord
 		{
