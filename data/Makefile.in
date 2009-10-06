@@ -256,11 +256,7 @@ top_srcdir = @top_srcdir@
 SUBDIRS = wood wood-small sound
 gmchess_ui = \
 	     gmchess.glade \
-	     p1.png \
-	     p2.png \
-	     book.dat \
-	     play.png \
-	     gmchess.png
+	     confwin.glade 
 
 desktopdir = $(datadir)/applications
 desktop_in_files = gmchess.desktop.in
@@ -686,6 +682,11 @@ uninstall-am: uninstall-desktopDATA uninstall-gmchessuiDATA \
 	uninstall uninstall-am uninstall-desktopDATA \
 	uninstall-gmchessuiDATA uninstall-pixmapsDATA
 
+	     p1.png \
+	     p2.png \
+	     book.dat \
+	     play.png \
+	     gmchess.png
 @INTLTOOL_DESKTOP_RULE@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

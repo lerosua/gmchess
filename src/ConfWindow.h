@@ -19,6 +19,9 @@
 #ifndef  CONFWINDOW_FILE_HEADER_INC
 #define  CONFWINDOW_FILE_HEADER_INC
 #include <gtkmm.h>
+
+#define conf_ui DATA_DIR"/confwin.glade"
+
 class MainWindow;
 class ConfWindow: public Gtk::Window
 {
@@ -30,6 +33,8 @@ class ConfWindow: public Gtk::Window
 		void on_button_cancel();
 		bool on_delete_event(GdkEventAny*);
 	private:
+		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
+		GBuilderXML			vbox_xml;
 		MainWindow* parent;
 
 };

@@ -745,7 +745,8 @@ int Board::try_move(int mv)
 			m_robot.send_ctrl_command("\n");
 			//user_player = 1-user_player;
 			if(!is_human_player()){
-				Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
+				//Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
+				Glib::ustring str_cmd="go depth 12\n";
 				DLOG("send command to tell robot\n");
 				DLOG("%s\n",str_cmd.c_str());
 				m_robot.send_ctrl_command(str_cmd.c_str());
@@ -881,6 +882,7 @@ void Board::set_level()
 	m_robot.send_ctrl_command("setoption pruning  large\n");
 	m_robot.send_ctrl_command("setoption randomness large\n");
 	m_robot.send_ctrl_command("setoption usebook false\n");
+	m_robot.send_ctrl_command("setoption usemillisec true\n");
 	//m_robot.send_ctrl_command("ucci\n");
 }
 
