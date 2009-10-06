@@ -20,6 +20,8 @@
 #include "MainWindow.h"
 
 ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
+					     ,m_size_big(true)
+					     ,m_level("10")
 {
 	vbox_xml = Gtk::Builder::create_from_file(conf_ui,"conf_vbox");
 	if(!vbox_xml)
@@ -59,6 +61,7 @@ ConfWindow::~ConfWindow()
 
 void ConfWindow::on_button_save()
 {
+	write_to_GMConf();
 	signal_quit_.emit();
 	on_button_cancel();
 }
@@ -74,4 +77,7 @@ bool ConfWindow::on_delete_event(GdkEventAny*)
 {
 	on_button_cancel();
 
+}
+void ConfWindow::write_to_GMConf()
+{
 }
