@@ -116,6 +116,7 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
       Gtk::ToggleButton* pToggleButton = dynamic_cast<Gtk::ToggleButton*>(pWidget); //CheckButtons and RadioButtons.
       Gtk::Scale* pScale = dynamic_cast<Gtk::Scale*>(pWidget); 
       Gtk::Calendar* pCalendar = dynamic_cast<Gtk::Calendar*>(pWidget); 
+      Gtk::SpinButton* pSpinButton = dynamic_cast<Gtk::SpinButton*>(pSpinButton);
 
       if(pEntry)
       {
@@ -169,6 +170,14 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
           pCalendar->select_day(pVar->get_day());
           pCalendar->select_month(pVar->get_month(), pVar->get_year());
 	}
+      }
+      if(pSpinButton){
+		Glib::ustring* pVar = (Glib::ustring*)(pVariable);
+		if(to_variable)
+			  (*pVar) = pSpinButton->get_text();
+		else
+			pSpinButton->set_value(atoi((*pVar).c_str()));
+
       }
     }
   }

@@ -44,7 +44,8 @@ class ConfWindow: public Gtk::Window
 		type_signal_quit signal_quit_;
 		VariablesMap* m_pVariablesMap;
 		bool				m_size_big;
-		Glib::ustring			m_level;
+		bool				m_usebook;
+		Glib::ustring			m_depth;
 
 };
 
