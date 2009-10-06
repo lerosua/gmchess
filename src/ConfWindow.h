@@ -32,10 +32,14 @@ class ConfWindow: public Gtk::Window
 		void on_button_save();
 		void on_button_cancel();
 		bool on_delete_event(GdkEventAny*);
+		typedef sigc::signal<void> type_signal_quit;
+		type_signal_quit signal_quit()
+		{ return signal_quit_; }
 	private:
 		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 		GBuilderXML			vbox_xml;
 		MainWindow* parent;
+		type_signal_quit signal_quit_;
 
 };
 

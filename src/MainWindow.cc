@@ -23,6 +23,7 @@
 #include <fstream>
 #include "BookView.h"
 #include "ConfWindow.h"
+#include "gmchess.h"
 
 #define version "0.20.3"
 
@@ -172,7 +173,7 @@ MainWindow::MainWindow():menubar(NULL)
 
 	this->signal_check_resize().connect(
 			sigc::mem_fun(*this,&MainWindow::on_size_change));
-	init();
+	init_conf();
 	
 	/** test for rgba */
 	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
@@ -225,15 +226,80 @@ void MainWindow::change_play(bool player)
 	}
 }
 
-
-void MainWindow::init()
+void MainWindow::save_conf()
 {
+
 	char buf[512];
-	char* homedir = getenv("HOME");
-	snprintf(buf, 512,"%s/.gmchess/book",homedir);
-	m_bookview->load_book_dir(buf);
+	std::string homedir=Glib::get_user_config_dir();
+	snprintf(buf, 512,"%s/gmchess/config",homedir.c_str());
+	std::ofstream file(buf);
+	std::string line;
+	std::map<std::string,std::string>::iterator iter=GMConf.begin();
+	for(;iter != GMConf.end(); ++iter)
+	{
+		line = iter->first + "\t=\t" + iter->second;
+		file << line << std::endl;
+	}
+	file.close();
 
 }
+
+void MainWindow::init_conf()
+{
+	char buf[512];
+	char book_dir[512];
+	std::string homedir=Glib::get_user_config_dir();
+	snprintf(book_dir, 512,"%s/gmchess/book",homedir.c_str());
+	m_bookview->load_book_dir(book_dir);
+	snprintf(buf,512,"%s/gmchess/config",homedir.c_str());
+	std::ifstream file(buf);
+	if(!file){
+		char homepath[512];
+		snprintf(homepath,512,"%s/gmchess/",homedir.c_str());
+		mkdir(homepath,S_IRUSR|S_IWUSR|S_IXUSR);
+		GMConf["usebook"]="1";
+		GMConf["desktop_size"] = "1"; //0--small,1--big
+		GMConf["engine_depth"] ="8";
+		return;
+	}
+	
+	std::string line;
+	std::string name;
+	std::string key;
+
+	if(file){
+		while(std::getline(file,line)){
+			size_t pos= line.find_first_of("=");
+			if(pos==std::string::npos)
+				continue;
+			name = line.substr(0,pos);
+			key = line.substr(pos+1,std::string::npos);
+			// 下面这2个把所有的空格都去掉了
+			//key.erase(std::remove_if(key.begin(), key.end(), IsBlank()), key.end());
+			//name.erase(std::remove_if(name.begin(), name.end(), IsBlank()), name.end());
+			size_t pos1 = 0;
+			size_t pos2 = 0;
+			size_t len = 0;
+			pos1 = name.find_first_not_of(" \t");
+			pos2 = name.find_last_not_of(" \t");
+			if (pos1 == std::string::npos || pos2 == std::string::npos)
+				continue;
+			len = pos2 - pos1 + 1;
+			name = name.substr(pos1, len);
+
+			pos1 = key.find_first_not_of(" \t");
+			pos2 = key.find_last_not_of(" \t");
+			if (pos1 == std::string::npos || pos2 == std::string::npos)
+				continue;
+			len = pos2 - pos1 + 1;
+			key = key.substr(pos1, len);
+
+			GMConf.insert(std::pair<std::string,std::string>(name,key));
+		}
+	}
+	file.close();
+}
+
 void MainWindow::set_comment(const std::string& f_comment)
 {
 	text_comment->set_wrap_mode(Gtk::WRAP_WORD);
@@ -530,11 +596,16 @@ void MainWindow::on_menu_view_preferences()
 {
 	if(NULL == confwindow){
 		confwindow = new ConfWindow(this);
+		confwindow->signal_quit().connect(sigc::mem_fun(*this, &MainWindow::on_conf_window_quit));
 		confwindow->raise();
 	}else
 		confwindow->raise();
 }
 
+void MainWindow::on_conf_window_quit()
+{
+	save_conf();
+}
 void MainWindow::on_conf_window_close()
 {
 	if(NULL !=confwindow){
