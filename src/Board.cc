@@ -764,7 +764,7 @@ int Board::try_move(int mv)
 		/**被将死了*/
 		/** is it  mate */
 		if(m_engine.mate()){
-			parent.on_mate_game();
+			parent.on_end_game(ROBOT_WIN);
 			DLOG("将军死棋\n");
 		}
 
@@ -938,18 +938,19 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		if(pos_ != std::string::npos){
 
 			printf("计算机同意和棋\n");
+			parent.on_end_game(ROBOT_DRAW);
 
 			return true;
 		}
 		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
 
-			parent.on_mate_game();
+			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
 		pos_=str_buf.find("nobestmove");
 		if(pos_ != std::string::npos){
-			parent.on_mate_game();
+			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
 		size_t pos=str_buf.find("bestmove");

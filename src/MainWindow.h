@@ -54,8 +54,8 @@ class MainWindow:public Gtk::Window
 		void on_draw_game();
 		/** 悔棋*/
 		void on_rue_game();
-		/** 死棋了，跳出对话框*/
-		void on_mate_game();
+		/** 结束对局，跳出对话框*/
+		void on_end_game(OVERSTATUS _over);
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
 		void set_comment(const std::string& f_comment);

@@ -891,12 +891,30 @@ void MainWindow::on_rue_game()
 	}
 
 }
-void MainWindow::on_mate_game()
+void MainWindow::on_end_game(OVERSTATUS _over)
 {
+	Glib::ustring msg ;
+	switch(_over){
+		case ROBOT_WIN:
+			//robot win
+			msg=_("You are Lose! \n Are you want to start a new game?");
+			break;
+		case ROBOT_LOSE:
+			//robot lose
+			msg=_("Congratuations ! YOU WIN!\n start a new game click OK");
+			break;
+		case ROBOT_DRAW:
+			//robot want to draw
+			msg=_("Computer want to draw with you, are you agree?");
+			break;
+		default:
+			break;
+
+	}
 	Gtk::MessageDialog dialog(*this, _("Game End"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
-		Glib::ustring msg =_("Mate!\n Are you want to start a new game?");
+		//Glib::ustring msg =_("Mate!\n Are you want to start a new game?");
 		dialog.set_secondary_text(msg);
 		int result = dialog.run();
 		switch (result) {
