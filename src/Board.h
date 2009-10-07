@@ -163,7 +163,7 @@ class Board : public Gtk::DrawingArea
 		void rev_game();
 		void set_board_size(BOARDSIZE sizemode);
 		/** 设置引擎搜索深度*/
-		void set_search_depth(int depth){ search_depth=depth;}
+		void set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook);
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -216,7 +216,9 @@ class Board : public Gtk::DrawingArea
 		/** 是否反转棋盘*/
 		bool is_rev_board;
 		/** 搜索深度-- search depth */
-		int search_depth;
+		int m_search_depth;
+		/** 是否使用开局库 -- use open book*/
+		bool m_usebook;
 };
 
 #endif // _BOARD_H_
