@@ -947,7 +947,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 			parent.on_mate_game();
 			return true;
 		}
-		pos_=str_bus.find("nobestmove");
+		pos_=str_buf.find("nobestmove");
 		if(pos_ != std::string::npos){
 			parent.on_mate_game();
 			return true;
