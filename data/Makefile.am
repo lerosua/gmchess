@@ -1,7 +1,7 @@
 SUBDIRS=wood wood-small sound
 gmchess_ui = \
 	     gmchess.glade \
-	     confwin.glade 
+	     confwin.glade \
 	     p1.png \
 	     p2.png \
 	     book.dat \

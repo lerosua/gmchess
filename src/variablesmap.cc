@@ -116,7 +116,7 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
       Gtk::ToggleButton* pToggleButton = dynamic_cast<Gtk::ToggleButton*>(pWidget); //CheckButtons and RadioButtons.
       Gtk::Scale* pScale = dynamic_cast<Gtk::Scale*>(pWidget); 
       Gtk::Calendar* pCalendar = dynamic_cast<Gtk::Calendar*>(pWidget); 
-      Gtk::SpinButton* pSpinButton = dynamic_cast<Gtk::SpinButton*>(pSpinButton);
+      Gtk::SpinButton* pSpinButton = dynamic_cast<Gtk::SpinButton*>(pWidget);
 
       if(pEntry)
       {
