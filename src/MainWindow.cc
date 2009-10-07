@@ -191,7 +191,7 @@ MainWindow::MainWindow():menubar(NULL)
 		board->set_board_size(SMALL_BOARD);
 	int _depth = atoi(GMConf["engine_depth"].c_str());
 	g_log("Mainwindow",G_LOG_LEVEL_INFO,"depth %d",_depth);
-	board->set_search_depth(_depth);
+	board->set_level_config(_depth,0,0,0,0,0,atoi(GMConf["usebook"].c_str()));
 }
 
 MainWindow::~MainWindow()
@@ -201,29 +201,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_size_change()
 {
-	int _wid = 	board->get_width();
+	int _wid = board->get_width();
 	board->configure_board(_wid);
-#if 0
-	if(_wid>521){
-		printf("become big\n");
-	}
-	else{
-		printf("become small\n");
-	}
-#endif
-
-
 }
 
 void MainWindow::change_play(bool player)
 {
-	/*
-	if( FIGHT_STATUS != board->get_status()){
-		p1_image->remove(*(board->get_p1_image()));
-		p2_image->remove(*(board->get_p2_image()));
-		return ;
-	}
-	*/
 	if(player){
 		p1_image->hide();
 		p2_image->show();

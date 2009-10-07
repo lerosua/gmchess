@@ -112,7 +112,8 @@ Board::Board(MainWindow& win) :
 	,chessman_width(29)
 	,is_small_board(true)
 	,is_rev_board(false)
-	,search_depth(8)
+	,m_search_depth(8)
+	,m_usebook(true)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -751,7 +752,7 @@ int Board::try_move(int mv)
 				//Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
 				//Glib::ustring str_cmd=Glib::ustring("go depth ")+search_depth+"\n";
 				char str_cmd[256];
-				sprintf(str_cmd,"go depth %d \n",search_depth);
+				sprintf(str_cmd,"go depth %d \n",m_search_depth);
 				m_robot.send_ctrl_command(str_cmd);
 				//m_robot.send_ctrl_command("go time 295000 increment 0\n");
 			}
@@ -875,6 +876,12 @@ void Board::start_robot()
 	new_game();
 }
 
+void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook)
+{
+	m_search_depth = _depth;
+	m_usebook = _usebook;
+
+}
 void Board::set_level()
 {
 
@@ -884,9 +891,10 @@ void Board::set_level()
 	m_robot.send_ctrl_command("setoption knowledge none\n");
 	m_robot.send_ctrl_command("setoption pruning  large\n");
 	m_robot.send_ctrl_command("setoption randomness large\n");
-	m_robot.send_ctrl_command("setoption usebook false\n");
-	m_robot.send_ctrl_command("setoption usemillisec true\n");
-	//m_robot.send_ctrl_command("ucci\n");
+	if(m_usebook)
+		m_robot.send_ctrl_command("setoption usebook false\n");
+	else
+		m_robot.send_ctrl_command("setoption usebook true\n");
 }
 
 void Board::new_game()
@@ -894,8 +902,8 @@ void Board::new_game()
 	m_status = FIGHT_STATUS;
 
 	m_engine.init_snapshot(start_fen);
-	set_level();
 	m_robot.send_ctrl_command("setoption newgame\n");
+	set_level();
 
 
 	moves_lines.clear();
@@ -936,6 +944,11 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
 
+			parent.on_mate_game();
+			return true;
+		}
+		pos_=str_buf.find("nobestmove");
+		if(pos_ != std::string::npos){
 			parent.on_mate_game();
 			return true;
 		}
