@@ -324,7 +324,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** 对战状态中，选了黑色棋子无效*/
 				/** choose the black chessman is useless on war */
 				if(is_fight_to_robot()){ 
-					if((m_human_black && (selected_chessman <32))||selected_chessman>31){
+					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
 						//draw_select_frame(false); 
@@ -767,8 +767,12 @@ int Board::try_move(int mv)
 		/**被将死了*/
 		/** is it  mate */
 		if(m_engine.mate() && is_human_player() ){
+			if(timer.connected())
+				timer.disconnect();
+			CSound::play(SND_CHECK);
 			parent.on_end_game(ROBOT_WIN);
 			DLOG("将军死棋\n");
+			return 0;
 		}
 		if(m_engine.get_checkby()){
 			CSound::play(SND_CHECK);
@@ -867,6 +871,7 @@ void Board::free_game()
 void Board::rev_game()
 {
 	is_rev_board=1-is_rev_board;
+	m_human_black=1-m_human_black;
 	redraw();
 }
 
@@ -917,6 +922,16 @@ void Board::new_game()
 	parent.change_play(is_human_player());
 
 	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
+	/**如果是用户选择黑方，则电脑先走棋 -- if user choose black,the robot go moves first*/
+	if(m_human_black){
+		moves_lines =moves_lines +std::string(" -- 0 1 ");
+		m_robot.send_ctrl_command(moves_lines.c_str());
+		m_robot.send_ctrl_command("\n");
+		char str_cmd[256];
+		sprintf(str_cmd,"go depth %d \n",m_search_depth);
+		m_robot.send_ctrl_command(str_cmd);
+
+	}
 
 }
 
@@ -942,6 +957,8 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		if(pos_ != std::string::npos){
 
 			printf("计算机同意和棋\n");
+			if(timer.connected())
+				timer.disconnect();
 			parent.on_end_game(ROBOT_DRAW);
 
 			return true;
@@ -949,11 +966,15 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
 
+			if(timer.connected())
+				timer.disconnect();
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
 		pos_=str_buf.find("nobestmove");
 		if(pos_ != std::string::npos){
+			if(timer.connected())
+				timer.disconnect();
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
