@@ -1651,13 +1651,17 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 	/** cman_type 是棋子类型*/
 	int cman_type = fen_to_piece(c_hanzi.word[0]);
 	int src_x,src_y,dst_x,dst_y;
-	int num;
+	int num =0;
 
 	DLOG("who is going black=%d\n",black_player);
+	num += 16*black_player;
+	/*
 	if(black_player)
 		num = 16;
 	else
 		num= 0;
+	*/
+	g_log("Engine",G_LOG_LEVEL_INFO,"num = %d\n",num);
 
 	if(0 == cman_type ){
 		/** 处理帅将的源地址*/

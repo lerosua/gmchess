@@ -114,6 +114,7 @@ Board::Board(MainWindow& win) :
 	,is_rev_board(false)
 	,m_search_depth(8)
 	,m_usebook(true)
+	,m_human_black(false)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -322,12 +323,13 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				}
 				/** 对战状态中，选了黑色棋子无效*/
 				/** choose the black chessman is useless on war */
-				if((is_fight_to_robot()) &&
-					(selected_chessman>31)){
+				if(is_fight_to_robot()){ 
+					if((m_human_black && (selected_chessman <32))||selected_chessman>31){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
 						//draw_select_frame(false); 
 						return true;
+					}
 				}
 
 				draw_select_frame(true);
@@ -761,17 +763,18 @@ int Board::try_move(int mv)
 			parent.change_play(is_human_player());
 			count_time=0;
 		}
+
 		/**被将死了*/
 		/** is it  mate */
-		if(m_engine.mate()){
+		if(m_engine.mate() && is_human_player() ){
 			parent.on_end_game(ROBOT_WIN);
 			DLOG("将军死棋\n");
 		}
-
 		if(m_engine.get_checkby()){
 			CSound::play(SND_CHECK);
 			DLOG("将军===============\n");
 		}
+
 	}
 
 	return 0;
@@ -910,7 +913,8 @@ void Board::new_game()
 	moves_lines = postion_str + std::string(start_fen);
 	redraw();
 
-	parent.change_play(m_engine.red_player());
+	//parent.change_play(m_engine.red_player());
+	parent.change_play(is_human_player());
 
 	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
 
