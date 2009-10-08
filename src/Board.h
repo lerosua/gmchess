@@ -145,7 +145,8 @@ class Board : public Gtk::DrawingArea
 		/** 标识是否与电脑AI对战*/
 		/** check is fight to AI */
 		bool is_fight_to_robot(){ return m_status == FIGHT_STATUS;}
-		bool is_human_player(){ return m_engine.red_player(); }
+		/** 检测是不是当前用户走棋 -- check if the human user going to move */
+		bool is_human_player(){ return m_engine.red_player()-m_human_black ; }
 		/** 走时函数*/
 		/** check go time*/
 		bool go_time();
@@ -219,6 +220,8 @@ class Board : public Gtk::DrawingArea
 		int m_search_depth;
 		/** 是否使用开局库 -- use open book*/
 		bool m_usebook;
+		/** 用户选择黑方棋子 -- the human choose the black player*/
+		bool m_human_black;
 };
 
 #endif // _BOARD_H_
