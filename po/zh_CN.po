@@ -7,164 +7,184 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmchess 0.20.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-17 14:32+0800\n"
-"PO-Revision-Date: 2009-05-03 22:29+0800\n"
-"Last-Translator:  Aron Xu <happyaron.xu@gmail.com>\n"
+"POT-Creation-Date: 2009-10-09 19:19+0800\n"
+"PO-Revision-Date: 2009-10-09 19:21+0700\n"
+"Last-Translator: lerosua <lerosua@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:141
+#: ../src/MainWindow.cc:145
 msgid "bout"
 msgstr "回合"
 
-#: ../src/MainWindow.cc:143
+#: ../src/MainWindow.cc:147
 msgid "step"
 msgstr "着法"
 
 #. File menu:
-#: ../src/MainWindow.cc:278
+#: ../src/MainWindow.cc:356
 msgid "_File"
 msgstr "文件"
 
-#: ../src/MainWindow.cc:280
+#: ../src/MainWindow.cc:358
 msgid "Open file"
 msgstr "打开文件"
 
-#: ../src/MainWindow.cc:281
+#: ../src/MainWindow.cc:359
 msgid "Open chessman File"
 msgstr "打开棋谱文件"
 
-#: ../src/MainWindow.cc:284
+#: ../src/MainWindow.cc:362
 msgid "Save as"
 msgstr "另存为"
 
-#: ../src/MainWindow.cc:285
+#: ../src/MainWindow.cc:363
 msgid "Save as a chess pgn file"
 msgstr "保存为PGN棋谱"
 
 #. View menu:
-#: ../src/MainWindow.cc:293
+#: ../src/MainWindow.cc:371
 msgid "_View"
 msgstr "查看"
 
 #. Game menu:
-#: ../src/MainWindow.cc:300
+#: ../src/MainWindow.cc:378
 msgid "_Game"
 msgstr "游戏"
 
-#: ../src/MainWindow.cc:301
+#: ../src/MainWindow.cc:379
 msgid "_Fight to AI"
 msgstr "与电脑对战"
 
-#: ../src/MainWindow.cc:303
+#: ../src/MainWindow.cc:381
 msgid "Free Play"
 msgstr "摆棋"
 
+#: ../src/MainWindow.cc:383
+msgid "Change Side"
+msgstr "换边"
+
 #. Help menu:
-#: ../src/MainWindow.cc:306
+#: ../src/MainWindow.cc:386
 msgid "_Help"
 msgstr "帮助"
 
-#: ../src/MainWindow.cc:325
+#: ../src/MainWindow.cc:405
 msgid "Save File"
 msgstr "保存文件"
 
-#: ../src/MainWindow.cc:367
+#: ../src/MainWindow.cc:447
 msgid "Choose File"
 msgstr "选择文件"
 
-#: ../src/MainWindow.cc:410
+#: ../src/MainWindow.cc:490
 msgid "All Files"
 msgstr "所有文件"
 
-#: ../src/MainWindow.cc:426
+#: ../src/MainWindow.cc:506
 msgid "AI Warn"
 msgstr "AI警告"
 
-#: ../src/MainWindow.cc:429
+#: ../src/MainWindow.cc:509
 msgid "Open book view will close the AI game,Are you sure?"
-msgstr ""
+msgstr "打开棋谱会关闭引擎，继续？"
 
-#: ../src/MainWindow.cc:471
+#: ../src/MainWindow.cc:552
 msgid "the file maybe not right format for chess"
 msgstr "未支持的棋谱格式"
 
-#: ../src/MainWindow.cc:539
+#: ../src/MainWindow.cc:635
 msgid "GMChess is chinese chess game write by gtkmm"
 msgstr "GMChess 是一款用Gtkmm库写成的中国象棋软件"
 
-#: ../src/MainWindow.cc:541
-msgid ""
-"This program is licenced under GNU General Public Licence (GPL) version 2."
+#: ../src/MainWindow.cc:637
+msgid "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr "此程序在 GNU 通用公共许可证第二版下发布。"
 
-#: ../src/MainWindow.cc:559
+#: ../src/MainWindow.cc:655
 msgid "Black"
 msgstr "黑"
 
-#: ../src/MainWindow.cc:562
+#: ../src/MainWindow.cc:658
 msgid "Red"
 msgstr "红"
 
-#: ../src/MainWindow.cc:632
+#: ../src/MainWindow.cc:728
 msgid "Game: "
 msgstr "游戏: "
 
-#: ../src/MainWindow.cc:633
+#: ../src/MainWindow.cc:729
 msgid "Time: "
 msgstr "时间: "
 
-#: ../src/MainWindow.cc:634
+#: ../src/MainWindow.cc:730
 msgid "Site: "
 msgstr "地点: "
 
-#: ../src/MainWindow.cc:635
+#: ../src/MainWindow.cc:731
 msgid "Result: "
 msgstr "结果: "
 
-#: ../src/MainWindow.cc:636
+#: ../src/MainWindow.cc:732
 msgid "Opening: "
 msgstr "开局信息: "
 
-#: ../src/MainWindow.cc:637
+#: ../src/MainWindow.cc:733
 msgid "Variation:  "
 msgstr "变着: "
 
-#: ../src/MainWindow.cc:709
+#: ../src/MainWindow.cc:806
 msgid "new game"
 msgstr "新游戏"
 
-#: ../src/MainWindow.cc:712
+#: ../src/MainWindow.cc:809
 msgid "Will you  start a new game?"
 msgstr "您确定要开始新游戏吗？"
 
-#: ../src/MainWindow.cc:743
+#: ../src/MainWindow.cc:840
 msgid "end game"
 msgstr "结束游戏"
 
-#: ../src/MainWindow.cc:746
+#: ../src/MainWindow.cc:843
 msgid "Will you end this game?"
 msgstr "您确定要结束游戏吗？"
 
-#: ../src/MainWindow.cc:787
+#: ../src/MainWindow.cc:884
 msgid "Warning"
 msgstr "警告"
 
-#: ../src/MainWindow.cc:788
+#: ../src/MainWindow.cc:885
 msgid "Only rue game when you are go,so wait a minute!"
 msgstr "只有在您走的时候才能悔棋，请等会!"
 
-#: ../src/MainWindow.cc:799
-msgid "Game End"
-msgstr "游戏结束 "
-
-#: ../src/MainWindow.cc:802
+#. robot win
+#: ../src/MainWindow.cc:900
 msgid ""
-"Mate!\n"
+"You are Lose! \n"
 " Are you want to start a new game?"
 msgstr ""
+"您输了 ! \n"
+" 您确定要开始新游戏吗？"
+
+#. robot lose
+#: ../src/MainWindow.cc:904
+msgid ""
+"Congratuations ! YOU WIN!\n"
+" start a new game click OK"
+msgstr ""
+"恭喜！您赢了!\n"
+"开始新游戏请点确定"
+
+#. robot want to draw
+#: ../src/MainWindow.cc:908
+msgid "Computer want to draw with you, are you agree?"
+msgstr "计算机想和您和棋，同意吗?"
+
+#: ../src/MainWindow.cc:914
+msgid "Game End"
+msgstr "游戏结束 "
 
 #: ../data/gmchess.glade.h:1
 msgid " "
@@ -332,6 +352,6 @@ msgstr "二"
 
 #~ msgid "hui"
 #~ msgstr "悔棋"
-
 #~ msgid "huo"
 #~ msgstr "和棋"
+

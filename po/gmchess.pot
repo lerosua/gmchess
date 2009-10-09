@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-17 14:32+0800\n"
+"POT-Creation-Date: 2009-10-09 19:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,155 +16,172 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:141
+#: ../src/MainWindow.cc:145
 msgid "bout"
 msgstr ""
 
-#: ../src/MainWindow.cc:143
+#: ../src/MainWindow.cc:147
 msgid "step"
 msgstr ""
 
 #. File menu:
-#: ../src/MainWindow.cc:278
+#: ../src/MainWindow.cc:356
 msgid "_File"
 msgstr ""
 
-#: ../src/MainWindow.cc:280
+#: ../src/MainWindow.cc:358
 msgid "Open file"
 msgstr ""
 
-#: ../src/MainWindow.cc:281
+#: ../src/MainWindow.cc:359
 msgid "Open chessman File"
 msgstr ""
 
-#: ../src/MainWindow.cc:284
+#: ../src/MainWindow.cc:362
 msgid "Save as"
 msgstr ""
 
-#: ../src/MainWindow.cc:285
+#: ../src/MainWindow.cc:363
 msgid "Save as a chess pgn file"
 msgstr ""
 
 #. View menu:
-#: ../src/MainWindow.cc:293
+#: ../src/MainWindow.cc:371
 msgid "_View"
 msgstr ""
 
 #. Game menu:
-#: ../src/MainWindow.cc:300
+#: ../src/MainWindow.cc:378
 msgid "_Game"
 msgstr ""
 
-#: ../src/MainWindow.cc:301
+#: ../src/MainWindow.cc:379
 msgid "_Fight to AI"
 msgstr ""
 
-#: ../src/MainWindow.cc:303
+#: ../src/MainWindow.cc:381
 msgid "Free Play"
 msgstr ""
 
+#: ../src/MainWindow.cc:383
+msgid "Change Side"
+msgstr ""
+
 #. Help menu:
-#: ../src/MainWindow.cc:306
+#: ../src/MainWindow.cc:386
 msgid "_Help"
 msgstr ""
 
-#: ../src/MainWindow.cc:325
+#: ../src/MainWindow.cc:405
 msgid "Save File"
 msgstr ""
 
-#: ../src/MainWindow.cc:367
+#: ../src/MainWindow.cc:447
 msgid "Choose File"
 msgstr ""
 
-#: ../src/MainWindow.cc:410
+#: ../src/MainWindow.cc:490
 msgid "All Files"
 msgstr ""
 
-#: ../src/MainWindow.cc:426
+#: ../src/MainWindow.cc:506
 msgid "AI Warn"
 msgstr ""
 
-#: ../src/MainWindow.cc:429
+#: ../src/MainWindow.cc:509
 msgid "Open book view will close the AI game,Are you sure?"
 msgstr ""
 
-#: ../src/MainWindow.cc:471
+#: ../src/MainWindow.cc:552
 msgid "the file maybe not right format for chess"
 msgstr ""
 
-#: ../src/MainWindow.cc:539
+#: ../src/MainWindow.cc:635
 msgid "GMChess is chinese chess game write by gtkmm"
 msgstr ""
 
-#: ../src/MainWindow.cc:541
+#: ../src/MainWindow.cc:637
 msgid ""
 "This program is licenced under GNU General Public Licence (GPL) version 2."
 msgstr ""
 
-#: ../src/MainWindow.cc:559
+#: ../src/MainWindow.cc:655
 msgid "Black"
 msgstr ""
 
-#: ../src/MainWindow.cc:562
+#: ../src/MainWindow.cc:658
 msgid "Red"
 msgstr ""
 
-#: ../src/MainWindow.cc:632
+#: ../src/MainWindow.cc:728
 msgid "Game: "
 msgstr ""
 
-#: ../src/MainWindow.cc:633
+#: ../src/MainWindow.cc:729
 msgid "Time: "
 msgstr ""
 
-#: ../src/MainWindow.cc:634
+#: ../src/MainWindow.cc:730
 msgid "Site: "
 msgstr ""
 
-#: ../src/MainWindow.cc:635
+#: ../src/MainWindow.cc:731
 msgid "Result: "
 msgstr ""
 
-#: ../src/MainWindow.cc:636
+#: ../src/MainWindow.cc:732
 msgid "Opening: "
 msgstr ""
 
-#: ../src/MainWindow.cc:637
+#: ../src/MainWindow.cc:733
 msgid "Variation:  "
 msgstr ""
 
-#: ../src/MainWindow.cc:709
+#: ../src/MainWindow.cc:806
 msgid "new game"
 msgstr ""
 
-#: ../src/MainWindow.cc:712
+#: ../src/MainWindow.cc:809
 msgid "Will you  start a new game?"
 msgstr ""
 
-#: ../src/MainWindow.cc:743
+#: ../src/MainWindow.cc:840
 msgid "end game"
 msgstr ""
 
-#: ../src/MainWindow.cc:746
+#: ../src/MainWindow.cc:843
 msgid "Will you end this game?"
 msgstr ""
 
-#: ../src/MainWindow.cc:787
+#: ../src/MainWindow.cc:884
 msgid "Warning"
 msgstr ""
 
-#: ../src/MainWindow.cc:788
+#: ../src/MainWindow.cc:885
 msgid "Only rue game when you are go,so wait a minute!"
 msgstr ""
 
-#: ../src/MainWindow.cc:799
-msgid "Game End"
+#. robot win
+#: ../src/MainWindow.cc:900
+msgid ""
+"You are Lose! \n"
+" Are you want to start a new game?"
 msgstr ""
 
-#: ../src/MainWindow.cc:802
+#. robot lose
+#: ../src/MainWindow.cc:904
 msgid ""
-"Mate!\n"
-" Are you want to start a new game?"
+"Congratuations ! YOU WIN!\n"
+" start a new game click OK"
+msgstr ""
+
+#. robot want to draw
+#: ../src/MainWindow.cc:908
+msgid "Computer want to draw with you, are you agree?"
+msgstr ""
+
+#: ../src/MainWindow.cc:914
+msgid "Game End"
 msgstr ""
 
 #: ../data/gmchess.glade.h:1
