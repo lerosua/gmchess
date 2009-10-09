@@ -250,7 +250,7 @@ void MainWindow::init_conf()
 		mkdir(homepath,S_IRUSR|S_IWUSR|S_IXUSR);
 		GMConf["usebook"]="1";
 		GMConf["desktop_size"] = "1"; //0--small,1--big
-		GMConf["engine_depth"] ="8";
+		GMConf["engine_depth"] ="5";
 		save_conf();
 		return;
 	}
