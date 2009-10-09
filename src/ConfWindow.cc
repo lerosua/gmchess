@@ -60,7 +60,7 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 
 	this->add(*vBox);
 	this->set_transient_for(*parent);
-	this->set_size_request(521,577);
+	//this->set_size_request(521,577);
 	show_all();
 
 }

@@ -122,7 +122,7 @@ Board::Board(MainWindow& win) :
 	listTargets.push_back(Gtk::TargetEntry("text/plain"));
 
 
-	this->set_size_request(241,200);
+	this->set_size_request(221,277);
 	//this->set_size_request(521,577);
 
 	this->drag_dest_set(listTargets);
@@ -1032,7 +1032,7 @@ void Board::set_board_size(BOARDSIZE sizemode)
 			break;
 		case SMALL_BOARD:
 			is_small_board=true;
-			this->set_size_request(241,200);
+			this->set_size_request(221,277);
 			break;
 		default:
 			g_warn_if_reached();
