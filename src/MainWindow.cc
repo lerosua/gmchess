@@ -21,11 +21,13 @@
 #include <gtkmm/treeselection.h>
 #include <gtkmm/aboutdialog.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "BookView.h"
 #include "ConfWindow.h"
 #include "gmchess.h"
 
-#define version "0.20.3"
+#define version "0.20.4"
 
 Glib::ustring ui_info =
 "<ui>"
