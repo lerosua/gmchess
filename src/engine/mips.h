@@ -60,13 +60,13 @@ static __inline__ int Bsr(uint32_t Operand)
       return eax;
       */
 }
-#ifdef linux
+//#ifdef linux
 //#include <sys/time.h>
 //#include <sys/types.h>
 //#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#endif
+//#endif
 
 static __inline__ uint64_t TimeStampCounter(void)
 {
