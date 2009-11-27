@@ -1,165 +1,164 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# US English translations for gmchess package.
+# Copyright (C) 2009 THE gmchess'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gmchess package.
+#  <lerosua@gmail.com>, 2009.
+#  <gbreed@gmail.com>, 2009.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: gmchess 0.20.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-09 19:19+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2009-10-09 19:21+0700\n"
+"Last-Translator: Graham Breed <gbreed@gmail.com>\n"
+"Language-Team: English\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../src/MainWindow.cc:145
 msgid "bout"
-msgstr ""
+msgstr "Turn"
 
 #: ../src/MainWindow.cc:147
 msgid "step"
-msgstr ""
+msgstr "Move"
 
 #. File menu:
 #: ../src/MainWindow.cc:356
 msgid "_File"
-msgstr ""
+msgstr "_File"
 
 #: ../src/MainWindow.cc:358
 msgid "Open file"
-msgstr ""
+msgstr "_Open file"
 
 #: ../src/MainWindow.cc:359
 msgid "Open chessman File"
-msgstr ""
+msgstr "Open _Chessman file"
 
 #: ../src/MainWindow.cc:362
 msgid "Save as"
-msgstr ""
+msgstr "Save _As"
 
 #: ../src/MainWindow.cc:363
 msgid "Save as a chess pgn file"
-msgstr ""
+msgstr "Save game as a _PGN file"
 
 #. View menu:
 #: ../src/MainWindow.cc:371
 msgid "_View"
-msgstr ""
+msgstr "_View"
 
 #. Game menu:
 #: ../src/MainWindow.cc:378
 msgid "_Game"
-msgstr ""
+msgstr "_Game"
 
 #: ../src/MainWindow.cc:379
 msgid "_Fight to AI"
-msgstr ""
+msgstr "_Computer opponent"
 
 #: ../src/MainWindow.cc:381
 msgid "Free Play"
-msgstr ""
+msgstr "_Human opponent"
 
 #: ../src/MainWindow.cc:383
 msgid "Change Side"
-msgstr ""
+msgstr "Change side"
 
 #. Help menu:
 #: ../src/MainWindow.cc:386
 msgid "_Help"
-msgstr ""
+msgstr "_Help"
 
 #: ../src/MainWindow.cc:405
 msgid "Save File"
-msgstr ""
+msgstr "Save file"
 
 #: ../src/MainWindow.cc:447
 msgid "Choose File"
-msgstr ""
+msgstr "Choose file"
 
 #: ../src/MainWindow.cc:490
 msgid "All Files"
-msgstr ""
+msgstr "All Files"
 
 #: ../src/MainWindow.cc:506
 msgid "AI Warn"
-msgstr ""
+msgstr "AI warn"
 
 #: ../src/MainWindow.cc:509
 msgid "Open book view will close the AI game,Are you sure?"
-msgstr ""
+msgstr "Opening book view will close the game. Are you sure？"
 
 #: ../src/MainWindow.cc:552
 msgid "the file maybe not right format for chess"
-msgstr ""
+msgstr  "File format not recognized"
 
 #: ../src/MainWindow.cc:635
 msgid "GMChess is chinese chess game write by gtkmm"
-msgstr ""
+msgstr "GMChess is a Chinese chess game written by gtkmm"
 
 #: ../src/MainWindow.cc:637
-msgid ""
-"This program is licenced under GNU General Public Licence (GPL) version 2."
-msgstr ""
+msgid "This program is licenced under GNU General Public Licence (GPL) version 2."
+msgstr "This program is licensed under the GNU General Public Licence (GPL) version 2."
 
 #: ../src/MainWindow.cc:655
 msgid "Black"
-msgstr ""
+msgstr "Black"
 
 #: ../src/MainWindow.cc:658
 msgid "Red"
-msgstr ""
+msgstr "Red"
 
 #: ../src/MainWindow.cc:728
 msgid "Game: "
-msgstr ""
+msgstr "Game: "
 
 #: ../src/MainWindow.cc:729
 msgid "Time: "
-msgstr ""
+msgstr "Time: "
 
 #: ../src/MainWindow.cc:730
 msgid "Site: "
-msgstr ""
+msgstr "Site: "
 
 #: ../src/MainWindow.cc:731
 msgid "Result: "
-msgstr ""
+msgstr "Result: "
 
 #: ../src/MainWindow.cc:732
 msgid "Opening: "
-msgstr ""
+msgstr "Opening: "
 
 #: ../src/MainWindow.cc:733
 msgid "Variation:  "
-msgstr ""
+msgstr "Variation: "
 
 #: ../src/MainWindow.cc:806
 msgid "new game"
-msgstr ""
+msgstr "New game"
 
 #: ../src/MainWindow.cc:809
 msgid "Will you  start a new game?"
-msgstr ""
+msgstr "Start a new game？"
 
 #: ../src/MainWindow.cc:840
 msgid "end game"
-msgstr ""
+msgstr "End game"
 
 #: ../src/MainWindow.cc:843
 msgid "Will you end this game?"
-msgstr ""
+msgstr "End this game？"
 
 #: ../src/MainWindow.cc:884
 msgid "Warning"
-msgstr ""
+msgstr "Warning"
 
 #: ../src/MainWindow.cc:885
 msgid "Only rue game when you are go,so wait a minute!"
-msgstr ""
+msgstr "You can only take back a move on your turn!"
 
 #. robot win
 #: ../src/MainWindow.cc:900
@@ -167,6 +166,8 @@ msgid ""
 "You are Lose! \n"
 " Are you want to start a new game?"
 msgstr ""
+"You lost! \n"
+" Do you want to start a new game?"
 
 #. robot lose
 #: ../src/MainWindow.cc:904
@@ -174,176 +175,179 @@ msgid ""
 "Congratuations ! YOU WIN!\n"
 " start a new game click OK"
 msgstr ""
+"Congratulations! YOU WON!\n"
+" Click OK to start a new game"
 
 #. robot want to draw
 #: ../src/MainWindow.cc:908
 msgid "Computer want to draw with you, are you agree?"
-msgstr ""
+msgstr "The computer offers a draw.  Do you agree?"
 
 #: ../src/MainWindow.cc:914
 msgid "Game End"
-msgstr ""
+msgstr "Game Over "
 
 #: ../data/gmchess.glade.h:1
 msgid " "
-msgstr ""
+msgstr " "
 
 #: ../data/gmchess.glade.h:2
 msgid "          "
-msgstr ""
+msgstr "          "
 
 #: ../data/gmchess.glade.h:3
 msgid "  Computer "
-msgstr ""
+msgstr "  Computer "
 
 #: ../data/gmchess.glade.h:4
 msgid " Human "
-msgstr ""
+msgstr " Human "
 
 #: ../data/gmchess.glade.h:5
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: ../data/gmchess.glade.h:6
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: ../data/gmchess.glade.h:7
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: ../data/gmchess.glade.h:8
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: ../data/gmchess.glade.h:9
 msgid "5"
-msgstr ""
+msgstr "5"
 
 #: ../data/gmchess.glade.h:10
 msgid "6"
-msgstr ""
+msgstr "6"
 
 #: ../data/gmchess.glade.h:11
 msgid "7"
-msgstr ""
+msgstr "7"
 
 #: ../data/gmchess.glade.h:12
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: ../data/gmchess.glade.h:13
 msgid "9"
-msgstr ""
+msgstr "9"
 
 #: ../data/gmchess.glade.h:14
 msgid "<b>Comment</b>"
-msgstr ""
+msgstr "<b>Comment</b>"
 
 #: ../data/gmchess.glade.h:15
 msgid "<b>Engine status</b>"
-msgstr ""
+msgstr "Engine status"
 
 #: ../data/gmchess.glade.h:16
 msgid "Board Information"
-msgstr ""
+msgstr "Board Information"
 
 #: ../data/gmchess.glade.h:17
 msgid "Book"
-msgstr ""
+msgstr "Book"
 
 #: ../data/gmchess.glade.h:18
 msgid "Draw"
-msgstr ""
+msgstr "Draw"
 
 #: ../data/gmchess.glade.h:19
 msgid "Engine"
-msgstr ""
+msgstr "Engine"
 
 #: ../data/gmchess.glade.h:20
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: ../data/gmchess.glade.h:21
 msgid "Lost"
-msgstr ""
+msgstr "Resign"
 
 #: ../data/gmchess.glade.h:22
 msgid "Rue"
-msgstr ""
+msgstr "Take back"
 
 #: ../data/gmchess.glade.h:23
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: ../data/gmchess.glade.h:24
 msgid "chess"
-msgstr ""
+msgstr "chess"
 
 #: ../data/gmchess.glade.h:25
 msgid "eight"
-msgstr ""
+msgstr "8"
 
 #: ../data/gmchess.glade.h:26
 msgid "first station"
-msgstr ""
+msgstr "first station"
 
 #: ../data/gmchess.glade.h:27
 msgid "five"
-msgstr ""
+msgstr "5"
 
 #: ../data/gmchess.glade.h:28
 msgid "four"
-msgstr ""
+msgstr "4"
 
 #: ../data/gmchess.glade.h:29
 msgid "last move"
-msgstr ""
+msgstr "previous move"
 
 #: ../data/gmchess.glade.h:30
 msgid "next move"
-msgstr ""
+msgstr "next move"
 
 #: ../data/gmchess.glade.h:31
 msgid "nickname:"
-msgstr ""
+msgstr "name: "
 
 #: ../data/gmchess.glade.h:32
 msgid "nickname: "
-msgstr ""
+msgstr "name: "
 
 #: ../data/gmchess.glade.h:33
 msgid "nine"
-msgstr ""
+msgstr "9"
 
 #: ../data/gmchess.glade.h:34
 msgid "one"
-msgstr ""
+msgstr "1"
 
 #: ../data/gmchess.glade.h:35
 msgid "play time: "
-msgstr ""
+msgstr "play time: "
 
 #: ../data/gmchess.glade.h:36
 msgid "preview move"
-msgstr ""
+msgstr "preview move"
 
 #: ../data/gmchess.glade.h:37
 msgid "seven"
-msgstr ""
+msgstr "7"
 
 #: ../data/gmchess.glade.h:38
 msgid "six"
-msgstr ""
+msgstr "6"
 
 #: ../data/gmchess.glade.h:39
 msgid "step time: "
-msgstr ""
+msgstr "step time: "
 
 #: ../data/gmchess.glade.h:40
 msgid "three"
-msgstr ""
+msgstr "3"
 
 #: ../data/gmchess.glade.h:41
 msgid "two"
-msgstr ""
+msgstr "2"
+

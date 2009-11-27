@@ -905,7 +905,7 @@ int Engine::do_move(int mv)
 	uint32_t hanzi = iccs_to_hanzi(iccs);
 	Glib::ustring mv_line = hanzi_to_move_chinese(hanzi);
 
-	DLOG(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,eated = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
+	DLOG(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,taken = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
 	//if(eated != chessboard[dst])
 	//	return -1;
@@ -914,7 +914,7 @@ int Engine::do_move(int mv)
 	 * 则要将这个棋子的位置值置0,表示被吃掉，不再出现在棋盘上
 	 */
 	if(eated !=0){
-		DLOG(" %d has been eat\n",chessboard[dst]);
+		DLOG(" %d taken\n",chessboard[dst]);
 		chessmans[eated]=0;
 	}
 	chessboard[dst] = chessboard[src];
