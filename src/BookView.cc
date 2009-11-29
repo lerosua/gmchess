@@ -22,6 +22,7 @@
 #include <glib/gi18n.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/errno.h>
 
 
 BookView::BookView(MainWindow* parent):m_parent(parent)
@@ -167,11 +168,17 @@ int BookView::load_book_dir(const char* Path)
  
 	DIR *dirp;
 	struct dirent * node;
-	char cPath[256];
+	char cPath[1024];
 	struct stat pStat;
 
+	if(mkdir(Path, 0755)==-1 && errno != EEXIST) {
+		printf("Unable to create folder %s\n", Path);
+		return -1;
+	}
+
+
 	if((dirp= opendir(Path))==NULL){
-		printf("The dir %s is not exit\n",Path);
+		printf("Could not read folder %s\n",Path);
 		return -1;
 	}
 
