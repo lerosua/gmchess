@@ -118,7 +118,7 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
-	init_conf();
+	//init_conf();
 
 	board= Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
@@ -175,6 +175,7 @@ MainWindow::MainWindow():menubar(NULL)
 	p2_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_step_time"));
 #endif
 
+	init_conf();
 	this->signal_check_resize().connect(
 			sigc::mem_fun(*this,&MainWindow::on_size_change));
 	
