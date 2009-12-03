@@ -957,11 +957,11 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		if(pos_ != std::string::npos){
 
 			printf("计算机同意和棋\n");
-			if(timer.connected())
-				timer.disconnect();
-			parent.on_end_game(ROBOT_DRAW);
-
-			return true;
+			if (parent.on_end_game(ROBOT_DRAW)) {
+				if(timer.connected())
+					timer.disconnect();
+				return 1;
+			}
 		}
 		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
