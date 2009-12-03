@@ -894,7 +894,7 @@ void MainWindow::on_rue_game()
 	}
 
 }
-void MainWindow::on_end_game(OVERSTATUS _over)
+bool MainWindow::on_end_game(OVERSTATUS _over)
 {
 	Glib::ustring msg ;
 	switch(_over){
@@ -924,16 +924,15 @@ void MainWindow::on_end_game(OVERSTATUS _over)
 			case (Gtk::RESPONSE_OK): {
 				m_refTreeModel->clear();
 				board->new_game();
-                	        break;
+				return true;
                 	}
 
 			case (Gtk::RESPONSE_CANCEL): {
-				return;
-                	        break;
+				return false;
                 	}
 
 			default: {
-				return;
+				return false;
                 	        break;
                 	}
 		}
