@@ -2010,19 +2010,26 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 		return c_iccs.digit;
 	}
 	else if(6==cman_type){
+		/** 兵的步法生成*/
 
 		src_x = digit_to_alpha(c_hanzi.word[1]);
+		/** a_x,a_y 分别代表五个兵现在的坐标，已经取得当前色彩的兵*/
 		int a_x[5]={0};
 		int a_y[5]={0};
-		for(int i=0;i<5;i++){
+		int i;
+		for(i=0;i<5;i++){
 			a_x[i] = get_iccs_x(chessmans[i+27+num]);
 			a_y[i] = get_iccs_y(chessmans[i+27+num]);
+			DLOG("a_x[%d]=%c,a_y[%d]=%c\n",i,a_x[i],i,a_y[i]);
 		}
 
 		if(src_x<0){
+			/** x_rand[9]代表九条纵线*/
 			int x_rand[9]={0};
+			/** p1_line[5] 用来装兵的位置的，分别是（前，后）（前，中，后）（一，二，三，四),值应该是五个兵的标识第几个兵之类,从而可以用a_x[p1_line[0]]取得前兵的x坐标 */
 			int p1_line[5]={0};
 			int i;
+			int p_max=0; /** 一条线上最多兵的数值，主要用于区分"后"是两个还是三个的情况 */
 			for(i=0;i<5;i++)
 				p1_line[i]=10;
 
@@ -2034,6 +2041,11 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 					DLOG("ax[%d]=%c x_rand[%d]=%d\n",i,a_x[i],n,x_rand[n]);
 				}
 			}
+			/** 取得纵线中最多兵的数值*/
+			for(i=0;i<9;i++){
+				if(x_rand[i]>p_max)
+					p_max=x_rand[i];
+			}
 
 			int n=0;
 			int start=0;
@@ -2042,7 +2054,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
 				if(x_rand[i]>1){
 					/**此纵线上有两个以上兵*/
-					DLOG("此纵线有两兵以上\n");
+					DLOG("此纵线有两红兵以上\n");
 					for(int j=0;j<5;j++){
 						DLOG("i = %d\n",i);
 						if(i == (a_x[j]-'a')){
@@ -2051,8 +2063,8 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 						}
 					}
 					/** 为纵线上的棋子排序*/
-					for(i=start;i<n-1;i++)
-						for(int j=n-2;j>=i;j--){
+					for(int k=start;k<n-1;k++)
+						for(int j=n-2;j>=k;j--){
 							if(a_y[p1_line[j]]<a_y[ p1_line[j+1] ]){
 								int tmp=p1_line[j];
 								p1_line[j]=p1_line[j+1];
@@ -2061,6 +2073,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 					}
 					start=n;
+					n=0;
 				}
 
 
@@ -2069,20 +2082,23 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 			else{
 			for(i=0;i<9;i++){
 				DLOG("x_rand[%d]=%d\n",i,x_rand[i]);
+
 				if(x_rand[i]>1){
 					/**此纵线上有两个以上兵*/
-					DLOG("此纵线有两兵以上\n");
+					DLOG("此纵线有两黑卒以上\n");
+					n=0;
 					for(int j=0;j<5;j++){
 						DLOG("i = %d\n",i);
 						if(i == (a_x[j]-'a')){
 							p1_line[n]=j;
+							printf("xx------p1_line[%d]=%d\n",n,p1_line[n]);
 							n++;
-							printf("xx------p1_line[%d]=%d\n",n,p1_line[n-1]);
 						}
 					}
+					DLOG(" n=%d\n");
 					/** 为纵线上的棋子排序*/
-					for(i=start;i<n-1;i++)
-						for(int j=n-2;j>=i;j--){
+					for(int k=start;k<n-1;k++)
+						for(int j=n-2;j>=k;j--){
 							if(a_y[p1_line[j]]>a_y[ p1_line[j+1] ]){
 								int tmp=p1_line[j];
 								p1_line[j]=p1_line[j+1];
@@ -2091,6 +2107,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 					}
 					start=n;
+					n=0;
 				}
 
 
@@ -2116,12 +2133,15 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 
 			}
 			else if(c_hanzi.word[1] == 'c'){
-				if(start==2){
+				if(p_max==2){
 					src_x=a_x[p1_line[1]];
 					src_y=a_y[p1_line[1]];
+					DLOG("两兵 p1_line[1]=%d,src_x=%c,src_y=%c\n",p1_line[1],src_x,src_y);
+		
 				}else{
 					src_x=a_x[p1_line[2]];
 					src_y=a_y[p1_line[2]];
+					DLOG("三兵 src_x=%c,src_y=%c\n",src_x,src_y);
 				}
 			}
 			else if(c_hanzi.word[1] == 'd'){
