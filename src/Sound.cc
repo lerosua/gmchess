@@ -28,6 +28,39 @@ CSound::play (SOUND_EVENTS event)
 		case SND_EAT:
 			filename = SOUND_DIR"eat.wav";
 			break;
+		case SND_10:
+			filename = SOUND_DIR"10.wav";
+			break;
+		case SND_9:
+			filename = SOUND_DIR"9.wav";
+			break;
+		case SND_8:
+			filename = SOUND_DIR"8.wav";
+			break;
+		case SND_7:
+			filename = SOUND_DIR"7.wav";
+			break;
+		case SND_6:
+			filename = SOUND_DIR"6.wav";
+			break;
+		case SND_5:
+			filename = SOUND_DIR"5.wav";
+			break;
+		case SND_4:
+			filename = SOUND_DIR"4.wav";
+			break;
+		case SND_3:
+			filename = SOUND_DIR"3.wav";
+			break;
+		case SND_2:
+			filename = SOUND_DIR"2.wav";
+			break;
+		case SND_1:
+			filename = SOUND_DIR"1.wav";
+			break;
+		case SND_0:
+			filename = SOUND_DIR"0.wav";
+			break;
 		default:
 			filename = SOUND_DIR"";
 			break;

@@ -106,9 +106,10 @@ Board::Board(MainWindow& win) :
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
-	,red_time(500)
-	,black_time(500)
+	,red_time(600)
+	,black_time(600)
 	,count_time(0)
+	,limit_count_time(60)
 	,chessman_width(29)
 	,is_small_board(true)
 	,is_rev_board(false)
@@ -806,7 +807,7 @@ void Board::rue_move()
 		return;
 	DLOG(" how_step %d\n",m_engine.how_step());
 	int mv = m_engine.get_last_move_from_snapshot();
-	DLOG(" undo move %d\n");
+	//DLOG(" undo move %d\n");
 	m_engine.undo_move(mv);
 	parent.del_step_last_line();
 
@@ -862,8 +863,8 @@ void Board::free_game()
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
 	m_status = FREE_STATUS;
-	red_time=500;
-	black_time=500;
+	red_time=600;
+	black_time=600;
 
 	m_engine.init_snapshot(start_fen);
 	redraw();
@@ -1011,14 +1012,38 @@ bool Board::go_time()
 		count_time++;
 		red_time--;
 		parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(count_time));
-		//printf("red_time : %d\n",red_time);
+		/** when the user 's step time over the limit time,we must warn it,and when over time the has not go,it will be losed */
+		if(count_time>limit_count_time-10 && count_time<= limit_count_time){
+			printf("time out,you less time: %d\n",limit_count_time-count_time);
+			reckon_time_sound(limit_count_time-count_time);
+		}
+		else if(count_time > limit_count_time || red_time<0 ){
+			printf(" time limit ,you lose\n");
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(HUMAN_OVER_TIME);
+			count_time =0;
+
+		}
 	}
 	else{
 		black_time--;
 		count_time++;
 		parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(count_time));
 		//printf("black_time: %d\n",black_time);
+		if(count_time>limit_count_time-10 && count_time<=limit_count_time){
+			printf("time out,bot waster much time\n");
+			m_robot.send_ctrl_command("stop\n");
+		}
+		else if(count_time >limit_count_time || black_time<0 ){
+			printf(" time limit ,robot lose\n");
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_OVER_TIME);
+			count_time =0;
+		}
 	}
+
 
 	return true;
 }
@@ -1038,4 +1063,47 @@ void Board::set_board_size(BOARDSIZE sizemode)
 			g_warn_if_reached();
 			break;
 	}
+}
+
+void Board::reckon_time_sound(int time_)
+{
+	switch(time_){
+		case 0:
+			CSound::play(SND_0);
+			break;
+		case 1:
+			CSound::play(SND_1);
+			break;
+		case 2:
+			CSound::play(SND_2);
+			break;
+		case 3:
+			CSound::play(SND_3);
+			break;
+		case 4:
+			CSound::play(SND_4);
+			break;
+		case 5:
+			CSound::play(SND_5);
+			break;
+		case 6:
+			CSound::play(SND_6);
+			break;
+		case 7:
+			CSound::play(SND_7);
+			break;
+		case 8:
+			CSound::play(SND_8);
+			break;
+		case 9:
+			CSound::play(SND_9);
+			break;
+		case 10:
+			CSound::play(SND_10);
+			break;
+		default:
+			break;
+
+	}
+
 }

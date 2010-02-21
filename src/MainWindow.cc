@@ -620,6 +620,7 @@ void MainWindow::on_menu_help()
 
 }
 
+
 void MainWindow::on_menu_about()
 {
 	static Gtk::AboutDialog*  about(0);
@@ -910,6 +911,12 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 			//robot want to draw
 			msg=_("Computer want to draw with you, are you agree?");
 			break;
+		case ROBOT_OVER_TIME:
+			// robot overload time,lose
+			msg = _("The Enemy overload the time, You Win!");
+			break;
+		case HUMAN_OVER_TIME:
+			msg = _("You overload the time, You Lose!");
 		default:
 			break;
 

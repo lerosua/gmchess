@@ -16,7 +16,18 @@ enum SOUND_EVENTS
 	SND_EAT,
 	SND_CHECK,
 	SND_MOVE,
-	SND_CHOOSE
+	SND_CHOOSE,
+	SND_10,
+	SND_9,
+	SND_8,
+	SND_7,
+	SND_6,
+	SND_5,
+	SND_4,
+	SND_3,
+	SND_2,
+	SND_1,
+	SND_0
 };
 
 namespace CSound

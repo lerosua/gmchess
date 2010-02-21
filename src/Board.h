@@ -165,6 +165,8 @@ class Board : public Gtk::DrawingArea
 		void set_board_size(BOARDSIZE sizemode);
 		/** 设置引擎搜索深度*/
 		void set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook);
+		/** 倒计时的声音*/
+		void reckon_time_sound(int time_);
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -206,6 +208,9 @@ class Board : public Gtk::DrawingArea
 		int black_time;
 		/** 计时，走秒*/
 		int count_time;
+		/** 每步时的极限秒数*/
+		int limit_count_time;
+
 		sigc::connection timer;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		//bool user_player;
