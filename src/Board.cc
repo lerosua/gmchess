@@ -919,6 +919,7 @@ void Board::new_game()
 	moves_lines = postion_str + std::string(start_fen);
 	redraw();
 
+	parent.textview_engine_log_clear();
 	//parent.change_play(m_engine.red_player());
 	parent.change_play(is_human_player());
 
