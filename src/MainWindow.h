@@ -59,6 +59,10 @@ class MainWindow:public Gtk::Window
 		/** treeview 双击事件回调*/
 		bool on_treeview_click(GdkEventButton* ev);
 		void set_comment(const std::string& f_comment);
+		/** 将引擎的返回显示到相关textview里 */
+		void show_textview_engine_log(const std::string& f_text);
+		/** 清空引擎textview里的内容*/
+		void textview_engine_log_clear();
 		/** 添加treeview数据*/
 		void add_step_line(int num,const Glib::ustring& f_line);
 		/** 删除treeview的最后一行,悔棋用的*/
@@ -126,6 +130,7 @@ class MainWindow:public Gtk::Window
 		BookView*			m_bookview;
 		Gtk::ButtonBox*			buttonbox_war;
 		Gtk::TextView*			text_comment;
+		Gtk::TextView*			text_engine_log;
 		Gtk::Notebook*			m_notebook;
 		ConfWindow*			confwindow;
 		Glib::RefPtr<Gdk::Pixbuf>	ui_logo ;

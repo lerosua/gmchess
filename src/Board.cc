@@ -954,6 +954,8 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 		*p = 0;
 		printf(buf);
 		std::string str_buf(buf);
+		parent.show_textview_engine_log(str_buf);
+
 		size_t pos_=str_buf.find("draw");
 		if(pos_ != std::string::npos){
 
