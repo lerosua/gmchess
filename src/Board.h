@@ -165,6 +165,8 @@ class Board : public Gtk::DrawingArea
 		void set_board_size(BOARDSIZE sizemode);
 		/** 设置引擎搜索深度*/
 		void set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook);
+		/** 设置对战时的走棋时间和总局时间*/
+		void set_war_time(int _step_time,int _play_time);
 		/** 倒计时的声音*/
 		void reckon_time_sound(int time_);
 		

@@ -196,6 +196,10 @@ MainWindow::MainWindow():menubar(NULL)
 	int _depth = atoi(GMConf["engine_depth"].c_str());
 	g_log("Mainwindow",G_LOG_LEVEL_INFO,"depth %d",_depth);
 	board->set_level_config(_depth,0,0,0,0,0,atoi(GMConf["usebook"].c_str()));
+	int _step_time= atoi(GMConf["step_time"].c_str());
+	int _play_time= atoi(GMConf["play_time"].c_str());
+	if(_step_time>0&&_step_time<300 && _play_time>0)
+		board->set_war_time(_step_time,_play_time);
 }
 
 MainWindow::~MainWindow()
@@ -655,8 +659,8 @@ void MainWindow::on_menu_about()
 	static Gtk::AboutDialog*  about(0);
 	if(about == 0){
 		std::vector<Glib::ustring> authors;
-		authors.push_back("lerosua ");
-		authors.push_back("wind");
+		authors.push_back("lerosua@gmail.com ");
+		authors.push_back("wind(xihels@gmail.com)");
 		about = new Gtk::AboutDialog ;
 		about->set_logo(ui_logo);
 		if(GTKMM_MAJOR_VERSION==2 && GTKMM_MINOR_VERSION>=12)

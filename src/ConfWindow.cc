@@ -22,6 +22,8 @@
 ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 					     ,m_size_big(true)
 					     ,m_depth("10")
+					     ,m_step_time("60")
+					     ,m_play_time("10")
 {
 	vbox_xml = Gtk::Builder::create_from_file(conf_ui,"conf_vbox");
 	if(!vbox_xml)
@@ -50,11 +52,15 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	std::string& use_book = GMConf["usebook"];
 	m_usebook = (!use_book.empty()) && (use_book[0] == '1'); 
 	m_depth = GMConf["engine_depth"] ;
+	m_step_time = GMConf["step_time"] ;
+	m_play_time = GMConf["play_time"] ;
 
 	m_pVariablesMap = new VariablesMap(vbox_xml);
 	m_pVariablesMap->connect_widget("b_radiobutton",m_size_big);
 	m_pVariablesMap->connect_widget("cb_book",m_usebook);
 	m_pVariablesMap->connect_widget("sb_depth",m_depth);
+	m_pVariablesMap->connect_widget("entry_step_time",m_step_time);
+	m_pVariablesMap->connect_widget("entry_play_time",m_play_time);
 
 	m_pVariablesMap->transfer_variables_to_widgets();
 
@@ -95,4 +101,6 @@ void ConfWindow::write_to_GMConf()
 	GMConf["usebook"] = m_usebook? "1":"0";
 	GMConf["desktop_size"] = m_size_big?"1":"0";
 	GMConf["engine_depth"] = m_depth;
+	GMConf["step_time"] = m_step_time;
+	GMConf["play_time"] = m_play_time;
 }

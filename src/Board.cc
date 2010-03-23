@@ -891,6 +891,13 @@ void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int 
 	m_usebook = _usebook;
 
 }
+
+void Board::set_war_time(int _step_time,int _play_time)
+{
+	limit_count_time = _step_time;
+
+}
+
 void Board::set_level()
 {
 
