@@ -1058,7 +1058,7 @@ where you want put piece.
                             <property name="spacing">5</property>
                             <property name="homogeneous">True</property>
                             <child>
-                              <object class="GtkButton" id="button_rking">
+                              <object class="GtkToggleButton" id="button_rking">
                                 <property name="label" translatable="yes">&#x5E05;</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -1182,7 +1182,7 @@ where you want put piece.
                             <property name="orientation">vertical</property>
                             <property name="spacing">5</property>
                             <child>
-                              <object class="GtkButton" id="button_bking">
+                              <object class="GtkToggleButton" id="button_bking">
                                 <property name="label" translatable="yes">&#x5C06;</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -1301,7 +1301,15 @@ where you want put piece.
                       <placeholder/>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkToggleButton" id="togglebutton1">
+                        <property name="label" translatable="yes">togglebutton</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing>
+                        <property name="position">3</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
