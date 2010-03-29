@@ -663,7 +663,6 @@ void MainWindow::on_menu_about()
 			about->set_program_name("GMChess");
 		about->set_version(version);
 		about->set_website("http://lerosua.org");
-		//about->set_website_label("lerosua");
 		about->set_copyright("Copyright (c) 2009 lerosua");
 		about->set_comments(_("GMChess is chinese chess game write by gtkmm"));
 		about->set_authors(authors);
