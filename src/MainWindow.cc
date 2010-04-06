@@ -27,7 +27,7 @@
 #include "ConfWindow.h"
 #include "gmchess.h"
 
-#define version "0.20.5"
+#define version "0.20.7"
 
 Glib::ustring ui_info =
 "<ui>"
