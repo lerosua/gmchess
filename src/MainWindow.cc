@@ -167,6 +167,8 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml->get_widget("P2_war_time",p2_war_time);
 	ui_xml->get_widget("P1_step_time",p1_step_time);
 	ui_xml->get_widget("P2_step_time",p2_step_time);
+	ui_xml->get_widget("P1_name",p1_name);
+	ui_xml->get_widget("P2_name",p2_name);
 #if 0
 	p1_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p1"));
 	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
@@ -806,6 +808,7 @@ void MainWindow::set_status()
 			btn_rue->set_sensitive(1-f_use);
 			break;
 		case FIGHT_STATUS:
+		case NETWORK_STATUS:
 			btn_next->set_sensitive(1-f_use);
 			btn_prev->set_sensitive(1-f_use);
 			btn_start->set_sensitive(1-f_use);
@@ -827,10 +830,23 @@ void MainWindow::set_status()
 			btn_draw->set_sensitive(1-f_use);
 			btn_rue->set_sensitive(1-f_use);
 			break;
-		case NETWORK_STATUS:
+		default:
 			break;
 	};
 
+}
+
+void MainWindow::on_network_game(const std::string me_name,const std::string& enemy_name,bool role_red_)
+{
+	p1_name->set_text(me_name);
+	p2_name->set_text(enemy_name);
+	if(!role_red_)
+		board->rev_game();
+	board->net_game();
+	set_status();
+	btn_begin->set_sensitive(false);
+		
+	
 }
 
 void MainWindow::on_begin_game()
@@ -888,6 +904,7 @@ void MainWindow::on_lose_game()
                     }
 
             case (Gtk::RESPONSE_CANCEL): {
+                board->free_game(false);
                 set_status();
                             break;
                     }
@@ -968,6 +985,8 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
                 	}
 
 			case (Gtk::RESPONSE_CANCEL): {
+				board->free_game(false);
+				set_status();
 				return false;
                 	}
 

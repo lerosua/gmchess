@@ -93,7 +93,11 @@ class Board : public Gtk::DrawingArea
 		void new_game();
 		/** 自由模式，即摆棋*/
 		/** free game mode*/
-		void free_game();
+		/** @param redraw 为真则重画棋盘，假则保留棋盘现状*/
+		void free_game(bool redraw=true);
+		/** 网络对战初始化*/
+		/** network play game initial*/
+		void net_game();
 		/** 读取AI的输出，并根据输出的着法走棋*/
 		/** read the output of AI,then go chess*/
 		bool robot_log(const Glib::IOCondition& condition);
@@ -145,6 +149,9 @@ class Board : public Gtk::DrawingArea
 		/** 标识是否与电脑AI对战*/
 		/** check is fight to AI */
 		bool is_fight_to_robot(){ return m_status == FIGHT_STATUS;}
+		/** 标识是否网络对战中*/
+		/** check is fight on network */
+		bool is_network_game() { return m_status == NETWORK_STATUS; }
 		/** 检测是不是当前用户走棋 -- check if the human user going to move */
 		bool is_human_player(){ return m_engine.red_player()-m_human_black ; }
 		/** 走时函数*/

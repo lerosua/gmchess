@@ -5,7 +5,7 @@
  *
  *    Description:  the ai handle
  *
- *        Version:  0.20
+ *        Version:  0.30
  *        Created:  2009年03月31日 13时55分18秒
  *       Revision:  none
  *       Compiler:  g++
