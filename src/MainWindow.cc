@@ -601,7 +601,9 @@ void MainWindow::open_file(const std::string& filename)
 
 void MainWindow::on_menu_war_to_ai()
 {
-	on_begin_game();
+	//on_begin_game();
+	//just test network game ; when finish test,please delete me
+	on_network_game("lerosua","igoogle",false);
 }
 
 void MainWindow::on_menu_free_play()
@@ -838,11 +840,11 @@ void MainWindow::set_status()
 
 void MainWindow::on_network_game(const std::string me_name,const std::string& enemy_name,bool role_red_)
 {
-	p1_name->set_text(me_name);
-	p2_name->set_text(enemy_name);
+	p1_name->set_text(enemy_name);
+	p2_name->set_text(me_name);
 	if(!role_red_)
 		board->rev_game();
-	board->net_game();
+	board->start_network();
 	set_status();
 	btn_begin->set_sensitive(false);
 		

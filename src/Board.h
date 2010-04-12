@@ -15,6 +15,7 @@
 #include "Engine.h"
 #include "Pgnfile.h"
 #include "robot.h"
+#include "pidgin.h"
 
 class MainWindow;
 
@@ -90,17 +91,19 @@ class Board : public Gtk::DrawingArea
 		void start_robot();
 		/** 开启新游戏，即在引擎已启动的情况下重新游戏*/
 		/** start a new game,with the presence engine*/
-		void new_game();
+		void new_game(BOARD_STATUS _status = FIGHT_STATUS);
 		/** 自由模式，即摆棋*/
 		/** free game mode*/
 		/** @param redraw 为真则重画棋盘，假则保留棋盘现状*/
 		void free_game(bool redraw=true);
 		/** 网络对战初始化*/
 		/** network play game initial*/
-		void net_game();
+		void start_network();
 		/** 读取AI的输出，并根据输出的着法走棋*/
 		/** read the output of AI,then go chess*/
 		bool robot_log(const Glib::IOCondition& condition);
+		/** 读取网络的输出，并根据输出的减法走棋*/
+		bool network_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
 		/** return the first station*/
 		void start_move();
@@ -187,6 +190,7 @@ class Board : public Gtk::DrawingArea
 		Engine m_engine;
 		/** AI引擎*/
 		Robot m_robot;
+		Pidgin m_network;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
 		/** 传递给AI的着法状态*/
@@ -210,7 +214,7 @@ class Board : public Gtk::DrawingArea
 		/** 步时 */
 		int m_step;
 		/** 棋局状态*/
-		int m_status;
+		BOARD_STATUS m_status;
 		/** 红方的局时*/
 		int red_time;
 		/** 黑方的局时*/

@@ -83,7 +83,7 @@ enum {
  * 程序棋局状态，分别为读谱，电脑对战，网络对战,自由摆棋
  * board station mode
  */
-enum { READ_STATUS , FIGHT_STATUS, NETWORK_STATUS,FREE_STATUS,NULL_STATUS };
+enum BOARD_STATUS{ READ_STATUS , FIGHT_STATUS, NETWORK_STATUS,FREE_STATUS,NULL_STATUS };
 
 /** 棋子数组示例*/
 const int PieceExample[48] = {

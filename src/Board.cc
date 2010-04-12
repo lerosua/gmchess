@@ -136,6 +136,7 @@ Board::Board(MainWindow& win) :
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
+	m_network.set_out_slot(sigc::mem_fun(*this, &Board::network_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 
 	this->show_all();
@@ -297,7 +298,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 {
 	/** 对战状态下，电脑走棋时就不响应鼠标事件了*/
 	/** if fight with AI, the compute doesn't handle the events */
-	if(is_fight_to_robot()){
+	if(is_fight_to_robot()||is_network_game()){
 		if(!is_human_player())
 			return true;
 
@@ -324,7 +325,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				}
 				/** 对战状态中，选了对方棋子无效*/
 				/** choose the enemy chessman is useless on war */
-				if(is_fight_to_robot()){ 
+				if(is_fight_to_robot()||is_network_game()){ 
 					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
@@ -766,7 +767,8 @@ int Board::try_move(int mv)
 		}
 		else if(is_network_game()){
 			/** 将iccs_str走法传给网络*/
-
+			parent.change_play(is_human_player());
+			count_time=0;
 
 		}
 
@@ -887,7 +889,7 @@ void Board::start_robot()
 
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
-	new_game();
+	new_game(m_status);
 }
 
 void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook)
@@ -920,26 +922,24 @@ void Board::set_level()
 		m_robot.send_ctrl_command("setoption usebook true\n");
 }
 
-void Board::net_game()
+void Board::start_network()
 {
-	m_status = NETWORK_STATUS;
+	m_network.start();
+	new_game(NETWORK_STATUS);
 
-	m_engine.init_snapshot(start_fen);
-	moves_lines.clear();
-	moves_lines = postion_str + std::string(start_fen);
-	redraw();
-	parent.textview_engine_log_clear();
-	parent.change_play(is_human_player());
-	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
 }
 
-void Board::new_game()
+void Board::new_game(BOARD_STATUS _status)
 {
-	m_status = FIGHT_STATUS;
+	//m_status = FIGHT_STATUS;
+	m_status = _status;
 
 	m_engine.init_snapshot(start_fen);
-	m_robot.send_ctrl_command("setoption newgame\n");
-	set_level();
+
+	if(m_status == FIGHT_STATUS){
+		m_robot.send_ctrl_command("setoption newgame\n");
+		set_level();
+	}
 
 
 	moves_lines.clear();
@@ -953,12 +953,16 @@ void Board::new_game()
 	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
 	/**如果是用户选择黑方，则电脑先走棋 -- if user choose black,the robot go moves first*/
 	if(m_human_black){
-		moves_lines =moves_lines +std::string(" -- 0 1 ");
-		m_robot.send_ctrl_command(moves_lines.c_str());
-		m_robot.send_ctrl_command("\n");
-		char str_cmd[256];
-		sprintf(str_cmd,"go depth %d \n",m_search_depth);
-		m_robot.send_ctrl_command(str_cmd);
+		if(m_status == FIGHT_STATUS){
+			moves_lines =moves_lines +std::string(" -- 0 1 ");
+			m_robot.send_ctrl_command(moves_lines.c_str());
+			m_robot.send_ctrl_command("\n");
+			char str_cmd[256];
+			sprintf(str_cmd,"go depth %d \n",m_search_depth);
+			m_robot.send_ctrl_command(str_cmd);
+		}else if(m_status == NETWORK_STATUS){
+
+		}
 
 	}
 
@@ -966,6 +970,63 @@ void Board::new_game()
 	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
 }
 
+bool Board::network_log(const Glib::IOCondition& condition)
+{
+	char buf[1024];
+	int buf_len = 1024;
+	char* p = buf;
+	for (; buf_len > 0; ) {
+		int len = m_network.get_network_log(p, buf_len);
+		if (len <= 0)
+			break;
+		p += len;
+		buf_len -= len;
+	}
+
+	if (buf_len > 0) {
+		*p = 0;
+		printf(buf);
+		std::string str_buf(buf);
+#if 0
+
+		size_t pos_=str_buf.find("draw");
+		if(pos_ != std::string::npos){
+
+			printf("计算机同意和棋\n");
+			if (parent.on_end_game(ROBOT_DRAW)) {
+				if(timer.connected())
+					timer.disconnect();
+				return 1;
+			}
+		}
+		pos_=str_buf.find("resign");
+		if(pos_ != std::string::npos){
+
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_LOSE);
+			return true;
+		}
+		pos_=str_buf.find("nobestmove");
+		if(pos_ != std::string::npos){
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_LOSE);
+			return true;
+		}
+#endif
+		size_t pos=str_buf.find("bestmoves:");
+		if(pos != std::string::npos){
+			std::string t_mv=str_buf.substr(pos+10,4);
+			std::cout<<"get network mv = "<<t_mv<<std::endl;
+			int mv = m_engine.iccs_str_to_move(t_mv);
+			try_move(mv);
+		}
+	}
+
+	return true;
+
+}
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
 	/*for testing,delete me*/
