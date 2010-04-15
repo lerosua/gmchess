@@ -106,10 +106,10 @@ class Board : public Gtk::DrawingArea
 		bool network_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
 		/** return the first station*/
-		void start_move();
+		void first_move();
 		/** 去到最后的局面*/
 		/** go to the last station */
-		void end_move();
+		void last_move();
 		/** 读谱状态下走下一步棋*/
 		/**  go next on reading chessbook*/
 		void next_move();

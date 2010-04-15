@@ -39,9 +39,9 @@ class MainWindow:public Gtk::Window
 		MainWindow();
 		~MainWindow();
 		/** 回到最初局面*/
-		void on_start_move();
+		void on_first_move();
 		/** 去到最后的局面*/
-		void on_end_move();
+		void on_last_move();
 		/** 执行下一步*/
 		void on_next_move();
 		/** 执行上一步*/

@@ -102,9 +102,9 @@ MainWindow::MainWindow():menubar(NULL)
 #endif
 
 	btn_start->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_start_move));
+			sigc::mem_fun(*this,&MainWindow::on_first_move));
 	btn_end->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_end_move));
+			sigc::mem_fun(*this,&MainWindow::on_last_move));
 	btn_prev->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_back_move));
 	btn_next->signal_clicked().connect(
@@ -372,14 +372,14 @@ void MainWindow::on_back_move()
 	board->back_move();
 	show_treeview_step();
 }
-void MainWindow::on_start_move()
+void MainWindow::on_first_move()
 {
-	board->start_move();
+	board->first_move();
 	m_treeview.scroll_to_point(1,1);
 }
-void MainWindow::on_end_move()
+void MainWindow::on_last_move()
 {
-	board->end_move();
+	board->last_move();
 	show_treeview_step();
 }
 

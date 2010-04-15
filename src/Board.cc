@@ -151,6 +151,7 @@ Board::~Board()
 		timer.disconnect();
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
+	m_network.stop();
 }
 
 void Board::load_images()
@@ -597,7 +598,7 @@ void Board::draw_board()
 	}
 }
 
-void Board::start_move()
+void Board::first_move()
 {
 	m_step = 0;
 	m_engine.get_snapshot(m_step);
@@ -611,10 +612,11 @@ void Board::start_move()
 	else
 		parent.set_comment(" ");
 
+	CSound::play(SND_MOVE);
 	redraw();
 }
 
-void Board::end_move()
+void Board::last_move()
 {
 	m_step = m_engine.how_step();
 	m_engine.get_snapshot(m_step);
@@ -628,6 +630,7 @@ void Board::end_move()
 	else
 		parent.set_comment(" ");
 
+	CSound::play(SND_MOVE);
 	redraw();
 }
 void Board::next_move()
@@ -869,6 +872,7 @@ void Board::free_game(bool redraw_)
 
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
+	m_network.stop();
 	m_status = FREE_STATUS;
 
 	if(redraw_){
