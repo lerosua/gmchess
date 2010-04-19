@@ -87,6 +87,7 @@ class MainWindow:public Gtk::Window
 		/** resize the chess by board*/
 		void on_size_change();
 		void save_conf();
+		void watch_socket(int fd);
 	protected:
 		/** 初始化配置文件*/
 		void init_conf();

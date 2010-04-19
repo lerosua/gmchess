@@ -103,6 +103,7 @@ Board::Board(MainWindow& win) :
 	m_status(FREE_STATUS),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
+	,fd_skt(-1)
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
@@ -136,7 +137,7 @@ Board::Board(MainWindow& win) :
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
-	m_network.set_out_slot(sigc::mem_fun(*this, &Board::network_log));
+	//m_network.set_out_slot(sigc::mem_fun(*this, &Board::network_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 
 	this->show_all();
@@ -1203,4 +1204,77 @@ void Board::reckon_time_sound(int time_)
 
 	}
 
+}
+
+void Board::watch_socket(int fd)
+{
+	fd_skt=fd;
+	Glib::signal_io().connect(sigc::mem_fun(*this,&Board::on_network_io),
+			fd_skt, Glib::IO_IN);
+
+}
+bool Board::on_network_io(const Glib::IOCondition& )
+{
+
+	int fd_cli = -1;
+	EC_THROW(-1 == (fd_cli = accept(fd_skt, NULL, 0)));
+	char buf[1024];
+	size_t len = read(fd_cli, &buf[0], 1023);
+	buf[len]=0;
+	if (len > 0) {
+		std::string str_buf(buf);
+		size_t pos_=str_buf.find("network-game");
+		if(pos_ != std::string::npos){
+			//start network game
+			parent.on_network_game("lerosua","enemy");
+		}
+		pos_ = str_buf.find("resign");
+		if(pos_ != std::string::npos){
+
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_LOSE);
+			return true;
+		}
+		size_t pos=str_buf.find("moves:");
+		if(pos != std::string::npos){
+			std::string t_mv=str_buf.substr(pos+6,4);
+			std::cout<<"get robot mv = "<<t_mv<<std::endl;
+			int mv = m_engine.iccs_str_to_move(t_mv);
+			try_move(mv);
+		}
+
+#if 0
+		if(0 == strncmp("[{game:gmchess,",buf,15)){
+			printf("get cmd %s\n",buf);
+			string cmd=string(buf);
+			network_package* net_pac = parse_network_package(cmd);
+
+			if(net_pac->action=="ask"){
+				//对方请求的包
+				if(net_pac->status == "start"){
+					//对方请求游戏
+
+				}
+
+
+			}else if(net_pac->action == "reply"){
+				//对方回复的包
+
+
+			}else if(net_pac->action == "working"){
+				//对方走棋的包
+
+				int mv = m_engine.iccs_str_to_move(net_pac->moves);
+				try_move(mv);
+
+			}
+
+
+
+		}
+#endif
+	}
+	close(fd_cli);
+	return true;
 }
