@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "position.h"
 #include "book.h"
 
+#pragma GCC push_option
+#pragma GCC optimize("00")
 int GetBookMoves(const PositionStruct &pos, const char *szBookFile, MoveStruct *lpmvs) {
   BookFileStruct BookFile;
   PositionStruct posScan;
@@ -93,6 +95,7 @@ int GetBookMoves(const PositionStruct &pos, const char *szBookFile, MoveStruct *
   }
   BookFile.Close();
 
+
   // 6. 对着法按分值排序
   for (i = 0; i < nMoves - 1; i ++) {
     for (j = nMoves - 1; j > i; j --) {
@@ -103,3 +106,4 @@ int GetBookMoves(const PositionStruct &pos, const char *szBookFile, MoveStruct *
   }
   return nMoves;
 }
+#pragma GCC pop_option

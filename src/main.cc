@@ -46,7 +46,6 @@ int singleon(const std::string& url)
 	if(bind(sockfd,(struct sockaddr*)&srvaddr,
 			sizeof(struct sockaddr))==-1){
 		printf("there has another gmchess running\n");
-		exit(0);
 #if 1
 		if(url.empty())
 			exit(0);

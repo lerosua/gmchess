@@ -9,9 +9,15 @@
 #include <vector>
 #include <string.h>
 #include <cassert>
+#include <netdb.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
 #include "Engine.h"
 #include "MainWindow.h"
 #include "Sound.h"
+#include "ec_throw.h"
 
 /** 边界的宽度*/
 /**  width of border */
@@ -103,7 +109,7 @@ Board::Board(MainWindow& win) :
 	m_status(FREE_STATUS),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
-	,fd_skt(-1)
+	fd_skt(-1),
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
