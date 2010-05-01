@@ -49,7 +49,12 @@ class MainWindow:public Gtk::Window
 		/** 开始AI对战*/
 		void on_begin_game();
 		/** 开始网络对战*/
-		void on_network_game(const std::string me_,const std::string& enemy_,bool role_red_);
+		/**
+		 * @param me_ 已方名字
+		 * @param enemy_ 对方名字
+		 * @param role_red_ 已方角色
+		 */
+		void on_network_game(const std::string me_,const std::string& enemy_,bool role_red_=true);
 		/** 认输*/
 		void on_lose_game();
 		/** 求和*/
