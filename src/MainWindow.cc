@@ -1012,3 +1012,8 @@ void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustr
 	p1_war_time->set_text(f_time);
 	p1_step_time->set_text(c_time);
 }
+void MainWindow::watch_socket(int fd)
+{
+	board->watch_socket(fd);
+	
+}

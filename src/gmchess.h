@@ -31,6 +31,7 @@ extern TGMConf GMConf;
 //保存的最大历史局面数
 //save the max number of history chess station
 const int MAX_COUNT=512;
+const int GMPORT=20125;
 
 // 每种子力的开始序号和结束序号
  const int KING_FROM = 0;

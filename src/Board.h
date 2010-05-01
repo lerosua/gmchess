@@ -34,6 +34,8 @@ class Board : public Gtk::DrawingArea
 		Board(MainWindow& win);
 		~Board();
 		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
+		void watch_socket(int fd);
+		bool on_network_io(const Glib::IOCondition&);
 	protected:
 		void on_map();
 		bool on_expose_event(GdkEventExpose* ev);
@@ -224,6 +226,7 @@ class Board : public Gtk::DrawingArea
 		/** 每步时的极限秒数*/
 		int limit_count_time;
 
+		int fd_skt;
 		sigc::connection timer;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		//bool user_player;
