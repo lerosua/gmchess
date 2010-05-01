@@ -844,6 +844,7 @@ void MainWindow::on_network_game(const std::string me_name,const std::string& en
 	p2_name->set_text(me_name);
 	if(!role_red_)
 		board->rev_game();
+	m_refTreeModel->clear();
 	board->start_network();
 	set_status();
 	btn_begin->set_sensitive(false);

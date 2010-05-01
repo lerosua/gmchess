@@ -18,7 +18,6 @@ gmchess_SOURCES= \
 	BookView.cc \
 	Sound.cc   \
 	robot.cc   \
-	pidgin.cc  \
 	ec_throw.cpp \
 	ConfWindow.cc \
 	variablesmap.cc \
@@ -34,7 +33,6 @@ noinst_HEADERS = \
 		 BookView.h \
 		 Sound.h    \
 		 robot.h 	\
-		 pidgin.h 	\
 		 ec_throw.h 	\
 		 ConfWindow.h  \
 		 variablesmap.h \

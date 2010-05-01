@@ -15,7 +15,7 @@
 #include "Engine.h"
 #include "Pgnfile.h"
 #include "robot.h"
-#include "pidgin.h"
+//#include "pidgin.h"
 
 class MainWindow;
 
@@ -36,6 +36,11 @@ class Board : public Gtk::DrawingArea
 		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
 		void watch_socket(int fd);
 		bool on_network_io(const Glib::IOCondition&);
+		int init_send_socket();
+		void close_send_socket();
+		void send_to_socket(const std::string& cmd_);
+
+
 	protected:
 		void on_map();
 		bool on_expose_event(GdkEventExpose* ev);
@@ -192,7 +197,7 @@ class Board : public Gtk::DrawingArea
 		Engine m_engine;
 		/** AI引擎*/
 		Robot m_robot;
-		Pidgin m_network;
+		//Pidgin m_network;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
 		/** 传递给AI的着法状态*/
@@ -226,7 +231,10 @@ class Board : public Gtk::DrawingArea
 		/** 每步时的极限秒数*/
 		int limit_count_time;
 
-		int fd_skt;
+		/** 接受命令的socket*/
+		int fd_recv_skt;
+		/** 发送命令的socket*/
+		int fd_send_skt;
 		sigc::connection timer;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		//bool user_player;
