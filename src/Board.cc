@@ -1238,10 +1238,15 @@ bool Board::on_network_io(const Glib::IOCondition& )
        if (len > 0) {
 
 		std::string str_buf(buf);
-		size_t pos_=str_buf.find("network-game");
+		size_t pos_=str_buf.find("network-game-red");
 		if(pos_ != std::string::npos){
 			//start network game
-			parent.on_network_game("lerosua","enemy");
+			parent.on_network_game("lerosua","enemy",true);
+		}
+		pos_=str_buf.find("network-game-black");
+		if(pos_ != std::string::npos){
+			//start network game
+			parent.on_network_game("lerosua","enemy",false);
 		}
 		pos_ = str_buf.find("resign");
 		if(pos_ != std::string::npos){
