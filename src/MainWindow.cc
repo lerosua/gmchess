@@ -603,7 +603,7 @@ void MainWindow::on_menu_war_to_ai()
 {
 	//on_begin_game();
 	//just test network game ; when finish test,please delete me
-	on_network_game("lerosua","igoogle",false);
+	on_network_game("lerosua","igoogle",true);
 }
 
 void MainWindow::on_menu_free_play()

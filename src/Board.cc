@@ -778,8 +778,9 @@ int Board::try_move(int mv)
 		}
 		else if(is_network_game()){
 
-			if(is_human_player()){
+			if(!is_human_player()){
 			/** 我走的棋，则将iccs_str走法传给网络*/
+				printf("my go\n");
 				send_to_socket(iccs_str);
 
 
@@ -1318,7 +1319,14 @@ int Board::init_send_socket()
 	return sockfd;
 }
 void Board::send_to_socket(const std::string& cmd_)
-{	int sockfd;
+{
+#if 0
+	std::string mv = "/tmp/a.out "+cmd_;
+
+	system(mv.c_str());
+#endif
+#if 1
+	int sockfd;
 	char buf[1024];
 	struct sockaddr_in srvaddr;
 
@@ -1335,6 +1343,7 @@ void Board::send_to_socket(const std::string& cmd_)
 				write(sockfd,cmd_.c_str(),cmd_.size());
 				close(sockfd);
 	}
+#endif 
 }
 void Board::close_send_socket()
 {
