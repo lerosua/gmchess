@@ -888,6 +888,7 @@ void MainWindow::on_lose_game()
                     }
 
             case (Gtk::RESPONSE_CANCEL): {
+                set_status();
                             break;
                     }
 
