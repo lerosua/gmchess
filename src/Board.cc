@@ -322,8 +322,8 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					printf("still no select chessman\n");
 					return true;
 				}
-				/** 对战状态中，选了黑色棋子无效*/
-				/** choose the black chessman is useless on war */
+				/** 对战状态中，选了对方棋子无效*/
+				/** choose the enemy chessman is useless on war */
 				if(is_fight_to_robot()){ 
 					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
@@ -730,6 +730,7 @@ int Board::try_move(int mv)
 		printf("sleceted = %d finish move and redraw now\n",selected_chessman);
 		selected_chessman=-1;
 
+		std::string iccs_str=m_engine.move_to_iccs_str(mv);
 		/** 对战时的处理*/
 		if(is_fight_to_robot()){
 			if(eat){
@@ -737,7 +738,6 @@ int Board::try_move(int mv)
 				moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
 			}
 			else{
-				std::string iccs_str=m_engine.move_to_iccs_str(mv);
 				size_t pos = moves_lines.find("moves");
 				if(pos == std::string::npos){
 					moves_lines=moves_lines + " -- 0 1  moves "+iccs_str;
@@ -763,6 +763,11 @@ int Board::try_move(int mv)
 
 			parent.change_play(is_human_player());
 			count_time=0;
+		}
+		else if(is_network_game()){
+			/** 将iccs_str走法传给网络*/
+
+
 		}
 
 		/**被将死了*/
@@ -855,7 +860,7 @@ void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
 	}
 }
 
-void Board::free_game()
+void Board::free_game(bool redraw_)
 {
 	if(timer.connected())
 		timer.disconnect();
@@ -863,11 +868,11 @@ void Board::free_game()
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
 	m_status = FREE_STATUS;
-	red_time=600;
-	black_time=600;
 
-	m_engine.init_snapshot(start_fen);
-	redraw();
+	if(redraw_){
+		m_engine.init_snapshot(start_fen);
+		redraw();
+	}
 }
 void Board::rev_game()
 {
@@ -895,6 +900,8 @@ void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int 
 void Board::set_war_time(int _step_time,int _play_time)
 {
 	limit_count_time = _step_time;
+	red_time = _play_time*60;
+	black_time = _play_time* 60;
 
 }
 
@@ -911,6 +918,19 @@ void Board::set_level()
 		m_robot.send_ctrl_command("setoption usebook false\n");
 	else
 		m_robot.send_ctrl_command("setoption usebook true\n");
+}
+
+void Board::net_game()
+{
+	m_status = NETWORK_STATUS;
+
+	m_engine.init_snapshot(start_fen);
+	moves_lines.clear();
+	moves_lines = postion_str + std::string(start_fen);
+	redraw();
+	parent.textview_engine_log_clear();
+	parent.change_play(is_human_player());
+	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
 }
 
 void Board::new_game()
@@ -942,6 +962,8 @@ void Board::new_game()
 
 	}
 
+	parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(0));
+	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
 }
 
 bool Board::robot_log(const Glib::IOCondition& condition)

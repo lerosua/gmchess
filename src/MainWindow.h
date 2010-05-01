@@ -46,8 +46,10 @@ class MainWindow:public Gtk::Window
 		void on_next_move();
 		/** 执行上一步*/
 		void on_back_move();
-		/** 开始对战*/
+		/** 开始AI对战*/
 		void on_begin_game();
+		/** 开始网络对战*/
+		void on_network_game(const std::string me_,const std::string& enemy_,bool role_red_);
 		/** 认输*/
 		void on_lose_game();
 		/** 求和*/
@@ -140,6 +142,8 @@ class MainWindow:public Gtk::Window
 		Gtk::Label*			p2_step_time;
 		Gtk::Label*			p1_war_time;
 		Gtk::Label*			p2_war_time;
+		Gtk::Label*			p1_name;
+		Gtk::Label*			p2_name;
 
 		/** 读谱时着法的按钮*/
 		Gtk::Button*			btn_start;
