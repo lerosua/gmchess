@@ -45,7 +45,7 @@ int singleon(const std::string& url)
 	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
 	if(bind(sockfd,(struct sockaddr*)&srvaddr,
 			sizeof(struct sockaddr))==-1){
-		printf("there has another gmchess running\n");
+		//printf("there has another gmchess running\n");
 #if 1
 		if(url.empty())
 			exit(0);

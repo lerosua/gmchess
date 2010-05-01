@@ -109,7 +109,8 @@ Board::Board(MainWindow& win) :
 	m_status(FREE_STATUS),
 	ui_pixmap(NULL),
 	p_pgnfile(NULL),
-	fd_skt(-1),
+	fd_recv_skt(-1),
+	fd_send_skt(-1),
 	selected_chessman(-1)
 	,postion_str("position fen ")
 	,parent(win)
@@ -158,7 +159,7 @@ Board::~Board()
 		timer.disconnect();
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
-	m_network.stop();
+	//m_network.stop();
 }
 
 void Board::load_images()
@@ -776,7 +777,13 @@ int Board::try_move(int mv)
 			count_time=0;
 		}
 		else if(is_network_game()){
-			/** 将iccs_str走法传给网络*/
+
+			if(is_human_player()){
+			/** 我走的棋，则将iccs_str走法传给网络*/
+				send_to_socket(iccs_str);
+
+
+			}
 			parent.change_play(is_human_player());
 			count_time=0;
 
@@ -879,7 +886,7 @@ void Board::free_game(bool redraw_)
 
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
-	m_network.stop();
+	//m_network.stop();
 	m_status = FREE_STATUS;
 
 	if(redraw_){
@@ -935,8 +942,9 @@ void Board::set_level()
 
 void Board::start_network()
 {
-	m_network.start();
+	//m_network.start();
 	new_game(NETWORK_STATUS);
+	//fd_send_skt = init_send_socket();
 
 }
 
@@ -983,6 +991,7 @@ void Board::new_game(BOARD_STATUS _status)
 
 bool Board::network_log(const Glib::IOCondition& condition)
 {
+#if 0
 	char buf[1024];
 	int buf_len = 1024;
 	char* p = buf;
@@ -998,7 +1007,6 @@ bool Board::network_log(const Glib::IOCondition& condition)
 		*p = 0;
 		printf(buf);
 		std::string str_buf(buf);
-#if 0
 
 		size_t pos_=str_buf.find("draw");
 		if(pos_ != std::string::npos){
@@ -1025,7 +1033,6 @@ bool Board::network_log(const Glib::IOCondition& condition)
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
-#endif
 		size_t pos=str_buf.find("bestmoves:");
 		if(pos != std::string::npos){
 			std::string t_mv=str_buf.substr(pos+10,4);
@@ -1035,6 +1042,7 @@ bool Board::network_log(const Glib::IOCondition& condition)
 		}
 	}
 
+#endif
 	return true;
 
 }
@@ -1214,20 +1222,21 @@ void Board::reckon_time_sound(int time_)
 
 void Board::watch_socket(int fd)
 {
-	fd_skt=fd;
+	fd_recv_skt=fd;
 	Glib::signal_io().connect(sigc::mem_fun(*this,&Board::on_network_io),
-			fd_skt, Glib::IO_IN);
+			fd_recv_skt, Glib::IO_IN);
 
 }
 bool Board::on_network_io(const Glib::IOCondition& )
 {
 
 	int fd_cli = -1;
-	EC_THROW(-1 == (fd_cli = accept(fd_skt, NULL, 0)));
-	char buf[1024];
-	size_t len = read(fd_cli, &buf[0], 1023);
-	buf[len]=0;
-	if (len > 0) {
+       EC_THROW(-1 == (fd_cli = accept(fd_recv_skt, NULL, 0)));
+       char buf[1024];
+       size_t len = read(fd_cli, &buf[0], 1023);
+       buf[len]=0;
+       if (len > 0) {
+
 		std::string str_buf(buf);
 		size_t pos_=str_buf.find("network-game");
 		if(pos_ != std::string::npos){
@@ -1283,4 +1292,49 @@ bool Board::on_network_io(const Glib::IOCondition& )
 	}
 	close(fd_cli);
 	return true;
+}
+
+
+int Board::init_send_socket()
+{
+	int sockfd;
+	char buf[1024];
+	struct sockaddr_in srvaddr;
+
+	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
+	bzero(&srvaddr,sizeof(srvaddr));
+	srvaddr.sin_family=AF_INET;
+	srvaddr.sin_port=htons(GMPORT+1);
+	srvaddr.sin_addr.s_addr=htonl(INADDR_ANY);
+
+	int on = 1;
+	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
+
+	return sockfd;
+}
+void Board::send_to_socket(const std::string& cmd_)
+{	int sockfd;
+	char buf[1024];
+	struct sockaddr_in srvaddr;
+
+	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
+	bzero(&srvaddr,sizeof(srvaddr));
+	srvaddr.sin_family=AF_INET;
+	srvaddr.sin_port=htons(GMPORT+1);
+	srvaddr.sin_addr.s_addr=htonl(INADDR_ANY);
+
+	int on = 1;
+	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
+
+	if( 0 == connect(fd_send_skt,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
+				write(sockfd,cmd_.c_str(),cmd_.size());
+				close(sockfd);
+	}
+}
+void Board::close_send_socket()
+{
+	if(fd_send_skt>0){
+		close(fd_send_skt);
+		fd_send_skt=-1;
+	}
 }
