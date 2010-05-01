@@ -1331,7 +1331,7 @@ void Board::send_to_socket(const std::string& cmd_)
 	int on = 1;
 	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
 
-	if( 0 == connect(fd_send_skt,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
+	if( 0 == connect(sockfd,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
 				write(sockfd,cmd_.c_str(),cmd_.size());
 				close(sockfd);
 	}
