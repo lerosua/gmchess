@@ -1,0 +1,65 @@
+
+gmchess protocol
+
+
+0.game:gmchess                          --游戏标识
+1.id:xxxxx			      --此次游戏会话id,随机生成并保存，以后比较
+2.action:ask/reply/start/working 	      --此次游戏状态
+3.status:start/rue/draw/lose            --请求的具体内容
+  status:ok/no			      --问话的回答
+4.role:red/black			      --此次游戏本人角色
+5.number:xx			      --此次游戏进行的阶段数
+6.moves:c2b2  			      --此步的走法
+7.error:xxx
+8.enemy_name:xxx
+9.name:xxx
+
+
+
+a发起请求
+[{game:gmchess,id:18293839,action:ask,status:start,role:red,number:0,moves:null}]
+
+b返回请求
+[{game:gmchess,id:18293839,action:reply,status:ok,role:black,number:0,moves:null}]
+
+a发开始
+[{game:gmchess,id:18293839,action:start,status:null,role:red,number:0,moves:null,enemy_name:wind,name:lerosua}]
+b回发确认开始
+[{game:gmchess,id:18293839,action:start,status:ok,role:black,number:0,moves:null,enemy_name:wind,name:lerosua}]
+如此，a和b都将gmchess调至网战状态。
+
+a下第一步棋并发送
+[{game:gmchess,id:18293839,action:working,status:null,role:red,number:1,moves:c2b2}]
+b收到并反馈确认
+[{game:gmchess,id:18293839,action:reply,status:ok,role:black,number:1,moves:c2b2}]
+
+b发送第二步棋
+[{game:gmchess,id:18293839,action:working,status:null,role:black,number:2,moves:c8b2}]
+a收到并反馈确认
+[{game:gmchess,id:18293839,action:reply,status:ok,role:red,number:2,moves:c8b2}]
+
+or
+a收到的信息并不匹配上一次的走法，则返回错误的走法，要求重发走法
+[{game:gmchess,id:18293839,action:reply,status:no,role:red,number:2,moves:c8b2,error:1}]
+b收到后则重发一走法
+
+....
+
+a想悔棋
+[{game:gmchess,id:18293839,action:ask_rue,status:null,role:red,number:23,moves:null}]
+b不同意
+[{game:gmchess,id:18293839,action:reply_rue,status:no,role:black,number:23,moves:null}]
+or
+b同意
+[{game:gmchess,id:18293839,action:reply_rue,status:ok,role:black,number:23,moves:null}]
+则两人做悔棋动作
+
+...
+
+a求和
+[{game:gmchess,id:18293839,action:ask,status:draw,role:red,number:33,moves:null}]
+b不同意
+[{game:gmchess,id:18293839,action:reply,status:no,role:black,number:33,moves:null}]
+
+a认输
+[{game:gmchess,id:18293839,action:lose,status:null,role:red,number:34,moves:null}]

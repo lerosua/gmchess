@@ -1245,7 +1245,59 @@ bool Board::on_network_io(const Glib::IOCondition& )
        if (len > 0) {
 
 		std::string str_buf(buf);
-		size_t pos_=str_buf.find("network-game-red");
+		size_t pos;
+		//size_t pos_=str_buf.find("network-game-red");
+
+		if((pos = str_buf.find("moves:")) != std::string::npos){
+			std::string t_mv=str_buf.substr(pos+6,4);
+			std::cout<<"get robot mv = "<<t_mv<<std::endl;
+			int mv = m_engine.iccs_str_to_move(t_mv);
+			try_move(mv);
+
+		}else if((pos = str_buf.find("network-game-red,"))!= std::string::npos){
+			//start network game with red player
+			std::string enemy_name,my_name;
+			size_t pos_s,pos_e,pos_m;
+			pos_s= str_buf.find("enemy_name:");
+			pos_e= str_buf.find(",my_name:");
+			pos_m= str_buf.find_first_of("@");
+			enemy_name = str_buf.substr(pos_s+11,pos_m-pos_s-11);
+			pos_m = str_buf.find_last_of("@");
+			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
+			
+			parent.on_network_game(my_name,enemy_name,true);
+		}else if((pos = str_buf.find("network-game-black,")) != std::string::npos){
+			//start network game with black player
+			std::string enemy_name,my_name;
+			size_t pos_s,pos_e,pos_m;
+			pos_s= str_buf.find("enemy_name:");
+			pos_e= str_buf.find(",my_name:");
+			pos_m= str_buf.find_first_of("@");
+			enemy_name = str_buf.substr(pos_s+11,pos_m-pos_s-11);
+			pos_m = str_buf.find_last_of("@");
+			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
+			parent.on_network_game(my_name,enemy_name,false);
+		}else if(str_buf.find("network-game-win") != std::string::npos){
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_LOSE);
+			return true;
+		}else if(str_buf.find("resign") != std::string::npos){
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_WIN);
+			return true;
+		}else if(str_buf.find("enemy_name:") != std::string::npos){
+
+		}else if(str_buf.find("my_name:") !=std::string::npos){
+
+		}
+
+
+
+
+
+#if 0
 		if(pos_ != std::string::npos){
 			//start network game with red player
 			parent.on_network_game("lerosua","enemy",true);
@@ -1279,7 +1331,6 @@ bool Board::on_network_io(const Glib::IOCondition& )
 			try_move(mv);
 		}
 
-#if 0
 		if(0 == strncmp("[{game:gmchess,",buf,15)){
 			printf("get cmd %s\n",buf);
 			string cmd=string(buf);

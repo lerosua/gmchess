@@ -602,9 +602,9 @@ void MainWindow::open_file(const std::string& filename)
 
 void MainWindow::on_menu_war_to_ai()
 {
-	//on_begin_game();
+	on_begin_game();
 	//just test network game ; when finish test,please delete me
-	on_network_game("lerosua","igoogle",true);
+	//on_network_game("lerosua","igoogle",true);
 }
 
 void MainWindow::on_menu_free_play()
@@ -1039,6 +1039,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		Gtk::MessageDialog dialog_info(*this, _("Game End"), false);
 		dialog_info.set_secondary_text(msg);
 		int result = dialog_info.run();
+		board->free_game(false);
 #if 0
 	Gtk::MessageDialog dialog(*this, _("Game End"), false,
                                   Gtk::MESSAGE_QUESTION,
