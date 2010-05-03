@@ -5,6 +5,8 @@ gmchess_sound_DATA= \
 		    move.wav \
 		    choose.wav \
 		    eat.wav \
+		    win.wav \
+		    loss.wav \
 		    0.wav \
 		    1.wav \
 		    2.wav \

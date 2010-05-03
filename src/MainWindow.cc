@@ -26,8 +26,9 @@
 #include "BookView.h"
 #include "ConfWindow.h"
 #include "gmchess.h"
+#include "Sound.h"
 
-#define version "0.20.7"
+#define version "0.29.1"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -620,7 +621,19 @@ void MainWindow::on_menu_rev_play()
 
 void MainWindow::on_menu_file_quit()
 {
+	if(board->get_status() == NETWORK_STATUS){
+		board->send_to_socket("gmchess-close");
+	}
 	Gtk::Main::quit();
+
+}
+bool MainWindow::on_delete_event(GdkEventAny* event)
+{
+	if(board->get_status() == NETWORK_STATUS){
+		board->send_to_socket("gmchess-close");
+	}
+
+	return Gtk::Window::on_delete_event(event);
 
 }
 
@@ -882,6 +895,14 @@ void MainWindow::on_begin_game()
 		return;
 
 	}
+	else if(board->is_network_game()){
+		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
+		Glib::ustring msg =_("You are play with network game,Please over it first!");
+		dialog_info.set_secondary_text(msg);
+		int result = dialog_info.run();
+		return ;
+
+	}
 	m_refTreeModel->clear();
 	board->start_robot();
 	set_status();
@@ -892,23 +913,23 @@ void MainWindow::on_lose_game()
 {
 
     if(board->is_fight_to_robot()){
-        Gtk::MessageDialog dialog(*this, _("end game"), false,
+        Gtk::MessageDialog dialog(*this, _("be lose"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
-        Glib::ustring msg =_("Will you end this game?");
+        Glib::ustring msg =_("Will you resign in this game?");
         dialog.set_secondary_text(msg);
         int result =dialog.run();
         switch (result) {
             case (Gtk::RESPONSE_OK): {
-                m_refTreeModel->clear();
+                //m_refTreeModel->clear();
                 board->free_game();
                 set_status();
                             break;
                     }
 
             case (Gtk::RESPONSE_CANCEL): {
-                board->free_game(false);
-                set_status();
+                //board->free_game(false);
+                //set_status();
                             break;
                     }
 
@@ -918,12 +939,45 @@ void MainWindow::on_lose_game()
         }
         return;
     }
+    else if(board->is_network_game()){
+
+        Gtk::MessageDialog dialog(*this, _("be lose"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+        Glib::ustring msg =_("Will you resign in this game?");
+        dialog.set_secondary_text(msg);
+        int result =dialog.run();
+        switch (result) {
+            case (Gtk::RESPONSE_OK): {
+		    board->send_to_socket("resign");
+		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
+		Glib::ustring msg =_("You lose the game!");
+		dialog_info.set_secondary_text(msg);
+		int result = dialog_info.run();
+                board->free_game();
+                set_status();
+                            break;
+                    }
+
+            case (Gtk::RESPONSE_CANCEL): {
+                //board->free_game(false);
+                //set_status();
+                            break;
+                    }
+
+            default: {
+                            break;
+                    }
+        }
+    }
 }
 
 /** draw 是打平局面的意思*/
 void MainWindow::on_draw_game()
 {
+    if(board->is_fight_to_robot()){
 	board->draw_move();
+    }
 
 }
 
@@ -946,6 +1000,10 @@ void MainWindow::on_rue_game()
 
 
 	}
+	else if(board->is_network_game()){
+
+
+	}
 
 }
 bool MainWindow::on_end_game(OVERSTATUS _over)
@@ -955,10 +1013,12 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		case ROBOT_WIN:
 			//robot win
 			msg=_("You are Lose! \n Are you want to start a new game?");
+			CSound::play(SND_LOSS);
 			break;
 		case ROBOT_LOSE:
 			//robot lose
 			msg=_("Congratuations ! YOU WIN!\n start a new game click OK");
+			CSound::play(SND_WIN);
 			break;
 		case ROBOT_DRAW:
 			//robot want to draw
@@ -967,13 +1027,19 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		case ROBOT_OVER_TIME:
 			// robot overload time,lose
 			msg = _("The Enemy overload the time, You Win!");
+			CSound::play(SND_WIN);
 			break;
 		case HUMAN_OVER_TIME:
 			msg = _("You overload the time, You Lose!");
+			CSound::play(SND_LOSS);
 		default:
 			break;
 
 	}
+		Gtk::MessageDialog dialog_info(*this, _("Game End"), false);
+		dialog_info.set_secondary_text(msg);
+		int result = dialog_info.run();
+#if 0
 	Gtk::MessageDialog dialog(*this, _("Game End"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
@@ -983,7 +1049,8 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		switch (result) {
 			case (Gtk::RESPONSE_OK): {
 				m_refTreeModel->clear();
-				board->new_game();
+				//board->new_game();
+				board->free_game(false);
 				return true;
                 	}
 
@@ -998,6 +1065,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
                 	        break;
                 	}
 		}
+#endif
 
 }
 

@@ -28,6 +28,12 @@ CSound::play (SOUND_EVENTS event)
 		case SND_EAT:
 			filename = SOUND_DIR"eat.wav";
 			break;
+		case SND_WIN:
+			filename = SOUND_DIR"win.wav";
+			break;
+		case SND_LOSS:
+			filename = SOUND_DIR"loss.wav";
+			break;
 		case SND_10:
 			filename = SOUND_DIR"10.wav";
 			break;

@@ -781,7 +781,8 @@ int Board::try_move(int mv)
 			if(!is_human_player()){
 			/** 我走的棋，则将iccs_str走法传给网络*/
 				printf("my go\n");
-				send_to_socket(iccs_str);
+				std::string mv_str = "moves:"+iccs_str;
+				send_to_socket(mv_str);
 
 
 			}
@@ -820,6 +821,10 @@ void Board::draw_move()
 			m_robot.send_ctrl_command("go draw\n");
 		else
 			m_robot.send_ctrl_command("ponderhit draw\n");
+
+	}
+	else if(is_network_game()){
+
 
 	}
 
@@ -943,6 +948,7 @@ void Board::set_level()
 
 void Board::start_network()
 {
+	set_war_time(300,30);
 	//m_network.start();
 	new_game(NETWORK_STATUS);
 	//fd_send_skt = init_send_socket();
@@ -1241,13 +1247,21 @@ bool Board::on_network_io(const Glib::IOCondition& )
 		std::string str_buf(buf);
 		size_t pos_=str_buf.find("network-game-red");
 		if(pos_ != std::string::npos){
-			//start network game
+			//start network game with red player
 			parent.on_network_game("lerosua","enemy",true);
 		}
 		pos_=str_buf.find("network-game-black");
 		if(pos_ != std::string::npos){
-			//start network game
+			//start network game with black player
 			parent.on_network_game("lerosua","enemy",false);
+		}
+		pos_ = str_buf.find("network-game-win");
+		if(pos_ !=std::string::npos){
+			// i win the game.
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_LOSE);
+			return true;
 		}
 		pos_ = str_buf.find("resign");
 		if(pos_ != std::string::npos){
@@ -1320,12 +1334,7 @@ int Board::init_send_socket()
 }
 void Board::send_to_socket(const std::string& cmd_)
 {
-#if 0
-	std::string mv = "/tmp/a.out "+cmd_;
 
-	system(mv.c_str());
-#endif
-#if 1
 	int sockfd;
 	char buf[1024];
 	struct sockaddr_in srvaddr;
@@ -1340,10 +1349,9 @@ void Board::send_to_socket(const std::string& cmd_)
 	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
 
 	if( 0 == connect(sockfd,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
-				write(sockfd,cmd_.c_str(),cmd_.size());
-				close(sockfd);
+		write(sockfd,cmd_.c_str(),cmd_.size());
+		close(sockfd);
 	}
-#endif 
 }
 void Board::close_send_socket()
 {

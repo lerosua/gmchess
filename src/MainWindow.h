@@ -88,6 +88,7 @@ class MainWindow:public Gtk::Window
 		void on_size_change();
 		void save_conf();
 		void watch_socket(int fd);
+		bool on_delete_event(GdkEventAny* event);
 	protected:
 		/** 初始化配置文件*/
 		void init_conf();
