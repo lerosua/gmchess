@@ -633,7 +633,7 @@ bool MainWindow::on_delete_event(GdkEventAny* event)
 		Gtk::MessageDialog dialog(*this, _("Warning"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
-		Glib::ustring msg =_("Will you  start a new game?");
+		Glib::ustring msg =_("Are you  sure to close the network game?");
 		dialog.set_secondary_text(msg);
 		int result = dialog.run();
 		switch (result) {
