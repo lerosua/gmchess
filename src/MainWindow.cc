@@ -28,7 +28,7 @@
 #include "gmchess.h"
 #include "Sound.h"
 
-#define version "0.29.1"
+#define version "0.29.0"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -622,7 +622,7 @@ void MainWindow::on_menu_rev_play()
 void MainWindow::on_menu_file_quit()
 {
 	if(board->get_status() == NETWORK_STATUS){
-		board->send_to_socket("gmchess-close");
+		board->send_to_socket("close");
 	}
 	Gtk::Main::quit();
 
@@ -630,7 +630,28 @@ void MainWindow::on_menu_file_quit()
 bool MainWindow::on_delete_event(GdkEventAny* event)
 {
 	if(board->get_status() == NETWORK_STATUS){
-		board->send_to_socket("gmchess-close");
+		Gtk::MessageDialog dialog(*this, _("Warning"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+		Glib::ustring msg =_("Will you  start a new game?");
+		dialog.set_secondary_text(msg);
+		int result = dialog.run();
+		switch (result) {
+			case (Gtk::RESPONSE_OK): {
+				board->send_to_socket("close");
+                	        break;
+                	}
+
+			case (Gtk::RESPONSE_CANCEL): {
+			     return false;
+                	        break;
+                	}
+
+			default: {
+			     return false;
+                	        break;
+                	}
+		}
 	}
 
 	return Gtk::Window::on_delete_event(event);

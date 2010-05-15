@@ -1,6 +1,7 @@
 #!/bin/sh
-aclocal
-autoheader
-autoconf
+#aclocal
+#autoheader
+#autoconf
 #autoreconf
-automake -a
+#automake -a
+gnome-autogen.sh

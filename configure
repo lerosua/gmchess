@@ -3137,7 +3137,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gmchess
- VERSION=0.20.7
+ VERSION=0.29.0
 
 
 cat >>confdefs.h <<_ACEOF
@@ -4726,8 +4726,8 @@ esac
 
 
 
-macro_version='2.2.6'
-macro_revision='1.3012'
+macro_version='2.2.6b'
+macro_revision='1.3017'
 
 
 
