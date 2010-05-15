@@ -55,6 +55,8 @@ class MainWindow:public Gtk::Window
 		 * @param role_red_ 已方角色
 		 */
 		void on_network_game(const std::string me_,const std::string& enemy_,bool role_red_=true);
+		/** gmchess最开始运行带的参数解释函数*/
+		void start_with(const std::string& param);
 		/** 认输*/
 		void on_lose_game();
 		/** 求和*/

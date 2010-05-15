@@ -603,8 +603,6 @@ void MainWindow::open_file(const std::string& filename)
 void MainWindow::on_menu_war_to_ai()
 {
 	on_begin_game();
-	//just test network game ; when finish test,please delete me
-	//on_network_game("lerosua","igoogle",true);
 }
 
 void MainWindow::on_menu_free_play()
@@ -643,12 +641,12 @@ bool MainWindow::on_delete_event(GdkEventAny* event)
                 	}
 
 			case (Gtk::RESPONSE_CANCEL): {
-			     return false;
+			     return true;
                 	        break;
                 	}
 
 			default: {
-			     return false;
+			     return true;
                 	        break;
                 	}
 		}
@@ -1107,4 +1105,33 @@ void MainWindow::watch_socket(int fd)
 {
 	board->watch_socket(fd);
 	
+}
+void MainWindow::start_with(const std::string& param)
+{
+
+		size_t pos;
+		if((pos = param.find("network-game-red,"))!= std::string::npos){
+			//start network game with red player
+			std::string enemy_name,my_name;
+			size_t pos_s,pos_e,pos_m;
+			pos_s= param.find("enemy_name:");
+			pos_e= param.find(",my_name:");
+			pos_m= param.find_first_of("@");
+			enemy_name = param.substr(pos_s+11,pos_m-pos_s-11);
+			pos_m = param.find_last_of("@");
+			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
+			
+			on_network_game(my_name,enemy_name,true);
+		}else if((pos = param.find("network-game-black,")) != std::string::npos){
+			//start network game with black player
+			std::string enemy_name,my_name;
+			size_t pos_s,pos_e,pos_m;
+			pos_s= param.find("enemy_name:");
+			pos_e= param.find(",my_name:");
+			pos_m= param.find_first_of("@");
+			enemy_name = param.substr(pos_s+11,pos_m-pos_s-11);
+			pos_m = param.find_last_of("@");
+			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
+			on_network_game(my_name,enemy_name,false);
+		}
 }

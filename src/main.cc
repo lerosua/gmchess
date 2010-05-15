@@ -84,6 +84,7 @@ int main (int argc, char *argv[])
 	Gtk::Main kit(argc, argv);
 	MainWindow win;
 	win.watch_socket(fd_io);
+	win.start_with(url);
 	//Board board;
 	//win.add(board);
 	kit.run(win);
