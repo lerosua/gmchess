@@ -894,6 +894,8 @@ void Board::free_game(bool redraw_)
 	m_robot.stop();
 	//m_network.stop();
 	m_status = FREE_STATUS;
+	is_rev_board=false;
+	m_human_black=false;
 
 	if(redraw_){
 		m_engine.init_snapshot(start_fen);
