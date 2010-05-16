@@ -1267,7 +1267,8 @@ bool Board::on_network_io(const Glib::IOCondition& )
 			pos_m = str_buf.find_last_of("@");
 			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
 			
-			parent.on_network_game(my_name,enemy_name,true);
+			//parent.on_network_game(my_name,enemy_name,true);
+			parent.on_network_game(enemy_name,my_name,true);
 		}else if((pos = str_buf.find("network-game-black,")) != std::string::npos){
 			//start network game with black player
 			std::string enemy_name,my_name;

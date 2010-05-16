@@ -226,6 +226,7 @@ void MainWindow::change_play(bool player)
 		p2_image->hide();
 		p1_image->show();
 	}
+	
 }
 
 void MainWindow::save_conf()
@@ -872,16 +873,12 @@ void MainWindow::set_status()
 
 void MainWindow::on_network_game(const std::string me_name,const std::string& enemy_name,bool role_red_)
 {
-	if(!role_red_){
-		board->rev_game();
-		p1_name->set_text(me_name);
-		p2_name->set_text(enemy_name);
-	}
-	else{
 		p1_name->set_text(enemy_name);
 		p2_name->set_text(me_name);
-
+	if(!role_red_){
+		board->rev_game();
 	}
+	
 	m_refTreeModel->clear();
 	board->start_network();
 	set_status();
@@ -1097,15 +1094,17 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
-	p2_war_time->set_text(f_time);
-	p2_step_time->set_text(c_time);
+
+		p2_war_time->set_text(f_time);
+		p2_step_time->set_text(c_time);
 
 
 }
 void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
 {
-	p1_war_time->set_text(f_time);
-	p1_step_time->set_text(c_time);
+
+		p1_war_time->set_text(f_time);
+		p1_step_time->set_text(c_time);
 }
 void MainWindow::watch_socket(int fd)
 {
@@ -1127,7 +1126,8 @@ void MainWindow::start_with(const std::string& param)
 			pos_m = param.find_last_of("@");
 			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
 			
-			on_network_game(my_name,enemy_name,true);
+			//on_network_game(my_name,enemy_name,true);
+			on_network_game(enemy_name,my_name,true);
 		}else if((pos = param.find("network-game-black,")) != std::string::npos){
 			//start network game with black player
 			std::string enemy_name,my_name;
