@@ -1015,14 +1015,22 @@ void MainWindow::on_rue_game()
 			board->rue_move();
 		}else{
 			Gtk::MessageDialog dialog(*this, _("Warning"), false);
-			Glib::ustring msg =_("Only rue game when you are go,so wait a minute!");
+			Glib::ustring msg =_("Only rue game when you are going,so wait a minute!");
 			dialog.set_secondary_text(msg);
 			int result = dialog.run();
 		}
 
-
 	}
 	else if(board->is_network_game()){
+		if(board->is_human_player()){
+			/** 发送了悔棋指令，此时界面不应该能操作，直到对方返回应答，yes/no */
+			board->send_to_socket("rue");
+		}else{
+			Gtk::MessageDialog dialog(*this, _("Warning"), false);
+			Glib::ustring msg =_("Only rue game when you are going,so wait a minute!");
+			dialog.set_secondary_text(msg);
+			int result = dialog.run();
+		}
 
 
 	}
@@ -1062,34 +1070,6 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		dialog_info.set_secondary_text(msg);
 		int result = dialog_info.run();
 		board->free_game(false);
-#if 0
-	Gtk::MessageDialog dialog(*this, _("Game End"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-		//Glib::ustring msg =_("Mate!\n Are you want to start a new game?");
-		dialog.set_secondary_text(msg);
-		int result = dialog.run();
-		switch (result) {
-			case (Gtk::RESPONSE_OK): {
-				m_refTreeModel->clear();
-				//board->new_game();
-				board->free_game(false);
-				return true;
-                	}
-
-			case (Gtk::RESPONSE_CANCEL): {
-				board->free_game(false);
-				set_status();
-				return false;
-                	}
-
-			default: {
-				return false;
-                	        break;
-                	}
-		}
-#endif
-
 }
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
