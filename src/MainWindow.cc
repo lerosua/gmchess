@@ -601,6 +601,15 @@ void MainWindow::open_file(const std::string& filename)
 
 }
 
+void MainWindow::info_window(const std::string& info)
+{
+			Gtk::MessageDialog dialog("Info",false,
+					Gtk::MESSAGE_INFO);
+			dialog.set_secondary_text(info);
+			dialog.run();
+}
+
+
 void MainWindow::on_menu_war_to_ai()
 {
 	on_begin_game();
@@ -998,8 +1007,12 @@ void MainWindow::on_lose_game()
 void MainWindow::on_draw_game()
 {
     if(board->is_fight_to_robot()){
-	board->draw_move();
+		board->draw_move();
     }
+	else if(board->is_network_game()){
+		if(board->is_human_player())
+			board->send_to_socket("draw");
+	}
 
 }
 

@@ -824,8 +824,7 @@ void Board::draw_move()
 
 	}
 	else if(is_network_game()){
-
-
+		parent.on_end_game(ROBOT_DRAW);
 	}
 
 }
@@ -1290,6 +1289,17 @@ bool Board::on_network_io(const Glib::IOCondition& )
 				timer.disconnect();
 			parent.on_end_game(ROBOT_WIN);
 			return true;
+		}else if(str_buf.find("network-game-rue") != std::string::npos){
+			rue_move();
+			rue_move();
+		}else if(str_buf.find("network-game-norue") != std::string::npos){
+			parent.info_window("The against doesn't agree rue!");
+		}else if(str_buf.find("network-game-nodraw") != std::string::npos){
+			parent.info_window(("The against doesn't agree draw!"));
+		}else if(str_buf.find("network-game-draw") != std::string::npos){
+			if(timer.connected())
+				timer.disconnect();
+			parent.on_end_game(ROBOT_DRAW);
 		}else if(str_buf.find("enemy_name:") != std::string::npos){
 
 		}else if(str_buf.find("my_name:") !=std::string::npos){

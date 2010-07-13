@@ -91,6 +91,7 @@ class MainWindow:public Gtk::Window
 		void save_conf();
 		void watch_socket(int fd);
 		bool on_delete_event(GdkEventAny* event);
+		void info_window(const std::string& info);
 	protected:
 		/** 初始化配置文件*/
 		void init_conf();
