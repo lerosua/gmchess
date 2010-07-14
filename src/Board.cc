@@ -1143,6 +1143,8 @@ bool Board::go_time()
 				timer.disconnect();
 			parent.on_end_game(HUMAN_OVER_TIME);
 			count_time =0;
+			if(is_network_game())
+				send_to_socket("timeout");
 
 		}
 	}
@@ -1161,6 +1163,8 @@ bool Board::go_time()
 				timer.disconnect();
 			parent.on_end_game(ROBOT_OVER_TIME);
 			count_time =0;
+			if(is_network_game())
+				send_to_socket("timeout");
 		}
 	}
 
