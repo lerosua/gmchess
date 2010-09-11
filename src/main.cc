@@ -46,7 +46,6 @@ int singleon(const std::string& url)
 	if(bind(sockfd,(struct sockaddr*)&srvaddr,
 			sizeof(struct sockaddr))==-1){
 		//printf("there has another gmchess running\n");
-#if 1
 		if(url.empty())
 			exit(0);
 		else{
@@ -59,7 +58,6 @@ int singleon(const std::string& url)
 			}
 			exit(1);
 		}
-#endif
 	}
 	EC_THROW(-1 == listen(sockfd,128));
 	return sockfd;
@@ -85,8 +83,6 @@ int main (int argc, char *argv[])
 	MainWindow win;
 	win.watch_socket(fd_io);
 	win.start_with(url);
-	//Board board;
-	//win.add(board);
 	kit.run(win);
 	return 0;
 }

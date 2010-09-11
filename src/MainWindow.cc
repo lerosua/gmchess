@@ -1106,6 +1106,7 @@ void MainWindow::watch_socket(int fd)
 }
 void MainWindow::start_with(const std::string& param)
 {
+		printf("1109open file %s\n",param.c_str());
 
 		size_t pos;
 		if((pos = param.find("network-game-red,"))!= std::string::npos){
@@ -1132,5 +1133,9 @@ void MainWindow::start_with(const std::string& param)
 			pos_m = param.find_last_of("@");
 			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
 			on_network_game(my_name,enemy_name,false);
+		}
+		else{
+			printf("open file %s\n",param.c_str());
+			open_file(param);
 		}
 }
