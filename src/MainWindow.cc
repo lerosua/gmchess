@@ -1135,7 +1135,7 @@ void MainWindow::start_with(const std::string& param)
 			on_network_game(my_name,enemy_name,false);
 		}
 		else{
-			printf("open file %s\n",param.c_str());
-			open_file(param);
+			if(!param.empty())
+				open_file(param);
 		}
 }

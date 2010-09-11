@@ -4,4 +4,4 @@
 #autoconf
 #autoreconf
 #automake -a
-gnome-autogen.sh
+gnome-autogen.sh $@
