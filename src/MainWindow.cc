@@ -28,7 +28,7 @@
 #include "gmchess.h"
 #include "Sound.h"
 
-#define version "0.29.0"
+#define version "0.29.1"
 
 Glib::ustring ui_info =
 "<ui>"
@@ -1083,6 +1083,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		dialog_info.set_secondary_text(msg);
 		int result = dialog_info.run();
 		board->free_game(false);
+		set_status();
 }
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
@@ -1106,8 +1107,6 @@ void MainWindow::watch_socket(int fd)
 }
 void MainWindow::start_with(const std::string& param)
 {
-		printf("1109open file %s\n",param.c_str());
-
 		size_t pos;
 		if((pos = param.find("network-game-red,"))!= std::string::npos){
 			//start network game with red player

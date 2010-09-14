@@ -46,14 +46,14 @@ class CodeConverter {
 	    return convert(inbuf.c_str(), inbuf.size());
 	}
 
-	string convert(const char* inbuf, int inlen) {
-	    int outlen = inlen * 3;
+	string convert(const char* inbuf, size_t inlen) {
+	    size_t outlen = inlen * 3;
 	    char *pin = (char*)inbuf;
 	    char outbuf[outlen];
 
 	    char *pout = &outbuf[0];
 	    //bzero(pout, outbuf);
-	    int oldoutlen = outlen;
+	    size_t oldoutlen = outlen;
 
 	    if(-1 == iconv(cd,&pin,(size_t *)&inlen
 			, &pout,(size_t *)&outlen) ) {
