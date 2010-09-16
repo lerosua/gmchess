@@ -1065,7 +1065,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 			break;
 		case ROBOT_DRAW:
 			//robot want to draw
-			msg=_("Computer want to draw with you, are you agree?");
+			msg=_("Draw Game!");
 			break;
 		case ROBOT_OVER_TIME:
 			// robot overload time,lose
