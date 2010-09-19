@@ -126,7 +126,6 @@
                             <property name="can_focus">True</property>
                             <property name="max_length">2</property>
                             <property name="invisible_char">&#x25CF;</property>
-                            <property name="adjustment">adjustment_depth</property>
                             <property name="climb_rate">1</property>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
@@ -164,7 +163,7 @@
                             <property name="can_focus">True</property>
                             <property name="max_length">3</property>
                             <property name="invisible_char">&#x25CF;</property>
-                            <property name="text" translatable="yes">60</property>
+                            <property name="text" translatable="yes">240</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -204,7 +203,7 @@
                             <property name="can_focus">True</property>
                             <property name="max_length">2</property>
                             <property name="invisible_char">&#x25CF;</property>
-                            <property name="text" translatable="yes">10</property>
+                            <property name="text" translatable="yes">40</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -330,13 +329,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkAdjustment" id="adjustment_depth">
-    <property name="value">1</property>
-    <property name="lower">1</property>
-    <property name="upper">15</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-    <property name="page_size">10</property>
   </object>
 </interface>

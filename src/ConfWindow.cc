@@ -22,8 +22,8 @@
 ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 					     ,m_size_big(true)
 					     ,m_depth("10")
-					     ,m_step_time("60")
-					     ,m_play_time("10")
+					     ,m_step_time("240")
+					     ,m_play_time("40")
 {
 	vbox_xml = Gtk::Builder::create_from_file(conf_ui,"conf_vbox");
 	if(!vbox_xml)
@@ -66,7 +66,6 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 
 	this->add(*vBox);
 	this->set_transient_for(*parent);
-	//this->set_size_request(521,577);
 	show_all();
 
 }

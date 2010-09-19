@@ -61,7 +61,6 @@ Glib::ustring ui_info =
 MainWindow::MainWindow():menubar(NULL)
 			 ,confwindow(NULL)
 {
-	//ui_xml = Gnome::Glade::Xml::create(main_ui,"main_window");
 	ui_xml = Gtk::Builder::create_from_file(main_ui,"main_window");
 	if(!ui_xml)
 		exit(271);
@@ -82,25 +81,6 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml->get_widget("button_lose",btn_lose);
 	ui_xml->get_widget("button_draw",btn_draw);
 	ui_xml->get_widget("button_rue",btn_rue);
-#if 0
-	Gtk::VBox* main_window = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("main_window"));
-
-	Gtk::VBox* box_board = dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("vbox_board"));
-	buttonbox_war = dynamic_cast<Gtk::ButtonBox*>(ui_xml->get_widget("hbuttonbox_war"));
-	text_comment = dynamic_cast<Gtk::TextView*>(ui_xml->get_widget("textview_comment"));
-
-	m_notebook = dynamic_cast<Gtk::Notebook*>(ui_xml->get_widget("notebook"));
-	 btn_start = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_start"));
-	 btn_end = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_end"));
-	 btn_prev = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_prev"));
-	 btn_next = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_next"));
-
-
-	 btn_begin = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_begin"));
-	 btn_lose  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_lose"));
-	 btn_draw   = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_draw"));
-	 btn_rue  = dynamic_cast<Gtk::Button*>(ui_xml->get_widget("button_rue"));
-#endif
 
 	btn_start->signal_clicked().connect(
 			sigc::mem_fun(*this,&MainWindow::on_first_move));
@@ -133,14 +113,11 @@ MainWindow::MainWindow():menubar(NULL)
 	/** 设置菜单, set the menu*/
 	init_ui_manager();
 	 menubar = ui_manager->get_widget("/MenuBar");
-	//Gtk::VBox* menu_tool_box	= dynamic_cast<Gtk::VBox*>(ui_xml->get_widget("box_menu_toolbar"));
 	Gtk::VBox* menu_tool_box=0;
 	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
 
 	/** 设置Treeview区, set the treeview*/
-	//Gtk::ScrolledWindow* scrolwin=dynamic_cast<Gtk::ScrolledWindow*>
-	//	(ui_xml->get_widget("scrolledwindow"));
 	Gtk::ScrolledWindow* scrolwin= 0;
 	ui_xml->get_widget("scrolledwindow",scrolwin);
 	m_refTreeModel = Gtk::ListStore::create(m_columns);
@@ -155,8 +132,6 @@ MainWindow::MainWindow():menubar(NULL)
 
 	set_status();
 
-	//Gtk::ScrolledWindow* scroll_book=dynamic_cast<Gtk::ScrolledWindow*>
-	//	(ui_xml->get_widget("scrolledwin_book"));
 	Gtk::ScrolledWindow* scroll_book=0;
 	ui_xml->get_widget("scrolledwin_book",scroll_book);
 	m_bookview= new BookView(this);
@@ -170,14 +145,6 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml->get_widget("P2_step_time",p2_step_time);
 	ui_xml->get_widget("P1_name",p1_name);
 	ui_xml->get_widget("P2_name",p2_name);
-#if 0
-	p1_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p1"));
-	p2_image = dynamic_cast<Gtk::Image*>(ui_xml->get_widget("image_p2"));
-	p1_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_war_time"));
-	p2_war_time = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_war_time"));
-	p1_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_step_time"));
-	p2_step_time= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_step_time"));
-#endif
 
 	init_conf();
 	this->signal_check_resize().connect(
@@ -191,7 +158,6 @@ MainWindow::MainWindow():menubar(NULL)
 	p1_image->hide();
 	p2_image->hide();
 
-	//set_default_size(851,727);
 	if(atoi(GMConf["desktop_size"].c_str()) == 1)
 		board->set_board_size(BIG_BOARD);
 	else
@@ -201,7 +167,7 @@ MainWindow::MainWindow():menubar(NULL)
 	board->set_level_config(_depth,0,0,0,0,0,atoi(GMConf["usebook"].c_str()));
 	int _step_time= atoi(GMConf["step_time"].c_str());
 	int _play_time= atoi(GMConf["play_time"].c_str());
-	if(_step_time>0&&_step_time<300 && _play_time>0)
+	if(_step_time>0&&_step_time<600 && _play_time>0)
 		board->set_war_time(_step_time,_play_time);
 }
 
