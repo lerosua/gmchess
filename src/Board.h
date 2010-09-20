@@ -109,8 +109,6 @@ class Board : public Gtk::DrawingArea
 		/** 读取AI的输出，并根据输出的着法走棋*/
 		/** read the output of AI,then go chess*/
 		bool robot_log(const Glib::IOCondition& condition);
-		/** 读取网络的输出，并根据输出的减法走棋*/
-		bool network_log(const Glib::IOCondition& condition);
 		/** 回到最初局面*/
 		/** return the first station*/
 		void first_move();
@@ -185,6 +183,8 @@ class Board : public Gtk::DrawingArea
 		void set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook);
 		/** 设置对战时的走棋时间和总局时间*/
 		void set_war_time(int _step_time,int _play_time);
+		/** 设置保存的走棋时间和总局时间*/
+		void set_time(int _step_time,int _play_time);
 		/** 倒计时的声音*/
 		void reckon_time_sound(int time_);
 		
@@ -198,7 +198,6 @@ class Board : public Gtk::DrawingArea
 		Engine m_engine;
 		/** AI引擎*/
 		Robot m_robot;
-		//Pidgin m_network;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
 		/** 传递给AI的着法状态*/
@@ -227,6 +226,9 @@ class Board : public Gtk::DrawingArea
 		int red_time;
 		/** 黑方的局时*/
 		int black_time;
+		/** 用以保存和电脑下棋的局时和步时*/
+		int play_time;
+		int step_time;
 		/** 计时，走秒*/
 		int count_time;
 		/** 每步时的极限秒数*/

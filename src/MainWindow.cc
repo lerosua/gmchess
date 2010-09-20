@@ -168,7 +168,7 @@ MainWindow::MainWindow():menubar(NULL)
 	int _step_time= atoi(GMConf["step_time"].c_str());
 	int _play_time= atoi(GMConf["play_time"].c_str());
 	if(_step_time>0&&_step_time<600 && _play_time>0)
-		board->set_war_time(_step_time,_play_time);
+		board->set_time(_step_time,_play_time);
 }
 
 MainWindow::~MainWindow()

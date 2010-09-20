@@ -116,6 +116,8 @@ Board::Board(MainWindow& win) :
 	,parent(win)
 	,red_time(2400)
 	,black_time(2400)
+	,play_time(40)
+	,step_time(240)
 	,count_time(0)
 	,limit_count_time(240)
 	,chessman_width(29)
@@ -924,6 +926,12 @@ void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int 
 
 }
 
+void Board::set_time(int _step_time, int _play_time)
+{
+	step_time = _step_time;
+	play_time = _play_time;
+}
+
 void Board::set_war_time(int _step_time,int _play_time)
 {
 	limit_count_time = _step_time;
@@ -950,22 +958,21 @@ void Board::set_level()
 void Board::start_network()
 {
 	set_war_time(300,30);
-	//m_network.start();
 	new_game(NETWORK_STATUS);
-	//fd_send_skt = init_send_socket();
 
 }
 
 void Board::new_game(BOARD_STATUS _status)
 {
-	//m_status = FIGHT_STATUS;
 	m_status = _status;
 
 	m_engine.init_snapshot(start_fen);
 
 	if(m_status == FIGHT_STATUS){
+		set_war_time(step_time,play_time);
 		m_robot.send_ctrl_command("setoption newgame\n");
 		set_level();
+		printf("计算机对战\n");
 	}
 
 
@@ -974,7 +981,6 @@ void Board::new_game(BOARD_STATUS _status)
 	redraw();
 
 	parent.textview_engine_log_clear();
-	//parent.change_play(m_engine.red_player());
 	parent.change_play(is_human_player());
 
 	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
@@ -997,63 +1003,7 @@ void Board::new_game(BOARD_STATUS _status)
 	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
 }
 
-bool Board::network_log(const Glib::IOCondition& condition)
-{
-#if 0
-	char buf[1024];
-	int buf_len = 1024;
-	char* p = buf;
-	for (; buf_len > 0; ) {
-		int len = m_network.get_network_log(p, buf_len);
-		if (len <= 0)
-			break;
-		p += len;
-		buf_len -= len;
-	}
 
-	if (buf_len > 0) {
-		*p = 0;
-		printf(buf);
-		std::string str_buf(buf);
-
-		size_t pos_=str_buf.find("draw");
-		if(pos_ != std::string::npos){
-
-			printf("计算机同意和棋\n");
-			if (parent.on_end_game(ROBOT_DRAW)) {
-				if(timer.connected())
-					timer.disconnect();
-				return 1;
-			}
-		}
-		pos_=str_buf.find("resign");
-		if(pos_ != std::string::npos){
-
-			if(timer.connected())
-				timer.disconnect();
-			parent.on_end_game(ROBOT_LOSE);
-			return true;
-		}
-		pos_=str_buf.find("nobestmove");
-		if(pos_ != std::string::npos){
-			if(timer.connected())
-				timer.disconnect();
-			parent.on_end_game(ROBOT_LOSE);
-			return true;
-		}
-		size_t pos=str_buf.find("bestmoves:");
-		if(pos != std::string::npos){
-			std::string t_mv=str_buf.substr(pos+10,4);
-			std::cout<<"get network mv = "<<t_mv<<std::endl;
-			int mv = m_engine.iccs_str_to_move(t_mv);
-			try_move(mv);
-		}
-	}
-
-#endif
-	return true;
-
-}
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
 	/*for testing,delete me*/
