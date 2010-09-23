@@ -217,10 +217,12 @@ void MainWindow::init_conf()
 {
 	char buf[512];
 	char book_dir[512];
+	char file_dir[512];
 	std::string homedir=Glib::get_user_config_dir();
 	snprintf(book_dir, 512,"%s/gmchess/book",homedir.c_str());
 	m_bookview->load_book_dir(book_dir);
 	snprintf(buf,512,"%s/gmchess/config",homedir.c_str());
+
 	std::ifstream file(buf);
 	if(!file){
 		char homepath[512];
@@ -230,6 +232,9 @@ void MainWindow::init_conf()
 		GMConf["desktop_size"] = "1"; //0--small,1--big
 		GMConf["engine_depth"] ="5";
 		save_conf();
+
+		snprintf(file_dir,512,"%s/gmchess/files",homedir.c_str());
+		mkdir(file_dir,S_IRUSR|S_IWUSR|S_IXUSR);
 		return;
 	}
 	
@@ -447,6 +452,55 @@ void MainWindow::on_menu_save_file()
 
 }
 
+void MainWindow::auto_save_chess_file()
+{
+	std::string homedir=Glib::get_user_config_dir();
+	homedir += "/gmchess/files/";
+
+	char time1[200];
+	char time2[200];
+	time_t t;
+	struct tm *tmp;
+
+	t = time(NULL);
+	tmp = localtime(&t);
+	strftime(time1, sizeof(time1), "%Y-%m-%d-%H-%M-", tmp);
+	strftime(time2, sizeof(time2), "%Y.%m.%d", tmp);
+	std::string name = p1_name->get_text()+"-"+p2_name->get_text()+".pgn";
+	std::string filename = homedir + std::string(time1) + name;
+
+	std::ofstream  file;
+	file.open(filename.c_str());
+	if(!file){
+		DLOG("open %s file error\n",filename.c_str());
+		return ;
+	}
+	
+	file<<"[Game \"Chese chess Play by GMChess\"]"<<std::endl;
+	file<<"[Date \""<<std::string(time2)<<"\"]"<<std::endl;
+	file<<"[Red \""<<p1_name->get_text()<<"\"]"<<std::endl;
+	file<<"[Black \""<<p2_name->get_text()<<"\"]"<<std::endl;
+
+	Gtk::TreeModel::Children children =  m_refTreeModel->children();
+	Gtk::TreeModel::iterator iter ;
+	for(iter = children.begin();iter!= children.end();iter++){
+
+		file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] ;
+		iter++;
+		if(iter!=children.end())
+			file<<"  "<<(*iter)[m_columns.step_line]<<std::endl;
+		else{
+			file<<std::endl;
+			break;
+		}
+	}
+
+	file.close();
+
+
+}
+
+
 void MainWindow:: on_menu_open_file()
 {
 	Gtk::FileChooserDialog dlg(*this,
@@ -540,7 +594,6 @@ void MainWindow::open_file(const std::string& filename)
 		size_t pos = filename.find(".pgn");
 		if(pos == std::string::npos){
 			char cmd[1024];
-			//remove("/tmp/gmchess.pgn");
 			sprintf(cmd,"convert_pgn \"%s\" ",filename.c_str());
 			if(system(cmd)<0){
 				DLOG("convert pgn file error\n");
@@ -761,14 +814,9 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 
 void MainWindow::set_information()
 {
-	Gtk::Label* p1_name= 0;ui_xml->get_widget("P1_name",p1_name);
-	Gtk::Label* p2_name= 0;ui_xml->get_widget("P2_name",p2_name);
+	//Gtk::Label* p1_name= 0;ui_xml->get_widget("P1_name",p1_name);
+	//Gtk::Label* p2_name= 0;ui_xml->get_widget("P2_name",p2_name);
 	Gtk::Label* info   = 0;ui_xml->get_widget("info_label",info);
-#if 0
-	Gtk::Label* p1_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P1_name"));
-	Gtk::Label* p2_name= dynamic_cast<Gtk::Label*>(ui_xml->get_widget("P2_name"));
-	Gtk::Label* info   = dynamic_cast<Gtk::Label*>(ui_xml->get_widget("info_label"));
-#endif
 	
 	const Board_info& board_info = board->get_board_info();
 	p1_name->set_label(board_info.black);
@@ -790,21 +838,7 @@ void MainWindow::set_status()
 {
 	int f_status = board->get_status();
 	bool f_use=1;
-#if 0
-	if( READ_STATUS != f_status){
-		f_use = 0;
-		//buttonbox_war->hide();
-	}
-	btn_next->set_sensitive(f_use);
-	btn_prev->set_sensitive(f_use);
-	btn_start->set_sensitive(f_use);
-	btn_end->set_sensitive(f_use);
 
-	btn_begin->set_sensitive(1-f_use);
-	btn_lose->set_sensitive(1-f_use);
-	btn_draw->set_sensitive(1-f_use);
-	btn_rue->set_sensitive(1-f_use);
-#endif
 	switch(f_status){
 		case READ_STATUS:
 			btn_next->set_sensitive(f_use);
@@ -1054,6 +1088,9 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 		Gtk::MessageDialog dialog_info(*this, _("Game End"), false);
 		dialog_info.set_secondary_text(msg);
 		int result = dialog_info.run();
+
+		if(board->is_network_game())
+			auto_save_chess_file();
 		board->free_game(false);
 		set_status();
 }

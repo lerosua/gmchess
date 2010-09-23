@@ -92,6 +92,8 @@ class MainWindow:public Gtk::Window
 		void watch_socket(int fd);
 		bool on_delete_event(GdkEventAny* event);
 		void info_window(const std::string& info);
+		/**  用于网络对战自动保存棋谱*/
+		void auto_save_chess_file();
 	protected:
 		/** 初始化配置文件*/
 		void init_conf();
@@ -133,7 +135,6 @@ class MainWindow:public Gtk::Window
 		
 	private:
 		Board*				board;
-		//GlademmXML			ui_xml;
 		GBuilderXML			ui_xml;
 		Glib::RefPtr<Gtk::UIManager>	ui_manager;
 		Glib::RefPtr<Gtk::ActionGroup> 	action_group;
