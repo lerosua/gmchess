@@ -100,8 +100,6 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
-	//init_conf();
-
 	board= Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
 
@@ -426,7 +424,6 @@ void MainWindow::on_menu_save_file()
 		return;
 
 
-	//std::ofstream  file("/tmp/chess.pgn");
 	std::ofstream  file;
 	file.open(filename.c_str());
 	if(!file){
@@ -1128,7 +1125,6 @@ void MainWindow::start_with(const std::string& param)
 			pos_m = param.find_last_of("@");
 			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
 			
-			//on_network_game(my_name,enemy_name,true);
 			on_network_game(enemy_name,my_name,true);
 		}else if((pos = param.find("network-game-black,")) != std::string::npos){
 			//start network game with black player

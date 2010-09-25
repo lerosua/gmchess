@@ -838,7 +838,6 @@ void Board::rue_move()
 		return;
 	DLOG(" how_step %d\n",m_engine.how_step());
 	int mv = m_engine.get_last_move_from_snapshot();
-	//DLOG(" undo move %d\n");
 	m_engine.undo_move(mv);
 	parent.del_step_last_line();
 
@@ -849,7 +848,6 @@ void Board::rue_move()
 		moves_lines =postion_str+ m_engine.get_last_fen_from_snapshot()+std::string(" -- 0 1 ");
 		m_robot.send_ctrl_command(moves_lines.c_str());
 		m_robot.send_ctrl_command("\n");
-		//user_player = 1-user_player;
 	}
 }
 
@@ -893,7 +891,6 @@ void Board::free_game(bool redraw_)
 
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
-	//m_network.stop();
 	m_status = FREE_STATUS;
 	is_rev_board=false;
 	m_human_black=false;
@@ -972,7 +969,6 @@ void Board::new_game(BOARD_STATUS _status)
 		set_war_time(step_time,play_time);
 		m_robot.send_ctrl_command("setoption newgame\n");
 		set_level();
-		printf("计算机对战\n");
 	}
 
 
