@@ -32,8 +32,8 @@ const int border_width = 32;
 #define PIECE_START 16  //棋子开始数字 start number of chessman
 #define PIECE_END   48  //棋子结束数字 end number of chessman
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
-#define IMGAGE_DIR DATA_DIR"/themes/wood/"
-#define IMGAGE_SMALL_DIR DATA_DIR"/themes/wood-small/"
+#define IMGAGE_DIR DATA_DIR"/themes/west/"
+#define IMGAGE_SMALL_DIR DATA_DIR"/themes/west-small/"
 #define HEX_ESCAPE '%'
 
 
