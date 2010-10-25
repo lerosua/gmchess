@@ -1,5 +1,5 @@
 
-gmchessimagedir= $(pkgdatadir)/wood-small
+gmchessimagedir= $(pkgdatadir)/themes/wood
 gmchessimage_DATA= \
 		   bg.png 	\
 		   select.png   \

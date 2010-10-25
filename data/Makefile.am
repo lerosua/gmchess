@@ -1,4 +1,4 @@
-SUBDIRS=wood wood-small sound
+SUBDIRS=sound themes
 gmchess_ui = \
 	     gmchess.glade \
 	     confwin.glade \

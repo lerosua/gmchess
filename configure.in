@@ -60,8 +60,9 @@ AC_CONFIG_FILES([Makefile
 	src/Makefile
 	src/engine/Makefile
 	data/Makefile
-	data/wood/Makefile
-	data/wood-small/Makefile
+	data/themes/Makefile
+	data/themes/wood/Makefile
+	data/themes/wood-small/Makefile
 	data/sound/Makefile
 	po/Makefile.in
 	doc/Makefile

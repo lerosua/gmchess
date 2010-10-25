@@ -17950,7 +17950,7 @@ $as_echo "$LINGUAS" >&6; }
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/engine/Makefile data/Makefile data/wood/Makefile data/wood-small/Makefile data/sound/Makefile po/Makefile.in doc/Makefile doc/gmchess.6 doc/convert_pgn.6 doc/eleeye_engine.6"
+ac_config_files="$ac_config_files Makefile src/Makefile src/engine/Makefile data/Makefile data/themes/Makefile data/themes/wood/Makefile data/themes/wood-small/Makefile data/sound/Makefile po/Makefile.in doc/Makefile doc/gmchess.6 doc/convert_pgn.6 doc/eleeye_engine.6"
 
 
 cat >confcache <<\_ACEOF
@@ -19080,8 +19080,9 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/engine/Makefile") CONFIG_FILES="$CONFIG_FILES src/engine/Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
-    "data/wood/Makefile") CONFIG_FILES="$CONFIG_FILES data/wood/Makefile" ;;
-    "data/wood-small/Makefile") CONFIG_FILES="$CONFIG_FILES data/wood-small/Makefile" ;;
+    "data/themes/Makefile") CONFIG_FILES="$CONFIG_FILES data/themes/Makefile" ;;
+    "data/themes/wood/Makefile") CONFIG_FILES="$CONFIG_FILES data/themes/wood/Makefile" ;;
+    "data/themes/wood-small/Makefile") CONFIG_FILES="$CONFIG_FILES data/themes/wood-small/Makefile" ;;
     "data/sound/Makefile") CONFIG_FILES="$CONFIG_FILES data/sound/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
