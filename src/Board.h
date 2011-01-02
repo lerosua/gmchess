@@ -31,7 +31,7 @@ class MainWindow;
 class Board : public Gtk::DrawingArea 
 {
 	public:
-		Board(MainWindow& win,const std::string& theme_);
+		Board(MainWindow& win);
 		~Board();
 		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
 		void watch_socket(int fd);
@@ -39,6 +39,7 @@ class Board : public Gtk::DrawingArea
 		int init_send_socket();
 		void close_send_socket();
 		void send_to_socket(const std::string& cmd_);
+		void set_themes(const std::string& themes_);
 
 
 	protected:

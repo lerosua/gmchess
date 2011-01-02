@@ -102,7 +102,7 @@ std::string  wind_unescape_string (const char *escaped_string,
 
 }
 
-Board::Board(MainWindow& win,const std::string& theme_) :
+Board::Board(MainWindow& win) :
 	selected_x(-1),
 	selected_y(-1),
 	m_step(0),
@@ -126,7 +126,7 @@ Board::Board(MainWindow& win,const std::string& theme_) :
 	,m_search_depth(8)
 	,m_usebook(true)
 	,m_human_black(false)
-	,theme(theme_)
+	,theme("wood")
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -152,6 +152,7 @@ Board::Board(MainWindow& win,const std::string& theme_) :
 
 }
 
+
 Board::~Board()
 {
 	if(timer.connected())
@@ -160,6 +161,13 @@ Board::~Board()
 	m_robot.stop();
 }
 
+void Board::set_themes(const std::string& themes_)
+{
+	theme = themes_;
+	/** 加载所需要图片进内存*/
+	load_images();
+	redraw();
+}
 Glib::RefPtr<Gdk::Pixbuf> Board::get_pic(const std::string& name_)
 {
 	char path[1024];

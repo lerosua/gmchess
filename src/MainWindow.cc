@@ -100,13 +100,7 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
-	//初始化配置文件
-	//init_conf();
-	//std::string theme_ = GMConf["themes"];
-	//if(theme_.empty())
-	//	theme_ = "wood";
-
-	board = Gtk::manage(new Board(*this,"west"));
+	board = Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
 
 	this->add(*main_window);
@@ -173,6 +167,10 @@ MainWindow::MainWindow():menubar(NULL)
 	int _play_time= atoi(GMConf["play_time"].c_str());
 	if(_step_time>0&&_step_time<600 && _play_time>0)
 		board->set_time(_step_time,_play_time);
+	std::string theme_ = GMConf["themes"];
+	if(theme_.empty())
+		theme_ = "wood";
+	board->set_themes(theme_);
 }
 
 MainWindow::~MainWindow()
