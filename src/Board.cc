@@ -732,8 +732,8 @@ int Board::try_move(int dst_x,int dst_y)
 	int dst = m_engine.get_dst_xy(dst_x,dst_y,is_rev_board);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
-	int eat = m_engine.get_move_eat(mv);
-	DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
+	//int eat = m_engine.get_move_eat(mv);
+	//DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
 	return try_move(mv);
 }
 int Board::try_move(int mv)
@@ -1349,11 +1349,11 @@ bool Board::on_network_io(const Glib::IOCondition& )
 int Board::init_send_socket()
 {
 	int sockfd;
-	char buf[1024];
+	//char buf[1024];
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
-	bzero(&srvaddr,sizeof(srvaddr));
+	memset(&srvaddr,0,sizeof(srvaddr));
 	srvaddr.sin_family=AF_INET;
 	srvaddr.sin_port=htons(GMPORT+1);
 	srvaddr.sin_addr.s_addr=htonl(INADDR_ANY);
@@ -1367,11 +1367,11 @@ void Board::send_to_socket(const std::string& cmd_)
 {
 
 	int sockfd;
-	char buf[1024];
+	//char buf[1024];
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
-	bzero(&srvaddr,sizeof(srvaddr));
+	memset(&srvaddr,0,sizeof(srvaddr));
 	srvaddr.sin_family=AF_INET;
 	srvaddr.sin_port=htons(GMPORT+1);
 	srvaddr.sin_addr.s_addr=htonl(INADDR_ANY);

@@ -39,12 +39,12 @@ class Robot {
 		ssize_t get_robot_log(char* buf, size_t count) 
 		{ return read(child_tem, buf, count); }
 
-		typedef sigc::signal<void> type_signal_stop;
-		type_signal_stop signal_stop()
+		typedef const sigc::signal<void> type_signal_stop;
+		type_signal_stop signal_stop() const
 		{ return signal_stop_; }
 
-		typedef sigc::signal<void> type_signal_start;
-		type_signal_start signal_start()
+		typedef const sigc::signal<void> type_signal_start;
+		type_signal_start signal_start() const
 		{ return signal_start_; }	
 	protected:
 		int my_system(char* const argv[]);

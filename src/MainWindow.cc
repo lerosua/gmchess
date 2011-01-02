@@ -884,7 +884,7 @@ void MainWindow::set_status()
 
 }
 
-void MainWindow::on_network_game(const std::string me_name,const std::string& enemy_name,bool role_red_)
+void MainWindow::on_network_game(const std::string& me_name,const std::string& enemy_name,bool role_red_)
 {
 		p1_name->set_text(enemy_name);
 		p2_name->set_text(me_name);
@@ -934,7 +934,7 @@ void MainWindow::on_begin_game()
 		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
 		Glib::ustring msg =_("You are play with network game,Please over it first!");
 		dialog_info.set_secondary_text(msg);
-		int result = dialog_info.run();
+		dialog_info.run();
 		return ;
 
 	}
@@ -984,15 +984,15 @@ void MainWindow::on_lose_game()
         int result =dialog.run();
         switch (result) {
             case (Gtk::RESPONSE_OK): {
-		    board->send_to_socket("resign");
-		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
-		Glib::ustring msg =_("You lose the game!");
-		dialog_info.set_secondary_text(msg);
-		int result = dialog_info.run();
-                board->free_game();
-                set_status();
+				board->send_to_socket("resign");
+				Gtk::MessageDialog dialog_info(*this, _("Information"), false);
+				Glib::ustring msg =_("You lose the game!");
+				dialog_info.set_secondary_text(msg);
+				dialog_info.run();
+				board->free_game();
+				set_status();
                             break;
-                    }
+				}
 
             case (Gtk::RESPONSE_CANCEL): {
                 //board->free_game(false);
@@ -1020,7 +1020,7 @@ void MainWindow::on_draw_game()
 			Gtk::MessageDialog dialog(*this, _("Warning"), false);
 			Glib::ustring msg =_("Only ask rue game when you are going,so wait a minute!");
 			dialog.set_secondary_text(msg);
-			int result = dialog.run();
+			dialog.run();
 		}
 	}
 
@@ -1040,7 +1040,7 @@ void MainWindow::on_rue_game()
 			Gtk::MessageDialog dialog(*this, _("Warning"), false);
 			Glib::ustring msg =_("Only rue game when you are going,so wait a minute!");
 			dialog.set_secondary_text(msg);
-			int result = dialog.run();
+			dialog.run();
 		}
 
 	}
@@ -1052,7 +1052,7 @@ void MainWindow::on_rue_game()
 			Gtk::MessageDialog dialog(*this, _("Warning"), false);
 			Glib::ustring msg =_("Only rue game when you are going,so wait a minute!");
 			dialog.set_secondary_text(msg);
-			int result = dialog.run();
+			dialog.run();
 		}
 
 
@@ -1091,7 +1091,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 	}
 		Gtk::MessageDialog dialog_info(*this, _("Game End"), false);
 		dialog_info.set_secondary_text(msg);
-		int result = dialog_info.run();
+		dialog_info.run();
 
 		if(board->is_network_game())
 			auto_save_chess_file();
@@ -1120,8 +1120,7 @@ void MainWindow::watch_socket(int fd)
 }
 void MainWindow::start_with(const std::string& param)
 {
-		size_t pos;
-		if((pos = param.find("network-game-red,"))!= std::string::npos){
+		if((param.find("network-game-red,"))!= std::string::npos){
 			//start network game with red player
 			std::string enemy_name,my_name;
 			size_t pos_s,pos_e,pos_m;
@@ -1133,7 +1132,7 @@ void MainWindow::start_with(const std::string& param)
 			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
 			
 			on_network_game(enemy_name,my_name,true);
-		}else if((pos = param.find("network-game-black,")) != std::string::npos){
+		}else if((param.find("network-game-black,")) != std::string::npos){
 			//start network game with black player
 			std::string enemy_name,my_name;
 			size_t pos_s,pos_e,pos_m;

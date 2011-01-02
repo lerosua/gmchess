@@ -133,7 +133,8 @@ __forceinline uint32_t Shrd(uint32_t LowLong, uint32_t HighLong, uint32_t Count)
 #else
 
 static __inline__ int Exchange(volatile int *Target, int Value) {
-  int eax, ebx;
+  int eax=0; 
+  int ebx=0;
   asm __volatile__ (
     "xchgl %0, (%1)" "\n\t"
     : "=a" (eax), "=b" (ebx)
@@ -143,7 +144,9 @@ static __inline__ int Exchange(volatile int *Target, int Value) {
 }
 
 static __inline__ int CompareExchange(volatile int *Destination, int Exchange, int Comperand) {
-  int eax, ebx, edx;
+  int eax=0; 
+  int ebx=0;
+  int edx=0;
     asm __volatile__ (
     "cmpxchgl %2, (%1)" "\n\t"
     : "=a" (eax), "=b" (ebx), "=d" (edx)
@@ -153,7 +156,8 @@ static __inline__ int CompareExchange(volatile int *Destination, int Exchange, i
 }
 
 static __inline__ int ExchangeAdd(volatile int *Addend, int Increment) {
-  int eax, ebx;
+  int eax=0;
+  int ebx=0;
   asm __volatile__ (
     "xaddl %0, (%1)" "\n\t"
     : "=a" (eax), "=b" (ebx)

@@ -633,8 +633,10 @@ int Pgn2Pgn(const char *szFile, const char *szPgnFile,
 	if (infp == NULL) {
 		return _ERROR_OPEN;
 	}
-	if((outfp=fopen(szPgnFile,"wb"))==NULL) 
+	if((outfp=fopen(szPgnFile,"wb"))==NULL) {
+		fclose(infp);
 		return _ERROR_OPEN;
+	}
 	while(!feof(infp)){
 		c=fgetc(infp);
 		fputc(c,outfp);

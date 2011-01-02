@@ -26,8 +26,6 @@
 #include <gtkmm/liststore.h>
 #include "Board.h"
 #define main_ui  DATA_DIR"/gmchess.glade"
-//typedef Glib::RefPtr < Gnome::Glade::Xml > GlademmXML;
-typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 
 class Board;
 class BookView;
@@ -54,7 +52,7 @@ class MainWindow:public Gtk::Window
 		 * @param enemy_ 对方名字
 		 * @param role_red_ 已方角色
 		 */
-		void on_network_game(const std::string me_,const std::string& enemy_,bool role_red_=true);
+		void on_network_game(const std::string& me_,const std::string& enemy_,bool role_red_=true);
 		/** gmchess最开始运行带的参数解释函数*/
 		void start_with(const std::string& param);
 		/** 认输*/
@@ -134,6 +132,7 @@ class MainWindow:public Gtk::Window
 		Glib::RefPtr<Gtk::ListStore>	m_refTreeModel;
 		
 	private:
+		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 		Board*				board;
 		GBuilderXML			ui_xml;
 		Glib::RefPtr<Gtk::UIManager>	ui_manager;

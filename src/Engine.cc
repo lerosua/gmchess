@@ -22,6 +22,9 @@
 Engine::Engine():black_player(0)
 		 ,m_checked(0)
 {
+	memset(chessboard, 0 , sizeof(chessboard));
+	memset(revchessboard, 0, sizeof(revchessboard));
+	memset(chessmans, 0, sizeof(chessmans));
 	clean_board();
 }
 
@@ -759,7 +762,7 @@ bool Engine::logic_move(int mv)
 				int min_t = src<dst?src:dst;
 				int num_t = abs(RANK_Y(src)-RANK_Y(dst))-1;
 				min_t +=16;
-				int paotai=0;
+				//int paotai=0;
 				if(!eated){
 					for(int i =0;i<num_t;i++){
 						if(chessboard[min_t]==0)
@@ -770,6 +773,7 @@ bool Engine::logic_move(int mv)
 					return true;
 				}
 				else{
+					int paotai=0;
 					for(int i =0;i<num_t;i++){
 						if(chessboard[min_t]==0)
 							;
@@ -786,7 +790,6 @@ bool Engine::logic_move(int mv)
 				int min_t = src<dst?src:dst;
 				int num_t = abs(src-dst) -1 ;
 				min_t++;
-				int paotai=0;
 				if(!eated){
 					for(int i =0;i<num_t; i++){
 						if(chessboard[min_t]==0)
@@ -797,6 +800,7 @@ bool Engine::logic_move(int mv)
 					return true;
 				}
 				else {
+					int paotai=0;
 					for(int i =0;i<num_t; i++){
 						if(chessboard[min_t]==0)
 							;
@@ -1650,7 +1654,11 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 	DLOG("hazi[0...3] = %c%c%c%c\n",c_hanzi.word[0],c_hanzi.word[1],c_hanzi.word[2],c_hanzi.word[3]);
 	/** cman_type 是棋子类型*/
 	int cman_type = fen_to_piece(c_hanzi.word[0]);
-	int src_x,src_y,dst_x,dst_y;
+	//int src_x,src_y,dst_x,dst_y;
+	int src_x = 0;
+	int src_y = 0;
+	int dst_x = 0;
+	int dst_y = 0;
 	int num =0;
 
 	DLOG("who is going black=%d\n",black_player);
@@ -1935,7 +1943,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 	}
 	else if(4==cman_type||5==cman_type){
 		/** 车炮的目标坐标生成*/
-		int type_num;
+		int type_num=0;
 			if(cman_type==4)
 				type_num = 23;
 			else if(5==cman_type)
@@ -2164,7 +2172,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 		}
 
 		if(c_hanzi.word[2] == '+'){
-			char c= c_hanzi.word[3];
+			//char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
 				dst_y = src_y + 1;
@@ -2172,7 +2180,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 				dst_y = src_y - 1;
 		}
 		else if(c_hanzi.word[2] == '-'){
-			char c= c_hanzi.word[3];
+			//char c= c_hanzi.word[3];
 			dst_x = src_x;
 			if(!black_player)
 				dst_y = src_y - 1;

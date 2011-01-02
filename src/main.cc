@@ -30,13 +30,12 @@ TGMConf GMConf;
 //检测单一实例
 int singleon(const std::string& url)
 {
-	int sockfd,nbytes;
-	char buf[1024];
-	struct hostent *he;
+	int sockfd;
+	//struct hostent *he;
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
-	bzero(&srvaddr,sizeof(srvaddr));
+	memset(&srvaddr, 0, sizeof(srvaddr));
 	srvaddr.sin_family=AF_INET;
 	srvaddr.sin_port=htons(GMPORT);
 	srvaddr.sin_addr.s_addr=htonl(INADDR_ANY);
