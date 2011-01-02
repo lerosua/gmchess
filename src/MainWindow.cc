@@ -739,7 +739,8 @@ void MainWindow::on_menu_about()
 		about->set_comments(_("GMChess is chinese chess game write by gtkmm"));
 		about->set_authors(authors);
 		about->set_license (_("This program is licenced under GNU General Public Licence (GPL) version 2."));
-		about->set_translator_credits("lerosua");
+		Glib::ustring transer = "zh_CN lerosua@gmail.com\nru Sadovnikov Dmitry <xbadcode@mail.ru>";
+		about->set_translator_credits(transer);
 
 
 	}
