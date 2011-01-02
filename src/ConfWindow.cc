@@ -54,6 +54,18 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	m_depth = GMConf["engine_depth"] ;
 	m_step_time = GMConf["step_time"] ;
 	m_play_time = GMConf["play_time"] ;
+	m_theme = GMConf["themes"];
+
+	Gtk::HBox* hbox = 0;
+	vbox_xml->get_widget("hbox_theme", hbox);
+	cbtheme = Gtk::manage(new Gtk::ComboBoxText);
+	cbtheme->append_text("wood");
+	cbtheme->append_text("west");
+	if(m_theme == "wood")
+		cbtheme->set_active_text("wood");
+	else
+		cbtheme->set_active_text("west");
+	hbox->pack_start(*cbtheme);
 
 	m_pVariablesMap = new VariablesMap(vbox_xml);
 	m_pVariablesMap->connect_widget("b_radiobutton",m_size_big);
@@ -102,4 +114,10 @@ void ConfWindow::write_to_GMConf()
 	GMConf["engine_depth"] = m_depth;
 	GMConf["step_time"] = m_step_time;
 	GMConf["play_time"] = m_play_time;
+
+	if(cbtheme->get_active_text() == "wood")
+		GMConf["themes"] = "wood";
+	else
+		GMConf["themes"] = "west";
+
 }

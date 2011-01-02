@@ -43,11 +43,13 @@ class ConfWindow: public Gtk::Window
 		MainWindow* parent;
 		type_signal_quit signal_quit_;
 		VariablesMap* m_pVariablesMap;
-		bool				m_size_big;
-		bool				m_usebook;
+		Gtk::ComboBoxText* cbtheme;
 		Glib::ustring			m_depth;
 		Glib::ustring			m_step_time;
 		Glib::ustring			m_play_time;
+		Glib::ustring			m_theme;
+		bool				m_size_big;
+		bool				m_usebook;
 
 };
 

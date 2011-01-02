@@ -705,6 +705,7 @@ void MainWindow::on_conf_window_quit()
 		board->set_board_size(BIG_BOARD);
 	else
 		board->set_board_size(SMALL_BOARD);
+	board->set_themes(GMConf["themes"]);
 }
 void MainWindow::on_conf_window_close()
 {
