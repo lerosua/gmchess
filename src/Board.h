@@ -31,7 +31,7 @@ class MainWindow;
 class Board : public Gtk::DrawingArea 
 {
 	public:
-		Board(MainWindow& win);
+		Board(MainWindow& win,const std::string& theme_);
 		~Board();
 		const Board_info& get_board_info(){ return p_pgnfile->get_board_info() ;}
 		void watch_socket(int fd);
@@ -46,6 +46,9 @@ class Board : public Gtk::DrawingArea
 		bool on_expose_event(GdkEventExpose* ev);
 		bool on_configure_event(GdkEventConfigure* ev);
 		bool on_button_press_event(GdkEventButton* ev);
+
+		Glib::RefPtr<Gdk::Pixbuf> get_pic(const std::string& name_);
+		Glib::RefPtr<Gdk::Pixbuf> get_spic(const std::string& name_);
 
 		/** 由棋盘9x10坐标得到棋盘真实坐标*/
 		/** get the true coordinate from 9x10 postion*/
@@ -204,6 +207,8 @@ class Board : public Gtk::DrawingArea
 		std::string moves_lines;
 		/** 着法状态开头序列，potions fen xxx*/
 		const std::string postion_str;
+		/** 所使用的主题*/
+		std::string theme;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;

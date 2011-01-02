@@ -100,7 +100,13 @@ MainWindow::MainWindow():menubar(NULL)
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
 
-	board= Gtk::manage(new Board(*this));
+	//初始化配置文件
+	//init_conf();
+	//std::string theme_ = GMConf["themes"];
+	//if(theme_.empty())
+	//	theme_ = "wood";
+
+	board = Gtk::manage(new Board(*this,"west"));
 	box_board->pack_start(*board);
 
 	this->add(*main_window);
@@ -110,7 +116,7 @@ MainWindow::MainWindow():menubar(NULL)
 	this->set_icon(ui_logo);
 	/** 设置菜单, set the menu*/
 	init_ui_manager();
-	 menubar = ui_manager->get_widget("/MenuBar");
+	menubar = ui_manager->get_widget("/MenuBar");
 	Gtk::VBox* menu_tool_box=0;
 	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
@@ -229,6 +235,7 @@ void MainWindow::init_conf()
 		GMConf["usebook"]="1";
 		GMConf["desktop_size"] = "1"; //0--small,1--big
 		GMConf["engine_depth"] ="5";
+		GMConf["themes"]="wood";
 		save_conf();
 
 		snprintf(file_dir,512,"%s/gmchess/files",homedir.c_str());

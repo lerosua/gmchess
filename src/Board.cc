@@ -102,7 +102,7 @@ std::string  wind_unescape_string (const char *escaped_string,
 
 }
 
-Board::Board(MainWindow& win) :
+Board::Board(MainWindow& win,const std::string& theme_) :
 	selected_x(-1),
 	selected_y(-1),
 	m_step(0),
@@ -126,6 +126,7 @@ Board::Board(MainWindow& win) :
 	,m_search_depth(8)
 	,m_usebook(true)
 	,m_human_black(false)
+	,theme(theme_)
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -134,7 +135,6 @@ Board::Board(MainWindow& win) :
 
 
 	this->set_size_request(221,277);
-	//this->set_size_request(521,577);
 
 	this->drag_dest_set(listTargets);
 	this->signal_drag_data_received().connect(
@@ -146,12 +146,9 @@ Board::Board(MainWindow& win) :
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
-	//m_network.set_out_slot(sigc::mem_fun(*this, &Board::network_log));
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 
 	this->show_all();
-
-
 
 }
 
@@ -161,13 +158,71 @@ Board::~Board()
 		timer.disconnect();
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
-	//m_network.stop();
+}
+
+Glib::RefPtr<Gdk::Pixbuf> Board::get_pic(const std::string& name_)
+{
+	char path[1024];
+	sprintf(path, DATA_DIR"/themes/%s/%s",theme.c_str(),name_.c_str());
+	return Gdk::Pixbuf::create_from_file(path);
+
+}
+
+Glib::RefPtr<Gdk::Pixbuf> Board::get_spic(const std::string& name_)
+{
+	char path[1024];
+	sprintf(path, DATA_DIR"/themes/%s-small/%s",theme.c_str(),name_.c_str());
+	return Gdk::Pixbuf::create_from_file(path);
+
 }
 
 void Board::load_images()
 {
-	bg_image = Gdk::Pixbuf::create_from_file(IMGAGE_DIR"bg.png");
+	//bg_image = Gdk::Pixbuf::create_from_file(IMGAGE_DIR"bg.png");
 
+	bg_image = get_pic("bg.png");
+	if(is_small_board){
+		chessman_images[BLACK_ADVISOR] = get_spic("black_advisor.png");
+		chessman_images[BLACK_BISHOP] = get_spic("black_bishop.png");
+		chessman_images[BLACK_CANNON] = get_spic("black_cannon.png");
+		chessman_images[BLACK_KING] = get_spic("black_king.png");
+		chessman_images[BLACK_KING_DIE] = get_spic("black_king_die.png");
+		chessman_images[BLACK_KNIGHT] = get_spic("black_knight.png");
+		chessman_images[BLACK_PAWN] = get_spic("black_pawn.png");
+		chessman_images[BLACK_ROOK] = get_spic("black_rook.png");
+		chessman_images[RED_ADVISOR] = get_spic("red_advisor.png");
+		chessman_images[RED_BISHOP] = get_spic("red_bishop.png");
+		chessman_images[RED_CANNON] = get_spic("red_cannon.png");
+		chessman_images[RED_KING] = get_spic("red_king.png");
+		chessman_images[RED_KING_DIE] = get_spic("red_king_die.png");
+		chessman_images[RED_KNIGHT] = get_spic("red_knight.png");
+		chessman_images[RED_PAWN] = get_spic("red_pawn.png");
+		chessman_images[RED_ROOK] = get_spic("red_rook.png");
+		chessman_images[SELECTED_CHESSMAN] = get_spic("select.png");
+		chessman_images[NULL_CHESSMAN] = get_spic("null.png");
+	}
+	else{
+
+		chessman_images[BLACK_ADVISOR] = get_pic("black_advisor.png");
+		chessman_images[BLACK_BISHOP] = get_pic("black_bishop.png");
+		chessman_images[BLACK_CANNON] = get_pic("black_cannon.png");
+		chessman_images[BLACK_KING] = get_pic("black_king.png");
+		chessman_images[BLACK_KING_DIE] = get_pic("black_king_die.png");
+		chessman_images[BLACK_KNIGHT] = get_pic("black_knight.png");
+		chessman_images[BLACK_PAWN] = get_pic("black_pawn.png");
+		chessman_images[BLACK_ROOK] = get_pic("black_rook.png");
+		chessman_images[RED_ADVISOR] = get_pic("red_advisor.png");
+		chessman_images[RED_BISHOP] = get_pic("red_bishop.png");
+		chessman_images[RED_CANNON] = get_pic("red_cannon.png");
+		chessman_images[RED_KING] = get_pic("red_king.png");
+		chessman_images[RED_KING_DIE] = get_pic("red_king_die.png");
+		chessman_images[RED_KNIGHT] = get_pic("red_knight.png");
+		chessman_images[RED_PAWN] = get_pic("red_pawn.png");
+		chessman_images[RED_ROOK] = get_pic("red_rook.png");
+		chessman_images[SELECTED_CHESSMAN] = get_pic("select.png");
+		chessman_images[NULL_CHESSMAN] = get_pic("null.png");
+	}
+	/*
 	if(is_small_board){
 		chessman_images[BLACK_ADVISOR] = Gdk::Pixbuf::create_from_file(IMGAGE_SMALL_DIR"black_advisor.png");
 		chessman_images[BLACK_BISHOP] = Gdk::Pixbuf::create_from_file(IMGAGE_SMALL_DIR"black_bishop.png");
@@ -210,6 +265,7 @@ void Board::load_images()
 		chessman_images[NULL_CHESSMAN] = Gdk::Pixbuf::create_from_file(IMGAGE_DIR"null.png");
 
 	}
+	*/
 	
 }
 
