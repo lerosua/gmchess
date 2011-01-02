@@ -2,10 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy toplevel-contextual -->
-  <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text">Chinese chess for linux 
-gmchess by lerosua and wind</property>
-  </object>
   <object class="GtkWindow" id="gmchess">
     <property name="visible">True</property>
     <property name="title" translatable="yes">chess</property>
@@ -879,9 +875,6 @@ gmchess by lerosua and wind</property>
                                   <object class="GtkTextView" id="textview_comment">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="editable">False</property>
-                                    <property name="wrap_mode">word</property>
-                                    <property name="buffer">textbuffer1</property>
                                   </object>
                                 </child>
                               </object>
