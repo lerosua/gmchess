@@ -809,6 +809,7 @@ int Board::try_move(int mv)
 			count_time=0;
 
 		}
+		parent.set_comment("");
 
 		/**被将死了*/
 		/** is it  mate */
@@ -817,12 +818,17 @@ int Board::try_move(int mv)
 				timer.disconnect();
 			CSound::play(SND_CHECK);
 			parent.on_end_game(ROBOT_WIN);
+			parent.set_comment("不要气馁，再接再大励吧!");
 			DLOG("将军死棋\n");
 			return 0;
 		}
 		if(m_engine.get_checkby()){
 			CSound::play(SND_CHECK);
 			DLOG("将军===============\n");
+			if(is_human_player())
+				parent.set_comment("您被将军了，小心噢!");
+			else
+				parent.set_comment("将军，干得好，看好你噢!");
 		}
 
 	}
