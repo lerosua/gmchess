@@ -98,6 +98,7 @@ class MainWindow:public Gtk::Window
 		void init_ui_manager();
 		void on_menu_open_file();
 		void on_menu_save_file();
+		void on_menu_save_board_to_png();
 		void on_menu_file_quit();
 		void on_menu_view_preferences();
 		void on_menu_war_to_ai();

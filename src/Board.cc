@@ -362,6 +362,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					}
 				}
 
+				selected_point = Gdk::Point(ev->x,ev->y);
 				draw_select_frame(true);
 			}
 		}
@@ -373,17 +374,18 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
 				/** change the select */
 				selected_chessman = dst_chessman;
+				selected_point = Gdk::Point(ev->x,ev->y);
 				draw_select_frame(true);
 				CSound::play(SND_CHOOSE);
 
 			}
 			else if(dst_chessman == 0){
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
-				try_move(selected_x,selected_y);
-			}
-			else{
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
+				new_point = Gdk::Point(ev->x,ev->y);
 				try_move(selected_x,selected_y);
+				
+			
 			}
 
 
@@ -600,21 +602,6 @@ void Board::draw_select_frame(bool selected)
 
 }
 
-void Board::draw_pieces()
-{
-#if 0
-	int i,j;
-	i = PIECE_START;
-	for(;i<PIECE_END;i++)
-	{
-		int sq = pieces[i];
-		if(sq == 0||sq<0x33||sq>0xcb)
-			continue;
-		draw_chessman(RANK_X(sq),RANK_Y(sq),get_chessman_type(i));
-	}
-	draw_select_frame(true);
-#endif
-}
 
 void Board::draw_board()
 {
@@ -625,6 +612,30 @@ void Board::draw_board()
 	}
 }
 
+void Board::draw_trace()
+{
+
+	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_base_gc(Gtk::STATE_NORMAL);
+
+	Gdk::Point p1 = get_position(selected_point.get_x(),selected_point.get_y());
+	Gdk::Point s1 = get_coordinate(p1.get_x(),p1.get_y());
+	p1 = get_position(new_point.get_x(),new_point.get_y());
+	Gdk::Point s2 = get_coordinate(p1.get_x(),p1.get_y());
+
+	gc->set_line_attributes(4,Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL);
+	std::vector<Gdk::Point> poss;
+	poss.push_back(s1);
+	poss.push_back(s2);
+	ui_pixmap->draw_lines(gc, poss);
+	printf("draw_trace --%dx%d ->%dx%d\n",selected_point.get_x(),selected_point.get_y(),new_point.get_x(),new_point.get_y());
+
+	int x,y;
+	ui_pixmap->get_size(x,y);
+	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
+			0,0,
+			0,0,
+			x,y);
+}
 void Board::first_move()
 {
 	m_step = 0;
@@ -757,6 +768,7 @@ int Board::try_move(int mv)
 
 		redraw();
 		selected_chessman = m_engine.get_piece(dst);
+		draw_trace();
 		draw_select_frame(true);
 		printf("sleceted = %d finish move and redraw now\n",selected_chessman);
 		selected_chessman=-1;
@@ -1396,4 +1408,13 @@ void Board::close_send_socket()
 		close(fd_send_skt);
 		fd_send_skt=-1;
 	}
+}
+
+void Board::save_board_to_file()
+{
+	int w,h;
+	ui_pixmap->get_size(w, h);
+	Glib::RefPtr<Gdk::Pixbuf> png = Gdk::Pixbuf::create((Glib::RefPtr<Gdk::Drawable>) ui_pixmap, 0, 0,	w, h);
+	png->save("/tmp/1.png", "png");
+
 }

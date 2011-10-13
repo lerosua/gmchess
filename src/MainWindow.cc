@@ -36,6 +36,7 @@ Glib::ustring ui_info =
 "		<menu action='FileMenu'>"
 "			<menuitem action='OpenFile'/>"
 "			<menuitem action='SaveAs'/>"
+"			<menuitem action='SaveBoard'/>"
 "			<separator/>"
 "			<menuitem action='FileQuit'/>"
 "        	</menu>"
@@ -377,6 +378,10 @@ void MainWindow::init_ui_manager()
 	action->set_tooltip(_("Save as a chess pgn file"));
 	action_group->add(action,
 			sigc::mem_fun(*this,&MainWindow::on_menu_save_file));
+	action = Gtk::Action::create("SaveBoard", Gtk::Stock::SAVE, _("Save Board"));
+	action->set_tooltip(_("Save borad to a png file"));
+	action_group->add(action,
+			sigc::mem_fun(*this, &MainWindow::on_menu_save_board_to_png));
 
 	action_group->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 			sigc::mem_fun(*this, &MainWindow::on_menu_file_quit));
@@ -410,6 +415,11 @@ void MainWindow::init_ui_manager()
 	add_accel_group(ui_manager->get_accel_group());
 	ui_manager->add_ui_from_string(ui_info);
 
+}
+
+void MainWindow::on_menu_save_board_to_png()
+{
+	board->save_board_to_file();
 }
 
 void MainWindow::on_menu_save_file()

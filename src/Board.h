@@ -79,12 +79,7 @@ class Board : public Gtk::DrawingArea
 		 * draw the station of board  from chess array
 		 */
 		void draw_board();
-		/**
-		 * @brief 根据棋子数组画出对局
-		 * 棋子数组，由16->47,0表示被吃掉了
-		 * useless
-		 */
-		void draw_pieces();
+
 		/** 画选择棋子边框 */
 		/** draw the frame of chess */
 		void draw_select_frame(bool selected = true);
@@ -191,6 +186,9 @@ class Board : public Gtk::DrawingArea
 		void set_time(int _step_time,int _play_time);
 		/** 倒计时的声音*/
 		void reckon_time_sound(int time_);
+		/** 测试保存棋盘局面为图像文件*/
+		void save_board_to_file();
+		void draw_trace();
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -224,6 +222,8 @@ class Board : public Gtk::DrawingArea
 		int selected_y;
 		/** 选中的棋子,值为代号,16-31红，32-47黑*/
 		int selected_chessman;
+		Gdk::Point selected_point;
+		Gdk::Point new_point;
 		/** 步时 */
 		int m_step;
 		/** 棋局状态*/
