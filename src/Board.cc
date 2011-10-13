@@ -379,13 +379,13 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				CSound::play(SND_CHOOSE);
 
 			}
-			else if(dst_chessman == 0){
+		//else if(dst_chessman == 0){
+		else{
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
 				new_point = Gdk::Point(ev->x,ev->y);
 				try_move(selected_x,selected_y);
 				
-			
 			}
 
 
