@@ -615,7 +615,8 @@ void Board::draw_board()
 void Board::draw_trace()
 {
 
-	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_base_gc(Gtk::STATE_NORMAL);
+	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_white_gc();
+	gc->set_rgb_fg_color(Gdk::Color("green"));
 
 	Gdk::Point p1 = get_position(selected_point.get_x(),selected_point.get_y());
 	Gdk::Point s1 = get_coordinate(p1.get_x(),p1.get_y());
@@ -627,7 +628,6 @@ void Board::draw_trace()
 	poss.push_back(s1);
 	poss.push_back(s2);
 	ui_pixmap->draw_lines(gc, poss);
-	printf("draw_trace --%dx%d ->%dx%d\n",selected_point.get_x(),selected_point.get_y(),new_point.get_x(),new_point.get_y());
 
 	int x,y;
 	ui_pixmap->get_size(x,y);
