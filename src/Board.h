@@ -123,6 +123,8 @@ class Board : public Gtk::DrawingArea
 		/** 重画棋盘界面*/
 		/** redraw the board*/
 		void redraw();
+		/** redraw the board with move trace*/
+		void redraw_with_line(int mv,bool select);
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		/** get the board station from chess move */
 		void get_board_by_move(int num);
@@ -188,7 +190,7 @@ class Board : public Gtk::DrawingArea
 		void reckon_time_sound(int time_);
 		/** 测试保存棋盘局面为图像文件*/
 		void save_board_to_file();
-		void draw_trace();
+		void draw_trace(int mv);
 		
 	private:
 		/** 加载所需要图片进内存*/
@@ -222,8 +224,6 @@ class Board : public Gtk::DrawingArea
 		int selected_y;
 		/** 选中的棋子,值为代号,16-31红，32-47黑*/
 		int selected_chessman;
-		Gdk::Point selected_point;
-		Gdk::Point new_point;
 		/** 步时 */
 		int m_step;
 		/** 棋局状态*/

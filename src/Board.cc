@@ -321,6 +321,21 @@ void Board::redraw()
 			x,y);
 }
 
+void Board::redraw_with_line(int mv,bool select)
+{
+	draw_bg();
+	draw_trace(mv);
+	draw_board();
+	int x,y;
+	ui_pixmap->get_size(x,y);
+	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
+			0,0,
+			0,0,
+			x,y);
+	draw_select_frame(select);
+	
+}
+
 /**处理点击事件, handle the click events*/
 bool Board::on_button_press_event(GdkEventButton* ev)
 {
@@ -362,7 +377,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					}
 				}
 
-				selected_point = Gdk::Point(ev->x,ev->y);
 				draw_select_frame(true);
 			}
 		}
@@ -374,7 +388,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
 				/** change the select */
 				selected_chessman = dst_chessman;
-				selected_point = Gdk::Point(ev->x,ev->y);
 				draw_select_frame(true);
 				CSound::play(SND_CHOOSE);
 
@@ -383,7 +396,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		else{
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
-				new_point = Gdk::Point(ev->x,ev->y);
 				try_move(selected_x,selected_y);
 				
 			}
@@ -612,16 +624,15 @@ void Board::draw_board()
 	}
 }
 
-void Board::draw_trace()
+void Board::draw_trace(int mv)
 {
+	int src = m_engine.get_move_src(mv);
+	int dst = m_engine.get_move_dst(mv);
 
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_white_gc();
 	gc->set_rgb_fg_color(Gdk::Color("green"));
-
-	Gdk::Point p1 = get_position(selected_point.get_x(),selected_point.get_y());
-	Gdk::Point s1 = get_coordinate(p1.get_x(),p1.get_y());
-	p1 = get_position(new_point.get_x(),new_point.get_y());
-	Gdk::Point s2 = get_coordinate(p1.get_x(),p1.get_y());
+	Gdk::Point s1 =get_coordinate(m_engine.RANK_X(src)-3,m_engine.RANK_Y(src)-3);
+	Gdk::Point s2 =get_coordinate(m_engine.RANK_X(dst)-3,m_engine.RANK_Y(dst)-3);
 
 	gc->set_line_attributes(4,Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL);
 	std::vector<Gdk::Point> poss;
@@ -629,12 +640,6 @@ void Board::draw_trace()
 	poss.push_back(s2);
 	ui_pixmap->draw_lines(gc, poss);
 
-	int x,y;
-	ui_pixmap->get_size(x,y);
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			0,0,
-			0,0,
-			x,y);
 }
 void Board::first_move()
 {
@@ -743,8 +748,6 @@ int Board::try_move(int dst_x,int dst_y)
 	int dst = m_engine.get_dst_xy(dst_x,dst_y,is_rev_board);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
-	//int eat = m_engine.get_move_eat(mv);
-	//DLOG("Board:: src = %x dst = %x mv = %d eat = %d\n",src,dst,mv,eat);
 	return try_move(mv);
 }
 int Board::try_move(int mv)
@@ -766,11 +769,9 @@ int Board::try_move(int mv)
 		else
 			CSound::play(SND_MOVE);
 
-		redraw();
+		redraw_with_line(mv,true);
 		selected_chessman = m_engine.get_piece(dst);
-		draw_trace();
-		draw_select_frame(true);
-		printf("sleceted = %d finish move and redraw now\n",selected_chessman);
+		printf("move = %d finish move and redraw now\n",mv);
 		selected_chessman=-1;
 
 		std::string iccs_str=m_engine.move_to_iccs_str(mv);
