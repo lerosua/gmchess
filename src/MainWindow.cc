@@ -164,14 +164,26 @@ MainWindow::MainWindow():menubar(NULL)
 	int _depth = atoi(GMConf["engine_depth"].c_str());
 	g_log("Mainwindow",G_LOG_LEVEL_INFO,"depth %d",_depth);
 	board->set_level_config(_depth,0,0,0,0,0,atoi(GMConf["usebook"].c_str()));
-	int _step_time= atoi(GMConf["step_time"].c_str());
-	int _play_time= atoi(GMConf["play_time"].c_str());
+	std::string tmp = GMConf["step_time"];
+	if(tmp.empty())
+		tmp = "240";
+	//int _step_time= atoi(GMConf["step_time"].c_str());
+	int _step_time= atoi(tmp.c_str());
+	tmp = GMConf["play_time"];
+	if(tmp.empty())
+		tmp="60";
+	//int _play_time= atoi(GMConf["play_time"].c_str());
+	int _play_time= atoi(tmp.c_str());
 	if(_step_time>0&&_step_time<600 && _play_time>0)
 		board->set_time(_step_time,_play_time);
 	std::string theme_ = GMConf["themes"];
+	std::string engine_name = GMConf["engine_name"];
+	if(engine_name.empty())
+		engine_name = "eleeye_engine";
 	if(theme_.empty())
 		theme_ = "wood";
 	board->set_themes(theme_);
+	board->set_engine(engine_name);
 }
 
 MainWindow::~MainWindow()
@@ -235,6 +247,7 @@ void MainWindow::init_conf()
 		GMConf["desktop_size"] = "1"; //0--small,1--big
 		GMConf["engine_depth"] ="5";
 		GMConf["themes"]="wood";
+		GMConf["engine_name"] = "eleeye_engine";
 		save_conf();
 
 		snprintf(file_dir,512,"%s/gmchess/files",homedir.c_str());

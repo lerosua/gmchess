@@ -52,9 +52,12 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	std::string& use_book = GMConf["usebook"];
 	m_usebook = (!use_book.empty()) && (use_book[0] == '1'); 
 	m_depth = GMConf["engine_depth"] ;
-	m_step_time = GMConf["step_time"] ;
-	m_play_time = GMConf["play_time"] ;
+	if(!GMConf["step_time"].empty())
+		m_step_time = GMConf["step_time"] ;
+	if(!GMConf["play_time"].empty())
+		m_play_time = GMConf["play_time"] ;
 	m_theme = GMConf["themes"];
+	m_engine_name = GMConf["engine_name"];
 
 	Gtk::HBox* hbox = 0;
 	vbox_xml->get_widget("hbox_theme", hbox);
@@ -73,6 +76,7 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	m_pVariablesMap->connect_widget("sb_depth",m_depth);
 	m_pVariablesMap->connect_widget("entry_step_time",m_step_time);
 	m_pVariablesMap->connect_widget("entry_play_time",m_play_time);
+	m_pVariablesMap->connect_widget("entry_engine_name", m_engine_name);
 
 	m_pVariablesMap->transfer_variables_to_widgets();
 
@@ -114,6 +118,7 @@ void ConfWindow::write_to_GMConf()
 	GMConf["engine_depth"] = m_depth;
 	GMConf["step_time"] = m_step_time;
 	GMConf["play_time"] = m_play_time;
+	GMConf["engine_name"] = m_engine_name;
 
 	if(cbtheme->get_active_text() == "wood")
 		GMConf["themes"] = "wood";

@@ -48,6 +48,7 @@ class ConfWindow: public Gtk::Window
 		Glib::ustring			m_step_time;
 		Glib::ustring			m_play_time;
 		Glib::ustring			m_theme;
+		Glib::ustring			m_engine_name;
 		bool				m_size_big;
 		bool				m_usebook;
 

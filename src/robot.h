@@ -30,6 +30,8 @@ class Robot {
 		void pause(); 
 		void stop();
 		void start();
+		void set_engine(const std::string&  name){ engine_name = name; }
+		std::string get_engine() { return engine_name ;}
 
 		bool running() const;
 		bool pausing() const { return is_pause; }
@@ -62,10 +64,11 @@ class Robot {
 		type_signal_stop  		signal_stop_;
 		type_signal_start 		signal_start_;
 		int		child_tem; 	// 主进程和子进程的连接管道的主进程则
-		int 		child_tem2; 	// 子进程端的标准输入，输出
+		int 	child_tem2; 	// 子进程端的标准输入，输出
 		int		child_pid;	/* robot's pid (internal)*/
-		bool		is_running;	
-		bool		is_pause;	
+		bool	is_running;	
+		bool	is_pause;	
+		std::string  engine_name;  //the ucci engine execute file's name
 };
 
 #endif

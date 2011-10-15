@@ -947,6 +947,7 @@ void Board::start_robot()
 {
 	m_status = FIGHT_STATUS;
 
+	m_robot.set_engine(engine_name);
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
 	new_game(m_status);

@@ -110,6 +110,7 @@ void Robot::set_m_pipe()
 	,is_pause(false)
 	 ,child_pid(-1)
 {
+	engine_name = "eleeye_engine";
 	child_tem = -1;
 	child_tem2 = -1;
 }
@@ -138,7 +139,8 @@ void Robot::start()
 	printf("%s:%d\n",__func__,__LINE__);
 	signal_start().emit();
 	const char* argv[2];
-	argv[0]="eleeye_engine";
+	//argv[0]="eleeye_engine";
+	argv[0]=get_engine().c_str();
 	argv[1]=NULL;
 	my_system((char* const *)argv);
 

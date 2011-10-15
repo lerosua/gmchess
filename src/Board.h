@@ -92,6 +92,7 @@ class Board : public Gtk::DrawingArea
 				guint,guint time);
 	public:
 
+		void set_engine(const std::string& name){engine_name = name; }
 		/** 启动AI对战,将会启动引擎进程*/
 		/** start the AI engine*/
 		void start_robot();
@@ -200,7 +201,7 @@ class Board : public Gtk::DrawingArea
 		MainWindow& parent;
 		/** 着法引擎 */
 		Engine m_engine;
-		/** AI引擎*/
+		/** UCCI engine interface*/
 		Robot m_robot;
 		/** 读PGN文件类*/
 		Pgnfile* p_pgnfile;
@@ -208,6 +209,7 @@ class Board : public Gtk::DrawingArea
 		std::string moves_lines;
 		/** 着法状态开头序列，potions fen xxx*/
 		const std::string postion_str;
+		std::string engine_name;
 		/** 所使用的主题*/
 		std::string theme;
 
