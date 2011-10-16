@@ -21,6 +21,7 @@
 #include "BookView.h"
 #include <glib/gi18n.h>
 #include <dirent.h>
+#include <libgen.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
 
@@ -197,12 +198,12 @@ int BookView::load_book_dir(const char* Path)
 			//printf(" dir = %s \n",cPath);
 			/** 是目录，继续打开读*/
 			/**  it is a directory,continue read */
-			add_group(basename(Path),basename(cPath));
+			add_group(basename((char*)Path),basename(cPath));
 			load_book_dir(cPath);
 
 		}else{
 			//printf(" add file = %s\n",basename(node->d_name));
-			add_line(basename(Path),node->d_name,cPath);
+			add_line(basename((char*)Path),node->d_name,cPath);
 		}
 	}
 	closedir(dirp);

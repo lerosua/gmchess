@@ -28,7 +28,7 @@
 #include "gmchess.h"
 #include "Sound.h"
 
-#define version "0.29.4"
+#define version "0.29.5"
 
 Glib::ustring ui_info =
 "<ui>"
