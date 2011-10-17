@@ -149,9 +149,11 @@ MainWindow::MainWindow():menubar(NULL)
 	this->signal_check_resize().connect(
 			sigc::mem_fun(*this,&MainWindow::on_size_change));
 	
-	/** test for rgba */
+#ifdef __linux__
+	/** test for rgba , it not work in mac osx*/
 	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
 	this->set_default_colormap(colormap_);
+#endif
 
 	show_all();
 	p1_image->hide();
@@ -240,6 +242,9 @@ void MainWindow::init_conf()
 
 	std::ifstream file(buf);
 	if(!file){
+#ifdef __APPLE__
+		mkdir(homedir.c_str(),S_IRUSR|S_IWUSR|S_IXUSR);
+#endif
 		char homepath[512];
 		snprintf(homepath,512,"%s/gmchess/",homedir.c_str());
 		mkdir(homepath,S_IRUSR|S_IWUSR|S_IXUSR);

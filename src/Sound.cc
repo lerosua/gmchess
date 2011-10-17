@@ -77,9 +77,14 @@ CSound::play (SOUND_EVENTS event)
 void CSound::play_file(const char* filename)
 {
 	gchar* argv[3];
+#ifdef __linux__
 	argv[0] = "aplay";
+#endif
+
+#ifdef __APPLE__
+	argv[0] = "afplay";
+#endif
 	argv[1] = (gchar*)filename;
-	//argv[1] = filename;
 	argv[2] = NULL;
 	GError* err;
 	GSpawnFlags flas = (GSpawnFlags)(G_SPAWN_SEARCH_PATH |
