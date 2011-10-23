@@ -83,6 +83,10 @@ class Board : public Gtk::DrawingArea
 		/** 画选择棋子边框 */
 		/** draw the frame of chess */
 		void draw_select_frame(bool selected = true);
+		/** show which can move in by select chess */
+		void draw_show_can_move();
+		/** draw prompt move point */
+		void draw_phonily_point(Gdk::Point& p);
 		void draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place);
 		void draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y);
 		/** 处理拖文件事件*/

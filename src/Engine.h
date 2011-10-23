@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <glibmm.h>
+#include <gtkmm.h>
 
 
 /**
@@ -264,6 +265,8 @@ class Engine {
 		/** return the identify of checkby */
 		inline bool get_checkby(){ return m_checked;}
 
+		/**生成合法的步法着点集合*/
+		void gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, bool rev);
 	private:
 		/**
 		 * @brief 从Fen串生成棋盘数组

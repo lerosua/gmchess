@@ -2215,3 +2215,37 @@ void Engine::sync_board()
 	revchessboard[255]=0;
 }
 
+void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, bool rev)
+{
+	int sx,sy;
+	get_xy_from_chess(chess_,sx,sy,rev);
+	int chess_t = get_chessman_type(chess_);
+	switch(chess_t){
+		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
+		case RED_KING:
+		case BLACK_KING:
+			{
+				//计算合法的能走的点再加入potins中
+			//points.push_back(Gdk::Point(sx+1, sy));
+			//points.push_back(Gdk::Point(sx-1, sy));
+			//points.push_back(Gdk::Point(sx, sy+1));
+			//points.push_back(Gdk::Point(sx, sy-1));
+			}
+			break;
+		case RED_ADVISOR:
+		case BLACK_ADVISOR:
+			points.push_back(Gdk::Point(sx+1, sy+1));
+			points.push_back(Gdk::Point(sx+1, sy-1));
+			points.push_back(Gdk::Point(sx-1, sy-1));
+			points.push_back(Gdk::Point(sx-1, sy+1));
+			break;
+		case RED_BISHOP:
+			break;
+			
+		case BLACK_BISHOP:
+			break;
+	}
+
+
+
+}

@@ -349,7 +349,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
 		redraw();
-		//draw_select_frame(false);
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
@@ -372,12 +371,12 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
-						//draw_select_frame(false); 
 						return true;
 					}
 				}
 
 				draw_select_frame(true);
+				draw_show_can_move();
 			}
 		}
 		else{
@@ -389,6 +388,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** change the select */
 				selected_chessman = dst_chessman;
 				draw_select_frame(true);
+				draw_show_can_move();
 				CSound::play(SND_CHOOSE);
 
 			}
@@ -577,6 +577,38 @@ void Board::draw_chessman(int x, int y, int chessman)
 	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[chess_type],
 			0, 0, px, py, chessman_images[chess_type]->get_width(), chessman_images[chess_type]->get_height(), 
 			Gdk::RGB_DITHER_NONE, 0, 0);
+}
+
+void Board::draw_show_can_move()
+{
+	if (selected_chessman < 0 )
+		return;
+	std::vector<Gdk::Point> points;
+	m_engine.gen_which_can_move(points, selected_chessman, is_rev_board);
+
+	std::vector<Gdk::Point>::iterator iter = points.begin();
+
+	for(;iter != points.end(); ++iter){
+		Gdk::Point p = get_coordinate(iter->get_x(), iter->get_y());
+		draw_phonily_point(p);
+	}
+
+}
+
+void Board::draw_phonily_point(Gdk::Point& p)
+{
+	int px = p.get_x() - chessman_width / 2;
+	int py = p.get_y() - chessman_width / 2;
+	ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
+	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
+				0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
+				Gdk::RGB_DITHER_NONE, 0, 0);
+	int x,y;
+	ui_pixmap->get_size(x,y);
+	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
+			0,0,
+			0,0,
+			x,y);
 }
 
 void Board::draw_select_frame(bool selected)
