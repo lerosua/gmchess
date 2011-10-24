@@ -205,7 +205,7 @@ void Board::load_images()
 		chessman_images[RED_PAWN] = get_spic("red_pawn.png");
 		chessman_images[RED_ROOK] = get_spic("red_rook.png");
 		chessman_images[SELECTED_CHESSMAN] = get_spic("select.png");
-		chessman_images[NULL_CHESSMAN] = get_spic("null.png");
+		chessman_images[PROPMT] = get_spic("null.png");
 	}
 	else{
 
@@ -226,7 +226,7 @@ void Board::load_images()
 		chessman_images[RED_PAWN] = get_pic("red_pawn.png");
 		chessman_images[RED_ROOK] = get_pic("red_rook.png");
 		chessman_images[SELECTED_CHESSMAN] = get_pic("select.png");
-		chessman_images[NULL_CHESSMAN] = get_pic("null.png");
+		chessman_images[PROPMT] = get_pic("null.png");
 	}
 }
 
@@ -581,6 +581,9 @@ void Board::draw_chessman(int x, int y, int chessman)
 
 void Board::draw_show_can_move()
 {
+	if(!is_fight_to_robot()&& !is_network_game())
+		return;
+
 	if (selected_chessman < 0 )
 		return;
 	std::vector<Gdk::Point> points;
@@ -597,11 +600,17 @@ void Board::draw_show_can_move()
 
 void Board::draw_phonily_point(Gdk::Point& p)
 {
-	int px = p.get_x() - chessman_width / 2;
-	int py = p.get_y() - chessman_width / 2;
-	ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
-	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
-				0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
+	int px = p.get_x() - 11 / 2;
+	int py = p.get_y() - 11 / 2;
+	//int px = p.get_x() - chessman_width / 2;
+	//int py = p.get_y() - chessman_width / 2;
+	//ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
+	//ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
+	//			0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
+	//			Gdk::RGB_DITHER_NONE, 0, 0);
+	ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, 11, 11);
+	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[PROPMT],
+				0, 0, px, py, chessman_images[PROPMT]->get_width(), chessman_images[PROPMT]->get_height(), 
 				Gdk::RGB_DITHER_NONE, 0, 0);
 	int x,y;
 	ui_pixmap->get_size(x,y);

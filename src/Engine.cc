@@ -646,10 +646,12 @@ bool Engine::logic_move(int mv)
 	if(!in_board(dst))
 		return false;
 	/** 检测是否同为红方的笨办法 */
-	if((chessboard[src]&16) && (chessboard[eated]&16))
+	//if((chessboard[src]&16) && (chessboard[eated]&16))
+	if((chessboard[src]&16) && (chessboard[dst]&16))
 			return false;
 	/** 检测是否同为黑方的笨办法 */
-	if((chessboard[src]&32) && (chessboard[eated]&32))
+	//if((chessboard[src]&32) && (chessboard[eated]&32))
+	if((chessboard[src]&32) && (chessboard[dst]&32))
 			return false;
 
 	/** 判断是否过河的方法，dst & 0x80,在下方是非0, 上方是0 */
@@ -2220,30 +2222,131 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 	int sx,sy;
 	get_xy_from_chess(chess_,sx,sy,rev);
 	int chess_t = get_chessman_type(chess_);
+	int src = get_chessman_xy(chess_);
 	switch(chess_t){
 		/** 将/帅的着法，同一纵线或横线，移动只一个单位，在九宫内*/
+		case RED_PAWN:
+		case BLACK_PAWN:
 		case RED_KING:
 		case BLACK_KING:
 			{
 				//计算合法的能走的点再加入potins中
-			//points.push_back(Gdk::Point(sx+1, sy));
-			//points.push_back(Gdk::Point(sx-1, sy));
-			//points.push_back(Gdk::Point(sx, sy+1));
-			//points.push_back(Gdk::Point(sx, sy-1));
+			int dst = get_dst_xy(sx+1,sy, rev);
+			int mv = get_move(src, dst);
+			if(logic_move(mv))
+				points.push_back(Gdk::Point(sx+1, sy));
+			dst = get_dst_xy(sx-1,sy, rev);
+			mv = get_move(src, dst);
+			if(logic_move(mv))
+				points.push_back(Gdk::Point(sx-1, sy));
+			dst = get_dst_xy(sx,sy+1, rev);
+			mv = get_move(src, dst);
+			if(logic_move(mv))
+				points.push_back(Gdk::Point(sx, sy+1));
+			dst = get_dst_xy(sx,sy-1, rev);
+			mv = get_move(src, dst);
+			if(logic_move(mv))
+				points.push_back(Gdk::Point(sx, sy-1));
 			}
 			break;
 		case RED_ADVISOR:
 		case BLACK_ADVISOR:
-			points.push_back(Gdk::Point(sx+1, sy+1));
-			points.push_back(Gdk::Point(sx+1, sy-1));
-			points.push_back(Gdk::Point(sx-1, sy-1));
-			points.push_back(Gdk::Point(sx-1, sy+1));
+			{
+				int dst = get_dst_xy(sx+1,sy+1, rev);
+				int mv = get_move(src, dst);
+				if(logic_move(mv))
+					points.push_back(Gdk::Point(sx+1, sy+1));
+				dst = get_dst_xy(sx+1,sy-1, rev);
+				mv = get_move(src, dst);
+				if(logic_move(mv))
+					points.push_back(Gdk::Point(sx+1, sy-1));
+				dst = get_dst_xy(sx-1,sy-1, rev);
+				mv = get_move(src, dst);
+				if(logic_move(mv))
+					points.push_back(Gdk::Point(sx-1, sy-1));
+				dst = get_dst_xy(sx-1,sy+1, rev);
+				mv = get_move(src, dst);
+				if(logic_move(mv))
+					points.push_back(Gdk::Point(sx-1, sy+1));
+			}
 			break;
 		case RED_BISHOP:
-			break;
-			
 		case BLACK_BISHOP:
+			{
+				int dst = get_dst_xy(sx+2,sy+2,rev);
+				int mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+2,sy+2));
+				dst = get_dst_xy(sx+2, sy-2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+2,sy-2));
+				dst = get_dst_xy(sx-2, sy+2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-2,sy+2));
+				dst = get_dst_xy(sx-2, sy-2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-2,sy-2));
+			}
 			break;
+		case RED_KNIGHT:
+		case BLACK_KNIGHT:
+			{
+				int dst = get_dst_xy(sx+1,sy+2,rev);
+				int mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+1,sy+2));
+				dst = get_dst_xy(sx+1, sy-2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+1,sy-2));
+				dst = get_dst_xy(sx-1, sy-2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-1,sy-2));
+				dst = get_dst_xy(sx-1, sy+2, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-1,sy+2));
+				dst = get_dst_xy(sx-2, sy+1, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-2,sy+1));
+				dst = get_dst_xy(sx-2, sy-1, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx-2,sy-1));
+				dst = get_dst_xy(sx+2, sy+1, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+2,sy+1));
+				dst = get_dst_xy(sx+2, sy-1, rev);
+				mv = get_move(src,dst);
+				if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+2,sy-1));
+			}
+			break;
+		case RED_ROOK:
+		case BLACK_ROOK:
+		case RED_CANNON:
+		case BLACK_CANNON:
+			{
+				for(int i = -9; i<9; ++i){
+					int dst = get_dst_xy(sx,sy+i);
+					int mv = get_move(src,dst);
+					if(logic_move(mv))
+						points.push_back(Gdk::Point(sx,sy+i));
+					dst = get_dst_xy(sx+i, sy);
+					mv = get_move(src,dst);
+					if(logic_move(mv))
+						points.push_back(Gdk::Point(sx+i,sy));
+				}
+
+			}
+			break;
+
 	}
 
 
