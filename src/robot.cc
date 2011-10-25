@@ -130,6 +130,7 @@ void Robot::wait_robot_exit(GPid pid, int)
 
 		is_running = false;
 		on_robot_exit();
+		printf(" i have exit ======\n");
 	}
 
 }

@@ -127,6 +127,7 @@ Board::Board(MainWindow& win) :
 	,m_usebook(true)
 	,m_human_black(false)
 	,theme("wood")
+	,color("#198964")
 {
 
 	std::list<Gtk::TargetEntry> listTargets;
@@ -161,6 +162,10 @@ Board::~Board()
 	m_robot.stop();
 }
 
+void Board::set_trace_color(const std::string& color_)
+{
+	color = color_;
+}
 void Board::set_themes(const std::string& themes_)
 {
 	theme = themes_;
@@ -671,7 +676,7 @@ void Board::draw_trace(int mv)
 	int dst = m_engine.get_move_dst(mv);
 
 	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_white_gc();
-	gc->set_rgb_fg_color(Gdk::Color("green"));
+	gc->set_rgb_fg_color(Gdk::Color(color));
 	Gdk::Point s1 =get_coordinate(m_engine.RANK_X(src)-3,m_engine.RANK_Y(src)-3);
 	Gdk::Point s2 =get_coordinate(m_engine.RANK_X(dst)-3,m_engine.RANK_Y(dst)-3);
 
@@ -1335,72 +1340,6 @@ bool Board::on_network_io(const Glib::IOCondition& )
 		}
 
 
-
-
-
-#if 0
-		if(pos_ != std::string::npos){
-			//start network game with red player
-			parent.on_network_game("lerosua","enemy",true);
-		}
-		pos_=str_buf.find("network-game-black");
-		if(pos_ != std::string::npos){
-			//start network game with black player
-			parent.on_network_game("lerosua","enemy",false);
-		}
-		pos_ = str_buf.find("network-game-win");
-		if(pos_ !=std::string::npos){
-			// i win the game.
-			if(timer.connected())
-				timer.disconnect();
-			parent.on_end_game(ROBOT_LOSE);
-			return true;
-		}
-		pos_ = str_buf.find("resign");
-		if(pos_ != std::string::npos){
-
-			if(timer.connected())
-				timer.disconnect();
-			parent.on_end_game(ROBOT_LOSE);
-			return true;
-		}
-		size_t pos=str_buf.find("moves:");
-		if(pos != std::string::npos){
-			std::string t_mv=str_buf.substr(pos+6,4);
-			std::cout<<"get robot mv = "<<t_mv<<std::endl;
-			int mv = m_engine.iccs_str_to_move(t_mv);
-			try_move(mv);
-		}
-
-		if(0 == strncmp("[{game:gmchess,",buf,15)){
-			printf("get cmd %s\n",buf);
-			string cmd=string(buf);
-			network_package* net_pac = parse_network_package(cmd);
-
-			if(net_pac->action=="ask"){
-				//对方请求的包
-				if(net_pac->status == "start"){
-					//对方请求游戏
-
-				}
-
-
-			}else if(net_pac->action == "reply"){
-				//对方回复的包
-
-
-			}else if(net_pac->action == "working"){
-				//对方走棋的包
-
-				int mv = m_engine.iccs_str_to_move(net_pac->moves);
-				try_move(mv);
-
-			}
-
-
-
-		}
-#endif
 	}
 	close(fd_cli);
 	return true;
@@ -1410,7 +1349,6 @@ bool Board::on_network_io(const Glib::IOCondition& )
 int Board::init_send_socket()
 {
 	int sockfd;
-	//char buf[1024];
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
@@ -1428,7 +1366,6 @@ void Board::send_to_socket(const std::string& cmd_)
 {
 
 	int sockfd;
-	//char buf[1024];
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
@@ -1453,11 +1390,11 @@ void Board::close_send_socket()
 	}
 }
 
-void Board::save_board_to_file()
+void Board::save_board_to_file(const std::string& filename)
 {
 	int w,h;
 	ui_pixmap->get_size(w, h);
 	Glib::RefPtr<Gdk::Pixbuf> png = Gdk::Pixbuf::create((Glib::RefPtr<Gdk::Drawable>) ui_pixmap, 0, 0,	w, h);
-	png->save("/tmp/1.png", "png");
+	png->save(filename, "png");
 
 }

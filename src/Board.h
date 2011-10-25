@@ -40,6 +40,7 @@ class Board : public Gtk::DrawingArea
 		void close_send_socket();
 		void send_to_socket(const std::string& cmd_);
 		void set_themes(const std::string& themes_);
+		void set_trace_color(const std::string& color_);
 
 
 	protected:
@@ -194,7 +195,7 @@ class Board : public Gtk::DrawingArea
 		/** 倒计时的声音*/
 		void reckon_time_sound(int time_);
 		/** 测试保存棋盘局面为图像文件*/
-		void save_board_to_file();
+		void save_board_to_file(const std::string& filename);
 		void draw_trace(int mv);
 		
 	private:
@@ -216,6 +217,7 @@ class Board : public Gtk::DrawingArea
 		std::string engine_name;
 		/** 所使用的主题*/
 		std::string theme;
+		std::string color;
 
 		/** 背景图像 */
 		Glib::RefPtr<Gdk::Pixbuf> bg_image;

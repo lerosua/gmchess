@@ -45,6 +45,11 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	bt = 0;
 	vbox_xml->get_widget("button_cancel", bt);
 	bt->signal_clicked().connect(sigc::mem_fun(*this,&ConfWindow::on_button_cancel));
+	vbox_xml->get_widget("colorbutton",colorBt);
+	colorBt->signal_color_set().connect(sigc::mem_fun(*this, &ConfWindow::on_button_color_set));
+
+	m_line_color = GMConf["line_color"];
+	colorBt->set_color(Gdk::Color(m_line_color));
 
 
 	std::string& size_big = GMConf["desktop_size"];
@@ -101,10 +106,14 @@ void ConfWindow::on_button_save()
 
 void ConfWindow::on_button_cancel()
 {
-	//delete this;
 	parent->on_conf_window_close();
 }
+void ConfWindow::on_button_color_set()
+{
+	Gdk::Color _color = colorBt->get_color();
+	m_line_color = _color.to_string();
 
+}
 bool ConfWindow::on_delete_event(GdkEventAny*)
 {
 	on_button_cancel();
@@ -119,6 +128,7 @@ void ConfWindow::write_to_GMConf()
 	GMConf["step_time"] = m_step_time;
 	GMConf["play_time"] = m_play_time;
 	GMConf["engine_name"] = m_engine_name;
+	GMConf["line_color"] = m_line_color;
 
 	if(cbtheme->get_active_text() == "wood")
 		GMConf["themes"] = "wood";

@@ -180,12 +180,14 @@ MainWindow::MainWindow():menubar(NULL)
 		board->set_time(_step_time,_play_time);
 	std::string theme_ = GMConf["themes"];
 	std::string engine_name = GMConf["engine_name"];
+	std::string color_ = GMConf["line_color"];
 	if(engine_name.empty())
 		engine_name = "eleeye_engine";
 	if(theme_.empty())
 		theme_ = "wood";
 	board->set_themes(theme_);
 	board->set_engine(engine_name);
+	board->set_trace_color(color_.c_str());
 }
 
 MainWindow::~MainWindow()
@@ -253,6 +255,7 @@ void MainWindow::init_conf()
 		GMConf["engine_depth"] ="5";
 		GMConf["themes"]="wood";
 		GMConf["engine_name"] = "eleeye_engine";
+		GMConf["line_color"] = "#198964";
 		save_conf();
 
 		snprintf(file_dir,512,"%s/gmchess/files",homedir.c_str());
@@ -437,7 +440,7 @@ void MainWindow::init_ui_manager()
 
 void MainWindow::on_menu_save_board_to_png()
 {
-	board->save_board_to_file();
+	board->save_board_to_file("/tmp/1.png");
 }
 
 void MainWindow::on_menu_save_file()
