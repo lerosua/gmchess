@@ -214,15 +214,6 @@ void Engine::init_snapshot(const char* fen)
 	move_snapshots.push_back(0);
 
 	sync_board();
-	/*
-	int i,j;
-	for(i=0;i<16;i++)
-	{
-		for(j=0;j<16;j++)
-			printf(" %2d ",chessboard[i*16+j]);
-		printf("\n");
-	}
-	*/
 }
 
 void Engine::get_snapshot(int num)
@@ -231,6 +222,7 @@ void Engine::get_snapshot(int num)
 	//DLOG("get_snapshot = %s\n",fens.c_str());
 	clean_board();
 	from_fens(fens.c_str());
+	current_fen_snapshots = fens;
 
 	sync_board();
 
@@ -936,6 +928,7 @@ int Engine::do_move(int mv)
 	char str_fen[128];
 	to_fens(str_fen);
 	fen_snapshots.push_back(std::string(str_fen));
+	current_fen_snapshots = std::string(str_fen);
 
 	add_move_chinese(mv_line);
 

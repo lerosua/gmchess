@@ -100,10 +100,11 @@ class Board : public Gtk::DrawingArea
 		void set_engine(const std::string& name){engine_name = name; }
 		/** 启动AI对战,将会启动引擎进程*/
 		/** start the AI engine*/
-		void start_robot();
+		void start_robot(bool new_ = true);
 		/** 开启新游戏，即在引擎已启动的情况下重新游戏*/
 		/** start a new game,with the presence engine*/
 		void new_game(BOARD_STATUS _status = FIGHT_STATUS);
+		void chanju_game(BOARD_STATUS _status = FIGHT_STATUS);
 		/** 自由模式，即摆棋*/
 		/** free game mode*/
 		/** @param redraw 为真则重画棋盘，假则保留棋盘现状*/

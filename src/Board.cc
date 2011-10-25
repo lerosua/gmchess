@@ -989,14 +989,17 @@ void Board::rev_game()
 	redraw();
 }
 
-void Board::start_robot()
+void Board::start_robot(bool new_)
 {
 	m_status = FIGHT_STATUS;
 
 	m_robot.set_engine(engine_name);
 	m_robot.start();
 	m_robot.send_ctrl_command("ucci\n");
-	new_game(m_status);
+	if(new_)
+		new_game(m_status);
+	else
+		chanju_game(m_status);
 }
 
 void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook)
@@ -1041,6 +1044,50 @@ void Board::start_network()
 	new_game(NETWORK_STATUS);
 
 }
+
+void Board::chanju_game(BOARD_STATUS _status)
+{
+	m_status = _status;
+	std::string cur_fen = m_engine.get_current_snapshot();
+	m_engine.init_snapshot(cur_fen.c_str());
+
+	if(m_status == FIGHT_STATUS){
+		set_war_time(step_time,play_time);
+		m_robot.send_ctrl_command("setoption newgame\n");
+		set_level();
+	}
+	DLOG("current fen = %s\n", cur_fen.c_str());
+
+
+	moves_lines.clear();
+	moves_lines = postion_str + cur_fen;
+	redraw();
+
+	parent.textview_engine_log_clear();
+	parent.change_play(is_human_player());
+
+	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
+	/**如果是用户选择黑方，则电脑先走棋 -- if user choose black,the robot go moves first*/
+	if(m_human_black){
+		if(m_status == FIGHT_STATUS){
+			moves_lines =moves_lines +std::string(" -- 0 1 ");
+			m_robot.send_ctrl_command(moves_lines.c_str());
+			m_robot.send_ctrl_command("\n");
+			char str_cmd[256];
+			sprintf(str_cmd,"go depth %d \n",m_search_depth);
+			m_robot.send_ctrl_command(str_cmd);
+		}else if(m_status == NETWORK_STATUS){
+
+		}
+
+	}
+
+	parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(0));
+	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
+
+
+}
+
 
 void Board::new_game(BOARD_STATUS _status)
 {

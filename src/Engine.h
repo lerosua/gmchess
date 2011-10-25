@@ -57,6 +57,7 @@ class Engine {
 		 * @param num 某一步时
 		 */
 		void get_snapshot(int num);
+		std::string get_current_snapshot(){ return current_fen_snapshots; }
 		/** 添加中文表达着法 */
 		/** add the chinese moves */
 		void add_move_chinese(Glib::ustring f_line){ move_chinese.push_back(f_line); };
@@ -291,6 +292,8 @@ class Engine {
 		/** 用于保存所有历史局面的FEN串数组*/
 		/**  save the all history station FEN array */
 		std::vector<std::string> fen_snapshots;
+		/** save the current FEN array for run chanju game*/
+		std::string current_fen_snapshots;
 		/** 用于保存所有的着法 */
 		/** save all history moves */
 		std::vector<int> move_snapshots;

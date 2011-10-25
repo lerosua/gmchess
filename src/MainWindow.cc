@@ -78,6 +78,7 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml->get_widget("button_end",btn_end);
 	ui_xml->get_widget("button_prev",btn_prev);
 	ui_xml->get_widget("button_next",btn_next);
+	ui_xml->get_widget("button_chanju", btn_chanjue);
 	ui_xml->get_widget("button_begin",btn_begin);
 	ui_xml->get_widget("button_lose",btn_lose);
 	ui_xml->get_widget("button_draw",btn_draw);
@@ -100,6 +101,8 @@ MainWindow::MainWindow():menubar(NULL)
 			sigc::mem_fun(*this, &MainWindow::on_draw_game));
 	btn_rue->signal_clicked().connect(
 			sigc::mem_fun(*this, &MainWindow::on_rue_game));
+	btn_chanjue->signal_clicked().connect(
+			sigc::mem_fun(*this, &MainWindow::on_chanju_game));
 
 	board = Gtk::manage(new Board(*this));
 	box_board->pack_start(*board);
@@ -849,8 +852,6 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 
 void MainWindow::set_information()
 {
-	//Gtk::Label* p1_name= 0;ui_xml->get_widget("P1_name",p1_name);
-	//Gtk::Label* p2_name= 0;ui_xml->get_widget("P2_name",p2_name);
 	Gtk::Label* info   = 0;ui_xml->get_widget("info_label",info);
 	
 	const Board_info& board_info = board->get_board_info();
@@ -929,6 +930,53 @@ void MainWindow::on_network_game(const std::string& me_name,const std::string& e
 	btn_begin->set_sensitive(false);
 		
 	
+}
+
+void MainWindow::on_chanju_game()
+{
+	/** 已经在对战中，则询问是否开始新游戏*/
+	/** ask if start new game */
+	if(board->is_fight_to_robot()){
+
+		Gtk::MessageDialog dialog(*this, _("new game"), false,
+                                  Gtk::MESSAGE_QUESTION,
+                                  Gtk::BUTTONS_OK_CANCEL);
+		Glib::ustring msg =_("Will you  start a new game?");
+		dialog.set_secondary_text(msg);
+		int result = dialog.run();
+		switch (result) {
+			case (Gtk::RESPONSE_OK): {
+				m_refTreeModel->clear();
+				board->chanju_game();
+                	        break;
+                	}
+
+			case (Gtk::RESPONSE_CANCEL): {
+                	        break;
+                	}
+
+			default: {
+                	        break;
+                	}
+		}
+		return;
+
+	}
+	else if(board->is_network_game()){
+		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
+		Glib::ustring msg =_("You are play with network game,Please over it first!");
+		dialog_info.set_secondary_text(msg);
+		dialog_info.run();
+		return ;
+
+	}
+	m_refTreeModel->clear();
+	board->start_robot(false);
+	set_status();
+	btn_begin->set_sensitive(false);
+	//btn_chanjue->set_sensitive(false);
+
+
 }
 
 void MainWindow::on_begin_game()

@@ -46,6 +46,8 @@ class MainWindow:public Gtk::Window
 		void on_back_move();
 		/** 开始AI对战*/
 		void on_begin_game();
+		/** start chanhue game*/
+		void on_chanju_game();
 		/** 开始网络对战*/
 		/**
 		 * @param me_ 已方名字
@@ -161,11 +163,13 @@ class MainWindow:public Gtk::Window
 		Gtk::Button*			btn_end ;
 		Gtk::Button*			btn_prev;
 		Gtk::Button*			btn_next;
+		Gtk::Button*			btn_chanjue;
 		/** 对战按钮*/
 		Gtk::Button*			btn_begin;
 		Gtk::Button*			btn_lose;
 		Gtk::Button*			btn_draw;
 		Gtk::Button*			btn_rue;
+
 };
 
 
