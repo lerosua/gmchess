@@ -79,9 +79,7 @@ void CSound::play_file(const char* filename)
 	gchar* argv[3];
 #ifdef __linux__
 	argv[0] = "aplay";
-#endif
-
-#ifdef __APPLE__
+#elif __APPLE__
 	argv[0] = "afplay";
 #endif
 	argv[1] = (gchar*)filename;
