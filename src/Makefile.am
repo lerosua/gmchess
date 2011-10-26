@@ -38,6 +38,6 @@ noinst_HEADERS = \
 		 variablesmap.h \
 		 MainWindow.h
 
-gmchess_LDFLAGS = 
+gmchess_LDFLAGS = -liconv
 
 gmchess_LDADD = @LIBS@ @PACKAGE_LIBS@
