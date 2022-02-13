@@ -5,25 +5,24 @@ ElephantEye - a Chinese Chess Program (UCCI Engine)
 Designed by Morning Yellow, Version: 3.1, Last Modified: Nov. 2007
 Copyright (C) 2004-2007 www.elephantbase.net
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option)
+any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+details.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+You should have received a copy of the GNU Lesser General Public License along
+with this library; if not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef BOOK_H
-#define BOOK_H
+#ifndef ELEEYE_BOOK_H
+#define ELEEYE_BOOK_H
 
-#include <stdio.h>
+#include <cstdio>
 #include "base.h"
 #include "position.h"
 
@@ -38,8 +37,8 @@ inline int BOOK_POS_CMP(const BookStruct &bk, const PositionStruct &pos) {
 }
 
 struct BookFileStruct {
-  FILE *fp;
-  int nLen;
+  FILE *fp = NULL;
+  int nLen = -1;
   bool Open(const char *szFileName) {
     fp = fopen(szFileName, "rb");
     if (fp == NULL) {
@@ -59,7 +58,9 @@ struct BookFileStruct {
   }
 };
 
-// ªÒ»°ø™æ÷ø‚◊≈∑®
+/**
+ * @brief Ëé∑ÂèñÂºÄÂ±ÄÂ∫ìÁùÄÊ≥ï
+ */
 int GetBookMoves(const PositionStruct &pos, const char *szBookFile, MoveStruct *lpmvs);
 
-#endif
+#endif /* ELEEYE_BOOK_H */

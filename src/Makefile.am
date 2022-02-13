@@ -1,17 +1,21 @@
 SUBDIRS =engine
 
-INCLUDES = 								\
-	   -I$(top_srcdir)                                              \
-	   -I$(srcdir)                                                  \
-	   -g								\
-	   -DDATA_DIR=\""${datadir}/gmchess"\" 				\
-	   -DGMCHESS_LOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"    \
-	   @PACKAGE_CFLAGS@
+# See https://developer.gnome.org/gtk3/stable/gtk-migrating-2-to-3.html
+AM_CPPFLAGS = \
+        -I$(top_srcdir)                                              \
+        -I$(srcdir)                                                  \
+        -g                                                           \
+        -DDATA_DIR=\""${datadir}/gmchess"\"                          \
+        -DGMCHESS_LOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"    \
+        -DGTK_DISABLE_SINGLE_INCLUDES                                \
+        -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED            \
+        -DGSEAL_ENABLE                                               \
+        @PACKAGE_CFLAGS@
 
 bin_PROGRAMS=gmchess
 
 gmchess_SOURCES= \
-	main.cc	\
+	main.cc \
 	Board.cc \
 	Engine.cc \
 	Pgnfile.cc \

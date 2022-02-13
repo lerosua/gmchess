@@ -53,10 +53,10 @@ class Board : public Gtk::DrawingArea
 		Glib::RefPtr<Gdk::Pixbuf> get_spic(const std::string& name_);
 
 		/** 由棋盘9x10坐标得到棋盘真实坐标*/
-		/** get the true coordinate from 9x10 postion*/
+		/** get the true coordinate from 9x10 position*/
 		Gdk::Point get_coordinate(int pos_x, int pos_y);
 		/** 由棋盘真实坐标得到棋盘9x10坐标*/
-		/** get the 9x10 postion from the true coordinate*/
+		/** get the 9x10 position from the true coordinate*/
 		Gdk::Point get_position(int pos_x, int pos_y);
 		/** 获取棋盘格子的长与宽*/
 		/** get the length and height with a chess grid */
@@ -139,7 +139,7 @@ class Board : public Gtk::DrawingArea
 		 * 根据x，y坐标(棋盘9x10坐标)获取到达的坐标，与选择的棋子达成着法
 		 * 进行尝试性走棋
 		 */
-		/** try to go move,(x,y) is the 9x10 postion */
+		/** try to go move,(x,y) is the 9x10 position */
 		int try_move(int x,int y);
 		/**
 		 * 直接根据着法尝试性走棋

@@ -20,7 +20,7 @@
 .fi
 .SH DESCRIPTION
 The \fBconvert_pgn\fP program converts the format of characters in \fIinput-file\fP, from
-one formated character set to another. The result is written to default file
+one formatted character set to another. The result is written to default file
 "/tmp/gmchess.pgn" unless otherwise specified by the \fIoutput-file\fP option.
 .RE
 .PP
@@ -47,7 +47,9 @@ MANUAL by Vern Sun <s5unty@gmail.com>
 .PP
 
 .SH RESOURCES
-Main web site: <http://gmchess.googlecode.com>
+Main website: <https://github.com/lerosua/gmchess>
+.br
+Debian source code repository: https://salsa.debian.org/chinese-team/gmchess
 .RE
 .PP
 

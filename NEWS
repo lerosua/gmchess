@@ -1,0 +1,15 @@
+2018-02-08 gmchess 0.29.6.3
+
+* Fix a typo that could lead to crashing.
+* Various clean-up.
+
+2018-01-29 gmchess 0.29.6.2
+===========================
+
+* I18n and translation for preferences subpage.
+* Various clean-up.
+
+2018-01-25 gmchess 0.29.6.1
+===========================
+
+* Various clean-up.

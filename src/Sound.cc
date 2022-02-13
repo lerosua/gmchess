@@ -1,12 +1,15 @@
 /*
  * Sound.cc
- * Copyright (C) lerosua 2009 <lerosua@gmail.com>
+ * Copyright (C) 2009 lerosua <lerosua@gmail.com>
+ * Copyright (C) 2018 Boyuan Yang <073plan@gmail.com>
  * 
  */
 
 #include "Sound.h"
 #include <string>
+#include <vector>
 #include <glib.h>
+
 using namespace std;
 
 
@@ -77,12 +80,18 @@ CSound::play (SOUND_EVENTS event)
 void CSound::play_file(const char* filename)
 {
 	gchar* argv[3];
-#ifdef __linux__
-	argv[0] = "aplay";
-#elif __APPLE__
-	argv[0] = "afplay";
+
+/* storing the program name in std::string */
+#ifdef __APPLE__
+    const std::string const_pname = "afplay";
+#else
+    const std::string const_pname = "aplay";
 #endif
-	argv[1] = (gchar*)filename;
+    std::vector<gchar> pname(const_pname.begin(), const_pname.end());
+    pname.push_back('\0');
+    argv[0] = &*pname.begin(); // retrieve non-const gchar *
+
+	argv[1] = (gchar *)filename;
 	argv[2] = NULL;
 	GError* err;
 	GSpawnFlags flas = (GSpawnFlags)(G_SPAWN_SEARCH_PATH |

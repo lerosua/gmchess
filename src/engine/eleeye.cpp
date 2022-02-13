@@ -32,13 +32,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef _WIN32
   #include <windows.h>
   const char *const cszLibEvalFile = "EVALUATE.DLL";
-#elif __linux__
-  #include <dlfcn.h>
-  #define WINAPI
-  const char *const cszLibEvalFile = "../lib/libeval.so.0";
 #elif __APPLE__
   #include <dlfcn.h>
   const char *const cszLibEvalFile = "/usr/local/lib/libeval.0.dylib";
+#else //for __linux__ and freebsd
+  #include <dlfcn.h>
+  #define WINAPI
+  const char *const cszLibEvalFile = "../lib/libeval.so.0";
 #endif
 
 const int INTERRUPT_COUNT = 4096; // 搜索若干结点后调用中断

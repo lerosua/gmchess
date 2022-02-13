@@ -9,327 +9,363 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmchess 0.20.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-25 21:42+0800\n"
+"POT-Creation-Date: 2018-01-29 20:47+0800\n"
 "PO-Revision-Date: 2010-10-23 23:05+0300\n"
 "Last-Translator: Sadovnikov Dmitry <xbadcode@mail.ru>\n"
 "Language-Team: English\n"
-"Language: \n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/MainWindow.cc:124
-msgid "bout"
-msgstr "Очередь"
+#: ../src/MainWindow.cc:115
+#, fuzzy
+msgid "GMChess"
+msgstr "шахматы"
 
-#: ../src/MainWindow.cc:126
-msgid "step"
-msgstr "Ход"
+#: ../src/MainWindow.cc:132
+msgid "Turn"
+msgstr ""
+
+#: ../src/MainWindow.cc:134
+msgid "Move"
+msgstr ""
 
 #. File menu:
-#: ../src/MainWindow.cc:365
+#: ../src/MainWindow.cc:399
 msgid "_File"
 msgstr "_Файл"
 
-#: ../src/MainWindow.cc:367
+#: ../src/MainWindow.cc:401
 msgid "Open file"
 msgstr "_Открыть файл"
 
-#: ../src/MainWindow.cc:368
+#: ../src/MainWindow.cc:402
 msgid "Open chessman File"
 msgstr "Открыть шахматный файл"
 
-#: ../src/MainWindow.cc:371
+#: ../src/MainWindow.cc:405
 msgid "Save as"
 msgstr "_Сохранить как"
 
-#: ../src/MainWindow.cc:372
+#: ../src/MainWindow.cc:406
 msgid "Save as a chess pgn file"
 msgstr "Сохранить в шахматном файле pgn"
 
+#: ../src/MainWindow.cc:409
+#, fuzzy
+msgid "Save Board"
+msgstr "_Сохранить как"
+
+#: ../src/MainWindow.cc:410
+#, fuzzy
+msgid "Save board to a png file"
+msgstr "Сохранить в шахматном файле pgn"
+
 #. View menu:
-#: ../src/MainWindow.cc:380
+#: ../src/MainWindow.cc:418
 msgid "_View"
 msgstr "_Вид"
 
 #. Game menu:
-#: ../src/MainWindow.cc:387
+#: ../src/MainWindow.cc:425
 msgid "_Game"
 msgstr "_Игра"
 
-#: ../src/MainWindow.cc:388
+#: ../src/MainWindow.cc:426
 msgid "_Fight to AI"
 msgstr "Игра с _компьютером"
 
-#: ../src/MainWindow.cc:390
+#: ../src/MainWindow.cc:428
 msgid "Free Play"
 msgstr "Игра с _человеком"
 
-#: ../src/MainWindow.cc:392
-msgid "Change Side"
-msgstr "Поменяться сторонами"
+#: ../src/MainWindow.cc:430
+msgid "_Switch colour"
+msgstr ""
 
 #. Help menu:
-#: ../src/MainWindow.cc:395
+#: ../src/MainWindow.cc:433
 msgid "_Help"
 msgstr "_Помощь"
 
-#: ../src/MainWindow.cc:414
+#: ../src/MainWindow.cc:457
 msgid "Save File"
 msgstr "Сохранить файл"
 
-#: ../src/MainWindow.cc:504
+#: ../src/MainWindow.cc:547
 msgid "Choose File"
 msgstr "Выбрать файл"
 
-#: ../src/MainWindow.cc:547
+#: ../src/MainWindow.cc:590
 msgid "All Files"
 msgstr "Все файлы"
 
-#: ../src/MainWindow.cc:563
+#: ../src/MainWindow.cc:606
 msgid "AI Warn"
 msgstr "Предупреждение ИИ"
 
-#: ../src/MainWindow.cc:566
-msgid "Open book view will close the AI game,Are you sure?"
+#: ../src/MainWindow.cc:609
+#, fuzzy
+msgid "Open book view will close the AI game. Are you sure?"
 msgstr "Открытие книги дебютов закончит игру с ИИ. Уверены?"
 
-#: ../src/MainWindow.cc:608
+#: ../src/MainWindow.cc:653
 msgid "the file maybe not right format for chess"
 msgstr "Неизвестный формат"
 
-#: ../src/MainWindow.cc:657
-#: ../src/MainWindow.cc:1013
-#: ../src/MainWindow.cc:1033
-#: ../src/MainWindow.cc:1045
+#: ../src/MainWindow.cc:700 ../src/MainWindow.cc:1103 ../src/MainWindow.cc:1123
+#: ../src/MainWindow.cc:1135
 msgid "Warning"
 msgstr "Внимание"
 
-#: ../src/MainWindow.cc:660
+#: ../src/MainWindow.cc:703
 msgid "Are you  sure to close the network game?"
 msgstr "Точно закончить сетевую игру?"
 
-#: ../src/MainWindow.cc:733
-msgid "GMChess is chinese chess game write by gtkmm"
+#: ../src/MainWindow.cc:758
+msgid "Function not implemented yet"
+msgstr ""
+
+#: ../src/MainWindow.cc:777
+#, fuzzy
+msgid "GMChess is a Chinese chess game written in gtkmm."
 msgstr "GMChess - китайские шахматы на gtkmm."
 
-#: ../src/MainWindow.cc:735
-msgid "This program is licenced under GNU General Public Licence (GPL) version 2."
+#: ../src/MainWindow.cc:779
+msgid ""
+"This program is licensed under GNU General Public Licence (GPL) version 2."
 msgstr "Лицензия GNU GPL 2ая версия."
 
-#: ../src/MainWindow.cc:753
+#: ../src/MainWindow.cc:798
 msgid "Black"
 msgstr "Чёрные"
 
-#: ../src/MainWindow.cc:756
+#: ../src/MainWindow.cc:801
 msgid "Red"
 msgstr "Красные"
 
-#: ../src/MainWindow.cc:821
+#: ../src/MainWindow.cc:864
 msgid "Game: "
 msgstr "Игра: "
 
-#: ../src/MainWindow.cc:822
+#: ../src/MainWindow.cc:865
 msgid "Time: "
 msgstr "Время: "
 
-#: ../src/MainWindow.cc:823
+#: ../src/MainWindow.cc:866
 msgid "Site: "
 msgstr "Сторона: "
 
-#: ../src/MainWindow.cc:824
+#: ../src/MainWindow.cc:867
 msgid "Result: "
 msgstr "Результат: "
 
-#: ../src/MainWindow.cc:825
+#: ../src/MainWindow.cc:868
 msgid "Opening: "
 msgstr "Начало: "
 
-#: ../src/MainWindow.cc:826
+#: ../src/MainWindow.cc:869
 msgid "Variation:  "
 msgstr "Вариация: "
 
-#: ../src/MainWindow.cc:902
+#: ../src/MainWindow.cc:945 ../src/MainWindow.cc:992
 msgid "new game"
 msgstr "Новая игра"
 
-#: ../src/MainWindow.cc:905
-msgid "Will you  start a new game?"
+#: ../src/MainWindow.cc:948 ../src/MainWindow.cc:995
+#, fuzzy
+msgid "Will you start a new game?"
 msgstr "Начать новую игру?"
 
-#: ../src/MainWindow.cc:927
-#: ../src/MainWindow.cc:981
-#: ../data/gmchess.glade.h:21
+#: ../src/MainWindow.cc:970 ../src/MainWindow.cc:1017 ../src/MainWindow.cc:1071
+#: ../data/gmchess.glade.h:33
 msgid "Information"
 msgstr "Информация"
 
-#: ../src/MainWindow.cc:928
-msgid "You are play with network game,Please over it first!"
+#: ../src/MainWindow.cc:971
+#, fuzzy
+msgid "You are play online, Please end this game first!"
 msgstr "Вы уже играете по сети. Пожалуйста, сначал закройте начатую партию."
 
-#: ../src/MainWindow.cc:944
-#: ../src/MainWindow.cc:972
+#: ../src/MainWindow.cc:1018
+#, fuzzy
+msgid "You are playing online, Please end this game first!"
+msgstr "Вы уже играете по сети. Пожалуйста, сначал закройте начатую партию."
+
+#: ../src/MainWindow.cc:1034 ../src/MainWindow.cc:1062
 msgid "be lose"
 msgstr "поражение"
 
-#: ../src/MainWindow.cc:947
-#: ../src/MainWindow.cc:975
+#: ../src/MainWindow.cc:1037 ../src/MainWindow.cc:1065
 msgid "Will you resign in this game?"
 msgstr "Сдаётесь?"
 
-#: ../src/MainWindow.cc:982
+#: ../src/MainWindow.cc:1072
 msgid "You lose the game!"
 msgstr "Вы проиграли эту партию!"
 
-#: ../src/MainWindow.cc:1014
-msgid "Only ask rue game when you are going,so wait a minute!"
+#: ../src/MainWindow.cc:1104
+#, fuzzy
+msgid ""
+"You may only take a back move when it's your turn. Please wait a minute!"
 msgstr "Ход можно отменить, когда Ваша очередь ходить!"
 
-#: ../src/MainWindow.cc:1034
-#: ../src/MainWindow.cc:1046
-msgid "Only rue game when you are going,so wait a minute!"
+#: ../src/MainWindow.cc:1124 ../src/MainWindow.cc:1136
+#, fuzzy
+msgid ""
+"You can only take a back move when it's your turn. Please wait a minute!"
 msgstr "Ход можно отменить, когда Ваша очередь ходить!"
 
 #. robot win
-#: ../src/MainWindow.cc:1061
+#: ../src/MainWindow.cc:1151
+#, fuzzy
 msgid ""
-"You are Lose! \n"
-" Are you want to start a new game?"
+"You Lose!\n"
+"Do you want to start a new game?"
 msgstr ""
 "Вы проиграли!\n"
 "Хотите начать новую игру?"
 
 #. robot lose
-#: ../src/MainWindow.cc:1066
+#: ../src/MainWindow.cc:1156
+#, fuzzy
 msgid ""
-"Congratuations ! YOU WIN!\n"
-" start a new game click OK"
+"Congratuations, YOU WIN!\n"
+"To start a new game, click OK"
 msgstr ""
 "Поздравления! ВЫ ПОБЕДИТЕЛЬ!\n"
 "Чтобы сыграть ещё нажмите ОК."
 
 #. robot want to draw
-#: ../src/MainWindow.cc:1071
+#: ../src/MainWindow.cc:1161
 msgid "Draw Game!"
 msgstr "Ничья!"
 
 #. robot overload time,lose
-#: ../src/MainWindow.cc:1075
-msgid "The Enemy overload the time, You Win!"
+#: ../src/MainWindow.cc:1165
+#, fuzzy
+msgid "The opponent used up their time. You Win!"
 msgstr "У противника вышло время! Вы выиграли!"
 
-#: ../src/MainWindow.cc:1079
-msgid "You overload the time, You Lose!"
+#: ../src/MainWindow.cc:1169
+#, fuzzy
+msgid "You used up your time. You Lose!"
 msgstr "Время вышло! Вы проиграли!"
 
-#: ../src/MainWindow.cc:1085
-msgid "Game End"
-msgstr "Игра закончена."
+#: ../src/MainWindow.cc:1175
+#, fuzzy
+msgid "Game Over"
+msgstr "Игра: "
 
 #: ../data/gmchess.glade.h:1
+msgid "chess"
+msgstr "шахматы"
+
+#: ../data/gmchess.glade.h:2 ../data/confwin.glade.h:21
 msgid " "
 msgstr " "
 
-#: ../data/gmchess.glade.h:2
-#, fuzzy
-msgid "  "
-msgstr " "
-
 #: ../data/gmchess.glade.h:3
-msgid "          "
-msgstr "          "
+msgid "nickname:"
+msgstr "имя: "
 
 #: ../data/gmchess.glade.h:4
 msgid "  Computer "
 msgstr "Компьютер"
 
 #: ../data/gmchess.glade.h:5
+msgid "step time: "
+msgstr "время на ход: "
+
+#: ../data/gmchess.glade.h:6
+msgid "play time: "
+msgstr "время на партию: "
+
+#: ../data/gmchess.glade.h:7
+msgid "          "
+msgstr "          "
+
+#: ../data/gmchess.glade.h:8
+msgid "nickname: "
+msgstr "имя: "
+
+#: ../data/gmchess.glade.h:9
 msgid " Human "
 msgstr "Человек"
 
-#: ../data/gmchess.glade.h:6
+#: ../data/gmchess.glade.h:10
 msgid "1"
 msgstr "1"
 
-#: ../data/gmchess.glade.h:7
+#: ../data/gmchess.glade.h:11
 msgid "2"
 msgstr "2"
 
-#: ../data/gmchess.glade.h:8
+#: ../data/gmchess.glade.h:12
 msgid "3"
 msgstr "3"
 
-#: ../data/gmchess.glade.h:9
+#: ../data/gmchess.glade.h:13
 msgid "4"
 msgstr "4"
 
-#: ../data/gmchess.glade.h:10
+#: ../data/gmchess.glade.h:14
 msgid "5"
 msgstr "5"
 
-#: ../data/gmchess.glade.h:11
+#: ../data/gmchess.glade.h:15
 msgid "6"
 msgstr "6"
 
-#: ../data/gmchess.glade.h:12
+#: ../data/gmchess.glade.h:16
 msgid "7"
 msgstr "7"
 
-#: ../data/gmchess.glade.h:13
+#: ../data/gmchess.glade.h:17
 msgid "8"
 msgstr "8"
 
-#: ../data/gmchess.glade.h:14
+#: ../data/gmchess.glade.h:18
 msgid "9"
 msgstr "9"
 
-#: ../data/gmchess.glade.h:15
-msgid "<b>Comment</b>"
-msgstr "<b>Комментарий</b>"
-
-#: ../data/gmchess.glade.h:16
-msgid "<b>Engine status</b>"
-msgstr "<b>Состояние движка</b>"
-
-#: ../data/gmchess.glade.h:17
-msgid "Board Information"
-msgstr "Информация о доске"
-
-#: ../data/gmchess.glade.h:18
-msgid "Book"
-msgstr "Книга"
-
 #: ../data/gmchess.glade.h:19
-msgid "Draw"
-msgstr "Ничья"
+msgid "Start"
+msgstr "Начать"
 
 #: ../data/gmchess.glade.h:20
-msgid "Engine"
-msgstr "Движок"
+#, fuzzy
+msgid "begin a new game"
+msgstr "Новая игра"
 
-#: ../data/gmchess.glade.h:22
+#: ../data/gmchess.glade.h:21
 msgid "Lost"
 msgstr "Поражение"
+
+#: ../data/gmchess.glade.h:22
+msgid "Draw"
+msgstr "Ничья"
 
 #: ../data/gmchess.glade.h:23
 msgid "Rue"
 msgstr "Отменить ход"
 
 #: ../data/gmchess.glade.h:24
-msgid "Start"
-msgstr "Начать"
+msgid "nine"
+msgstr "9"
 
 #: ../data/gmchess.glade.h:25
-msgid "chess"
-msgstr "шахматы"
-
-#: ../data/gmchess.glade.h:26
 msgid "eight"
 msgstr "8"
 
+#: ../data/gmchess.glade.h:26
+msgid "seven"
+msgstr "7"
+
 #: ../data/gmchess.glade.h:27
-msgid "first station"
-msgstr "начальное положение"
+msgid "six"
+msgstr "6"
 
 #: ../data/gmchess.glade.h:28
 msgid "five"
@@ -340,59 +376,164 @@ msgid "four"
 msgstr "4"
 
 #: ../data/gmchess.glade.h:30
-msgid "last move"
-msgstr "предыдущий ход"
-
-#: ../data/gmchess.glade.h:31
-msgid "next move"
-msgstr "следующий ход"
-
-#: ../data/gmchess.glade.h:32
-msgid "nickname:"
-msgstr "имя: "
-
-#: ../data/gmchess.glade.h:33
-msgid "nickname: "
-msgstr "имя: "
-
-#: ../data/gmchess.glade.h:34
-msgid "nine"
-msgstr "9"
-
-#: ../data/gmchess.glade.h:35
-msgid "one"
-msgstr "1"
-
-#: ../data/gmchess.glade.h:36
-msgid "play time: "
-msgstr "время на партию: "
-
-#: ../data/gmchess.glade.h:37
-msgid "preview move"
-msgstr "посмотреть ход"
-
-#: ../data/gmchess.glade.h:38
-msgid "seven"
-msgstr "7"
-
-#: ../data/gmchess.glade.h:39
-msgid "six"
-msgstr "6"
-
-#: ../data/gmchess.glade.h:40
-msgid "step time: "
-msgstr "время на ход: "
-
-#: ../data/gmchess.glade.h:41
 msgid "three"
 msgstr "3"
 
-#: ../data/gmchess.glade.h:42
+#: ../data/gmchess.glade.h:31
 msgid "two"
 msgstr "2"
 
+#: ../data/gmchess.glade.h:32
+msgid "one"
+msgstr "1"
+
+#: ../data/gmchess.glade.h:34
+msgid "start game with state"
+msgstr ""
+
+#: ../data/gmchess.glade.h:35
+msgid "first station"
+msgstr "начальное положение"
+
+#: ../data/gmchess.glade.h:36
+msgid "preview move"
+msgstr "посмотреть ход"
+
+#: ../data/gmchess.glade.h:37
+msgid "next move"
+msgstr "следующий ход"
+
+#: ../data/gmchess.glade.h:38
+msgid "last move"
+msgstr "предыдущий ход"
+
+#: ../data/gmchess.glade.h:39
+msgid "<b>Comment</b>"
+msgstr "<b>Комментарий</b>"
+
+#: ../data/gmchess.glade.h:40
+msgid "Board Information"
+msgstr "Информация о доске"
+
+#: ../data/gmchess.glade.h:41
+msgid "Book"
+msgstr "Книга"
+
+#: ../data/gmchess.glade.h:42 ../data/confwin.glade.h:6
+#, fuzzy
+msgid "  "
+msgstr " "
+
+#: ../data/gmchess.glade.h:43
+msgid "<b>Engine status</b>"
+msgstr "<b>Состояние движка</b>"
+
+#: ../data/gmchess.glade.h:44
+msgid "Engine"
+msgstr "Движок"
+
+#: ../data/confwin.glade.h:1
+#, fuzzy
+msgid "Size of Board\n"
+msgstr "_Сохранить как"
+
+#: ../data/confwin.glade.h:3
+msgid "small board"
+msgstr ""
+
+#: ../data/confwin.glade.h:4
+msgid "big board"
+msgstr ""
+
+#: ../data/confwin.glade.h:5
+msgid "themes"
+msgstr ""
+
+#: ../data/confwin.glade.h:7
+msgid "trace line color"
+msgstr ""
+
+#: ../data/confwin.glade.h:8
+#, fuzzy
+msgid "<b>Aspect</b>"
+msgstr "<b>Комментарий</b>"
+
+#: ../data/confwin.glade.h:9
+#, fuzzy
+msgid "select Engine"
+msgstr "Движок"
+
+#: ../data/confwin.glade.h:10
+msgid "default is eleeye_engine"
+msgstr ""
+
+#: ../data/confwin.glade.h:11
+msgid "eleeye_engine"
+msgstr ""
+
+#: ../data/confwin.glade.h:12
+msgid "use open book"
+msgstr ""
+
+#: ../data/confwin.glade.h:13
+msgid "Search Depth"
+msgstr ""
+
+#: ../data/confwin.glade.h:14
+#, fuzzy
+msgid "step time:"
+msgstr "время на ход: "
+
+#: ../data/confwin.glade.h:15
+msgid "240"
+msgstr ""
+
+#: ../data/confwin.glade.h:16
+msgid "sec"
+msgstr ""
+
+#: ../data/confwin.glade.h:17
+#, fuzzy
+msgid "play time:"
+msgstr "время на партию: "
+
+#: ../data/confwin.glade.h:18
+#, fuzzy
+msgid "40"
+msgstr "4"
+
+#: ../data/confwin.glade.h:19
+msgid "min"
+msgstr ""
+
+#: ../data/confwin.glade.h:20
+#, fuzzy
+msgid "<b>Engine</b>"
+msgstr "<b>Состояние движка</b>"
+
+#~ msgid "bout"
+#~ msgstr "Очередь"
+
+#~ msgid "step"
+#~ msgstr "Ход"
+
+#~ msgid "Change Side"
+#~ msgstr "Поменяться сторонами"
+
+#~ msgid "Only rue game when you are going,so wait a minute!"
+#~ msgstr "Ход можно отменить, когда Ваша очередь ходить!"
+
+#~ msgid "Game End"
+#~ msgstr "Игра закончена."
+
+#~ msgid "hui"
+#~ msgstr "悔棋"
+
+#~ msgid "huo"
+#~ msgstr "和棋"
+
 #~ msgid "end game"
 #~ msgstr "End game"
+
 #~ msgid "Computer want to draw with you, are you agree?"
 #~ msgstr "The computer offers a draw.  Do you agree?"
-

@@ -24,7 +24,7 @@ std::runtime_error throw_except(const char* func, const char* file, long line, c
 {
 	std::stringstream stream;
 	stream << "File: " 	<< file << std::endl;
-	stream << "Fucntion: " 	<< func << std::endl;
+	stream << "Function: " 	<< func << std::endl;
 	stream << "Expression:"	<< std::endl << line << ":\t" << var << std::endl; 
 	stream	<< "Errno: "	<< errno << std::endl;
 	stream << strerror(errno) << std::endl; 

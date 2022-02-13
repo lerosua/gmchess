@@ -175,17 +175,19 @@ void Board::set_themes(const std::string& themes_)
 }
 Glib::RefPtr<Gdk::Pixbuf> Board::get_pic(const std::string& name_)
 {
-	char path[1024];
-	sprintf(path, DATA_DIR"/themes/%s/%s",theme.c_str(),name_.c_str());
-	return Gdk::Pixbuf::create_from_file(path);
+    const std::string path = \
+            std::string(DATA_DIR) + \
+            "/themes/" + theme + "/" + name_;
+    return Gdk::Pixbuf::create_from_file(path);
 
 }
 
 Glib::RefPtr<Gdk::Pixbuf> Board::get_spic(const std::string& name_)
 {
-	char path[1024];
-	sprintf(path, DATA_DIR"/themes/%s-small/%s",theme.c_str(),name_.c_str());
-	return Gdk::Pixbuf::create_from_file(path);
+    const std::string path = \
+            std::string(DATA_DIR) + \
+            "/themes/" + theme + "-small/" + name_;
+    return Gdk::Pixbuf::create_from_file(path);
 
 }
 
@@ -1133,7 +1135,7 @@ void Board::new_game(BOARD_STATUS _status)
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
 	/*for testing,delete me*/
-	char buf[1024];
+	char buf[1024] = {0};
 	int buf_len = 1024;
 	char* p = buf;
 	for (; buf_len > 0; ) {
@@ -1146,7 +1148,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 	if (buf_len > 0) {
 		*p = 0;
-		printf(buf);
+		printf("%s", buf);
 		std::string str_buf(buf);
 		parent.show_textview_engine_log(str_buf);
 
@@ -1320,7 +1322,7 @@ bool Board::on_network_io(const Glib::IOCondition& )
 
 	int fd_cli = -1;
        EC_THROW(-1 == (fd_cli = accept(fd_recv_skt, NULL, 0)));
-       char buf[1024];
+       char buf[1024] = {0};
        size_t len = read(fd_cli, &buf[0], 1023);
        buf[len]=0;
        if (len > 0) {

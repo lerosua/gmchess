@@ -444,33 +444,41 @@ int Engine::get_knight_leg(int f_src, int f_dst)
 }
 
 /** 
+ * @brief Check if the player could mitigate checkmate status
  * 目前所有棋子的着法，检测走后是否能解除将军状态，如果都不行，则死棋
  * 死棋检测耗资源巨大，最好设定一个将军标识，在被将军状态下再检测
  * 这是在将军前提下检测死棋，没子走的情况暂不检测,公头被困死应该只剩下一个
  * 公的状态下，这种状态另外搞吧，应该很简单。
+ *
+ * 如果被将死，返回 false。
  */
 bool Engine::mate()
 {
-	/** 没被将军，那就没事，有棋,bug是将/帅被困死 */
-	m_checked = checked_by();
-	if(!m_checked)
-		return false;
-	/** 
-	 * 轮到黑方走，则生成黑方所有的着法，并一一检测，如果都不能通过，
-	 * 则死棋,如果遇到一个能通过的，则马上返回false吧
-	 */
-	DLOG("mate function\n");
-		int src;
-		int i;
-		int dst;
-		for (i = KING_FROM; i <= PAWN_TO; i++) {
-			if(src = chessmans[side_tag(black_player)+i]){
-				int chess_t =get_chessman_type(get_piece(src));
-				switch(chess_t){
-				case RED_KING:
-				case BLACK_KING:
-					for(int k=0;k<4;k++){
-						dst=src+KingMoveTab[k];
+    /** 没被将军，那就没事，有棋,bug是将/帅被困死 */
+    /** FIXME: 实现将帅被困死的情况，目前存在 bug */
+    m_checked = checked_by();
+    if(!m_checked) {
+        return false;
+    }
+
+    /**
+     * 轮到黑方走，则生成黑方所有的着法，并一一检测，如果都不能通过，
+     * 则死棋,如果遇到一个能通过的，则马上返回false吧
+     */
+    DLOG("Checkmate evaluation started\n");
+    int src;
+    int i;
+    int dst;
+
+    for (i = KING_FROM; i <= PAWN_TO; i++) {
+        src = chessmans[side_tag(black_player) + i];
+        if (src) {
+            int chess_t =  get_chessman_type(get_piece(src));
+            switch (chess_t) {
+                case RED_KING:
+                case BLACK_KING:
+                    for (int k = 0; k < 4; k++) {
+                        dst = src + KingMoveTab[k];
 						if(in_fort(dst)){
 							int mv = get_move(src,dst);
 							if(make_move(mv)){
@@ -509,7 +517,7 @@ bool Engine::mate()
 				case RED_KNIGHT:
 				case BLACK_KNIGHT:
 					for(int k=0;k<8;k++){
-						dst=src+ KingMoveTab[k];
+						dst=src+ KnightMoveTab[k];
 						if(in_board(dst)){
 							int mv = get_move(src,dst);
 							if(make_move(mv)){
@@ -2098,7 +2106,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 							n++;
 						}
 					}
-					DLOG(" n=%d\n");
+					DLOG(" n=%d\n", n);
 					/** 为纵线上的棋子排序*/
 					for(int k=start;k<n-1;k++)
 						for(int j=n-2;j>=k;j--){

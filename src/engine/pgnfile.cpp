@@ -1,5 +1,5 @@
 /*
-PGN->XQF - a Chinese Chess Score Convertion Program
+PGN->XQF - a Chinese Chess Score Conversion Program
 Designed by Morning Yellow, Version: 2.1, Last Modified: Jun. 2007
 Copyright (C) 2004-2007 www.elephantbase.net
 

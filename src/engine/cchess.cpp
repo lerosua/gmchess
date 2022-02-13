@@ -690,7 +690,7 @@ void FenMirror(char *szFenDst, const char *szFenSrc) {
     }
     lpSrc ++;
   };
-  while(lpSrc != '\0' && lpDst < lpDstLimit) {
+  while(lpSrc && lpDst < lpDstLimit) {
     *lpDst = *lpSrc;
     lpSrc ++;
     lpDst ++;

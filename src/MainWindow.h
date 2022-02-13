@@ -16,12 +16,11 @@
  * =====================================================================================
  */
 
-#ifndef  MAINWINDOW_FILE_HEADER_INC
-#define  MAINWINDOW_FILE_HEADER_INC
+#ifndef  GMCHESS_MAINWINDOW_FILE_HEADER_INC
+#define  GMCHESS_MAINWINDOW_FILE_HEADER_INC
 
 #include <gtkmm.h>
 #include <gtkmm/window.h>
-//#include <libglademm/xml.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include "Board.h"
@@ -173,4 +172,4 @@ class MainWindow:public Gtk::Window
 };
 
 
-#endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */
+#endif   /* ----- #ifndef GMCHESS_MAINWINDOW_FILE_HEADER_INC  ----- */

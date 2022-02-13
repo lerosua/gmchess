@@ -1,0 +1,9 @@
+* Detect libglib2.0-dev via pkgconfig
+* Do not assume config files under ~/.config/ by hardcoding;
+  should consider XDG standards.
+* Do not hardcode tmp files under /tmp/.
+  Should use library functions.
+* The "Save As" function should set default file extension
+  to "pgn" format.
+* "Settings" page is not i18n-ed at all. We need to fix that
+  problem.

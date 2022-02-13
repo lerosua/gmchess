@@ -20,8 +20,8 @@
 #ifndef  GMCHESS_FILE_HEADER_INC
 #define  GMCHESS_FILE_HEADER_INC
 
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdint>
 #include "define.h"
 #include <map>
 #include <string>
@@ -30,23 +30,23 @@ typedef std::map<std::string,std::string> TGMConf;
 extern TGMConf GMConf;
 //保存的最大历史局面数
 //save the max number of history chess station
-const int MAX_COUNT=512;
-const int GMPORT=20125;
+const int MAX_COUNT = 512;
+const int GMPORT = 20125;
 
 // 每种子力的开始序号和结束序号
- const int KING_FROM = 0;
- const int ADVISOR_FROM = 1;
- const int ADVISOR_TO = 2;
- const int BISHOP_FROM = 3;
- const int BISHOP_TO = 4;
- const int KNIGHT_FROM = 5;
- const int KNIGHT_TO = 6;
- const int ROOK_FROM = 7;
- const int ROOK_TO = 8;
- const int CANNON_FROM = 9;
- const int CANNON_TO = 10;
- const int PAWN_FROM = 11;
- const int PAWN_TO = 15;
+const int KING_FROM = 0;
+const int ADVISOR_FROM = 1;
+const int ADVISOR_TO = 2;
+const int BISHOP_FROM = 3;
+const int BISHOP_TO = 4;
+const int KNIGHT_FROM = 5;
+const int KNIGHT_TO = 6;
+const int ROOK_FROM = 7;
+const int ROOK_TO = 8;
+const int CANNON_FROM = 9;
+const int CANNON_TO = 10;
+const int PAWN_FROM = 11;
+const int PAWN_TO = 15;
 
 const int RANK_TOP = 3;
 const int RANK_BOTTOM = 12;
