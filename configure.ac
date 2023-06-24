@@ -23,6 +23,7 @@ PKG_CHECK_MODULES(PACKAGE, $pkg_modules)
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
 
+CXXFLAGS="-fpermissive -g"
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h libintl.h locale.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/timeb.h unistd.h])
