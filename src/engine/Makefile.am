@@ -53,7 +53,7 @@ noinst_HEADERS = \
 
 
 eleeye_engine_LDFLAGS= -ldl
-convert_pgn_LDFLAGS= -ldl -liconv
+convert_pgn_LDFLAGS= -ldl
 libeval_so_LDFLAGS= -fPIC -shared
 AM_CPPFLAGS =
 
