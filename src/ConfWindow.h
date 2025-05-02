@@ -18,6 +18,10 @@
 
 #ifndef  CONFWINDOW_FILE_HEADER_INC
 #define  CONFWINDOW_FILE_HEADER_INC
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <gtkmm.h>
 #include "variablesmap.h"
 

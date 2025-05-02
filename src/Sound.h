@@ -7,6 +7,9 @@
 
 #ifndef __GM_SOUND_H__
 #define __GM_SOUND_H__
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #define SOUND_DIR DATA_DIR"/sound/"
 
