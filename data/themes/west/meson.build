@@ -19,5 +19,5 @@ install_data(
 		'black_cannon.png',
 		'red_pawn.png',
 		'black_pawn.png',
-  install_dir: join_paths(pkgdatadir, 'themes', 'west-small')
+  install_dir: join_paths(pkgdatadir, 'themes', 'west')
   )

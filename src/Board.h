@@ -2,7 +2,7 @@
 /*
  * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
- * 
+ *
  */
 
 #ifndef _BOARD_H_
@@ -43,8 +43,7 @@ class Board : public Gtk::DrawingArea
 		void set_trace_color (const std::string &color_);
 
 	protected:
-		virtual bool on_expose_event (GdkEventExpose *event);
-		bool on_configure_event(GdkEventConfigure* ev);
+                bool on_draw(const ::Cairo::RefPtr<::Cairo::Context> &cr);
 		bool on_button_press_event (GdkEventButton *ev);
 
 		Cairo::RefPtr<Cairo::ImageSurface> get_pic (const std::string &name_);
@@ -125,11 +124,6 @@ class Board : public Gtk::DrawingArea
 		/** 读谱状态下走上一步棋*/
 		/** go previous on reading chessbook */
 		void back_move ();
-		/** 重画棋盘界面*/
-		/** redraw the board*/
-		void redraw ();
-		/** redraw the board with move trace*/
-		void redraw_with_line (int mv, bool select);
 		/** 根据treeview的棋局着法获得棋盘局面*/
 		/** get the board station from chess move */
 		void get_board_by_move (int num);
@@ -209,65 +203,64 @@ class Board : public Gtk::DrawingArea
 		/** UCCI engine interface*/
 		Robot m_robot;
 		/** 读PGN文件类*/
-		Pgnfile *p_pgnfile;
+		Pgnfile *p_pgnfile = NULL;
 		/** 传递给AI的着法状态*/
 		std::string moves_lines;
 		/** 着法状态开头序列，potions fen xxx*/
-		const std::string postion_str;
+		const std::string position_str = "position fen ";
 		std::string engine_name;
 		/** 所使用的主题*/
-		std::string theme;
-		std::string color;
+		std::string theme = "wood";
+		std::string color = "#198964";
 
 		/** 背景图像 */
 		Cairo::RefPtr<Cairo::ImageSurface> bg_image;
 
-		Glib::RefPtr<Gdk::Pixmap> ui_pixmap;
 		/** 棋子图像 */
 		Cairo::RefPtr<Cairo::ImageSurface> chessman_images[18];
 		/** 选中图像*/
 		Glib::RefPtr<Cairo::ImageSurface> selected_chessman_image;
 		/** 选中的棋盘9x10坐标*/
-		int selected_x;
-		int selected_y;
+		int selected_x = -1;
+		int selected_y = -1;
 		/** 选中的棋子,值为代号,16-31红，32-47黑*/
-		int selected_chessman;
+		int selected_chessman = -1;
 		/** 步时 */
-		int m_step;
+		int m_step = 0;
 		/** 棋局状态*/
-		BOARD_STATUS m_status;
+		BOARD_STATUS m_status = FREE_STATUS;
 		/** 红方的局时*/
-		int red_time;
+		int red_time = 2400;
 		/** 黑方的局时*/
-		int black_time;
+		int black_time = 2400;
 		/** 用以保存和电脑下棋的局时和步时*/
-		int play_time;
-		int step_time;
+		int play_time = 40;
+		int step_time = 240;
 		/** 计时，走秒*/
-		int count_time;
+		int count_time = 0;
 		/** 每步时的极限秒数*/
-		int limit_count_time;
+		int limit_count_time = 240;
 
 		/** 接受命令的socket*/
-		int fd_recv_skt;
+		int fd_recv_skt = -1;
 		/** 发送命令的socket*/
-		int fd_send_skt;
+		int fd_send_skt = -1;
 		sigc::connection timer;
 		/** 对战状态中标识是否用户走棋,true是用户，false是AI*/
 		// bool user_player;
 		/** 棋子的宽度,大的57,小的29*/
 		/** width of chessman */
-		int chessman_width;
+		int chessman_width = 29;
 		/** 是否小棋盘*/
-		bool is_small_board;
+		bool is_small_board = true;
 		/** 是否反转棋盘*/
-		bool is_rev_board;
+		bool is_rev_board = false;
 		/** 搜索深度-- search depth */
-		int m_search_depth;
+		int m_search_depth = 8 ;
 		/** 是否使用开局库 -- use open book*/
-		bool m_usebook;
+		bool m_usebook = true;
 		/** 用户选择黑方棋子 -- the human choose the black player*/
-		bool m_human_black;
+		bool m_human_black = false;
 };
 
 #endif // _BOARD_H_

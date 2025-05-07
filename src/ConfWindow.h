@@ -1,18 +1,18 @@
 /*
  * =====================================================================================
- * 
+ *
  *       Filename:  ConfWindow.h
- * 
+ *
  *    Description:  config window class
- * 
+ *
  *        Version:  1.0
  *        Created:  2009年06月19日 21时40分28秒 CST
  *       Revision:  none
  *       Compiler:  gcc
- * 
+ *
  *         Author:  lerosua (), lerosua@gmail.com
  *        Company:  Cyclone
- * 
+ *
  * =====================================================================================
  */
 
@@ -50,13 +50,13 @@ class ConfWindow: public Gtk::Window
 		VariablesMap* m_pVariablesMap;
 		Gtk::ComboBoxText* cbtheme;
 		Gtk::ColorButton* colorBt;
-		Glib::ustring			m_depth;
-		Glib::ustring			m_step_time;
-		Glib::ustring			m_play_time;
+		Glib::ustring			m_depth = "10";
+		Glib::ustring			m_step_time = "240";
+		Glib::ustring			m_play_time = "40";
 		Glib::ustring			m_theme;
 		Glib::ustring			m_engine_name;
 		Glib::ustring			m_line_color;
-		bool				m_size_big;
+		bool				m_size_big = true;
 		bool				m_usebook;
 
 };

@@ -3,7 +3,7 @@
  *
  *       Filename:  MainWindow.cc
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  2009年02月14日 07时52分14秒 CST
@@ -155,12 +155,12 @@ MainWindow::MainWindow():menubar(NULL)
 	init_conf();
 	this->signal_check_resize().connect(
 			sigc::mem_fun(*this,&MainWindow::on_size_change));
-	
-#ifdef __linux__
-	/** test for rgba , it not work in mac osx*/
-	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
-	this->set_default_colormap(colormap_);
-#endif
+
+//#ifdef __linux__
+//	/** test for rgba , it not work in mac osx*/
+//	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
+//	this->set_default_colormap(colormap_);
+//#endif
 
 	show_all();
 	p1_image->hide();
@@ -197,10 +197,10 @@ MainWindow::MainWindow():menubar(NULL)
 	board->set_trace_color(color_.c_str());
 }
 
-MainWindow::~MainWindow()
-{
-	this->pop_colormap();
-}
+//MainWindow::~MainWindow()
+//{
+//	this->pop_colormap();
+//}
 
 void MainWindow::on_size_change()
 {
@@ -218,7 +218,7 @@ void MainWindow::change_play(bool player)
 		p2_image->hide();
 		p1_image->show();
 	}
-	
+
 }
 
 void MainWindow::save_conf()
@@ -269,7 +269,7 @@ void MainWindow::init_conf()
 		mkdir(file_dir,S_IRUSR|S_IWUSR|S_IXUSR);
 		return;
 	}
-	
+
 	std::string line;
 	std::string name;
 	std::string key;
@@ -332,7 +332,7 @@ void MainWindow::show_textview_engine_log(const std::string& f_text)
 	buffer_->place_cursor(buffer_->insert(end_,f_text));
 
 	if(y<rect_.get_y() + rect_.get_height()+16)
-		text_engine_log->scroll_to_mark(buffer_->get_insert(),0);
+		text_engine_log->scroll_to(buffer_->get_insert(),0);
 }
 void MainWindow::textview_engine_log_clear()
 {
@@ -454,7 +454,7 @@ void MainWindow::on_menu_save_file()
 {
 
 	Gtk::FileChooserDialog dlg(*this,
-			_("Save File"), 
+			_("Save File"),
 			Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dlg.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
@@ -499,11 +499,11 @@ void MainWindow::auto_save_chess_file()
 
 	char time1[200];
 	char time2[200];
-	time_t t;
+	time_t now;
 	struct tm *tmp;
 
-	t = time(NULL);
-	tmp = localtime(&t);
+	now = time(NULL);
+	tmp = localtime(&now);
 	strftime(time1, sizeof(time1), "%Y-%m-%d-%H-%M-", tmp);
 	strftime(time2, sizeof(time2), "%Y.%m.%d", tmp);
 	std::string name = p1_name->get_text()+"-"+p2_name->get_text()+".pgn";
@@ -515,7 +515,7 @@ void MainWindow::auto_save_chess_file()
 		DLOG("open %s file error\n",filename.c_str());
 		return ;
 	}
-	
+
 	file<<"[Game \"Chese chess Play by GMChess\"]"<<std::endl;
 	file<<"[Date \""<<std::string(time2)<<"\"]"<<std::endl;
 	file<<"[Red \""<<p1_name->get_text()<<"\"]"<<std::endl;
@@ -544,53 +544,54 @@ void MainWindow::auto_save_chess_file()
 void MainWindow:: on_menu_open_file()
 {
 	Gtk::FileChooserDialog dlg(*this,
-			_("Choose File"), 
+			_("Choose File"),
 			Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dlg.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
-	Gtk::FileFilter filter_pgn;
-	filter_pgn.set_name("PGN");
-	filter_pgn.add_pattern("*.pgn");
-	filter_pgn.add_pattern("*.PGN");
+	Glib::RefPtr<Gtk::FileFilter> filter_pgn = Gtk::FileFilter::create ();
+	filter_pgn->set_name("PGN");
+	filter_pgn->add_pattern("*.pgn");
+	filter_pgn->add_pattern("*.PGN");
 	dlg.add_filter(filter_pgn);
 	/** 中游象棋*/
-	Gtk::FileFilter filter_ccm;
-	filter_ccm.set_name("CCM");
-	filter_ccm.add_pattern("*.ccm");
-	filter_ccm.add_pattern("*.CCM");
+	Glib::RefPtr<Gtk::FileFilter> filter_ccm = Gtk::FileFilter::create ();
+	filter_ccm->set_name("CCM");
+	filter_ccm->add_pattern("*.ccm");
+	filter_ccm->add_pattern("*.CCM");
 	dlg.add_filter(filter_ccm);
 	/** QQ象棋*/
-	Gtk::FileFilter filter_che;
-	filter_che.set_name("CHE");
-	filter_che.add_pattern("*.che");
-	filter_che.add_pattern("*.CHE");
+	Glib::RefPtr<Gtk::FileFilter> filter_che = Gtk::FileFilter::create ();
+	filter_che->set_name("CHE");
+	filter_che->add_pattern("*.che");
+	filter_che->add_pattern("*.CHE");
 	dlg.add_filter(filter_che);
 	/** 联众象棋*/
-	Gtk::FileFilter filter_chn;
-	filter_chn.set_name("CHN");
-	filter_chn.add_pattern("*.chn");
-	filter_chn.add_pattern("*.CHN");
+	Glib::RefPtr<Gtk::FileFilter> filter_chn = Gtk::FileFilter::create ();
+	filter_chn->set_name("CHN");
+	filter_chn->add_pattern("*.chn");
+	filter_chn->add_pattern("*.CHN");
 	dlg.add_filter(filter_chn);
 
 	/** 弈天象棋*/
-	Gtk::FileFilter filter_mxq;
-	filter_mxq.set_name("MXQ");
-	filter_mxq.add_pattern("*.mxq");
-	filter_mxq.add_pattern("*.MXQ");
+	Glib::RefPtr<Gtk::FileFilter> filter_mxq = Gtk::FileFilter::create ();
+	filter_mxq->set_name("MXQ");
+	filter_mxq->add_pattern("*.mxq");
+	filter_mxq->add_pattern("*.MXQ");
 	dlg.add_filter(filter_mxq);
 	/** 象棋演播室*/
-	Gtk::FileFilter filter_xqf;
-	filter_xqf.set_name("XQF");
-	filter_xqf.add_pattern("*.xqf");
-	filter_xqf.add_pattern("*.XQF");
+  Glib::RefPtr<Gtk::FileFilter> filter_xqf = Gtk::FileFilter::create ();
+	filter_xqf->set_name("XQF");
+	filter_xqf->add_pattern("*.xqf");
+	filter_xqf->add_pattern("*.XQF");
 	dlg.add_filter(filter_xqf);
 	/** 所有文件*/
-	Gtk::FileFilter filter_any;
-	filter_any.set_name(_("All Files"));
-	filter_any.add_pattern("*");
+	//Gtk::FileFilter filter_any;
+	Glib::RefPtr<Gtk::FileFilter> filter_any = Gtk::FileFilter::create ();
+	filter_any->set_name(_("All Files"));
+	filter_any->add_pattern("*");
 	dlg.add_filter(filter_any);
-	
+
 	std::string filename ;
 	if (Gtk::RESPONSE_OK == dlg.run()) {
 		filename = dlg.get_filename();
@@ -614,7 +615,7 @@ void MainWindow::open_file(const std::string& filename)
             case (Gtk::RESPONSE_OK): {
                 board->free_game();
                 break;
-            } 
+            }
             case (Gtk::RESPONSE_CANCEL): {
                 return;
                 break;
@@ -857,7 +858,7 @@ bool MainWindow::on_treeview_click(GdkEventButton* ev)
 void MainWindow::set_information()
 {
 	Gtk::Label* info   = 0;ui_xml->get_widget("info_label",info);
-	
+
 	const Board_info& board_info = board->get_board_info();
 	p1_name->set_label(board_info.black);
 	p2_name->set_label(board_info.red);
@@ -927,13 +928,13 @@ void MainWindow::on_network_game(const std::string& me_name,const std::string& e
 	if(!role_red_){
 		board->rev_game();
 	}
-	
+
 	m_refTreeModel->clear();
 	board->start_network();
 	set_status();
 	btn_begin->set_sensitive(false);
-		
-	
+
+
 }
 
 void MainWindow::on_chanju_game()
@@ -1062,8 +1063,7 @@ void MainWindow::on_lose_game()
         Gtk::MessageDialog dialog(*this, _("be lose"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
-        Glib::ustring msg =_("Will you resign in this game?");
-        dialog.set_secondary_text(msg);
+        dialog.set_secondary_text(_("Will you resign in this game?"));
         int result =dialog.run();
         switch (result) {
             case (Gtk::RESPONSE_OK): {
@@ -1180,6 +1180,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 			auto_save_chess_file();
 		board->free_game(false);
 		set_status();
+		return true;
 }
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
@@ -1199,7 +1200,7 @@ void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustr
 void MainWindow::watch_socket(int fd)
 {
 	board->watch_socket(fd);
-	
+
 }
 void MainWindow::start_with(const std::string& param)
 {
@@ -1213,7 +1214,7 @@ void MainWindow::start_with(const std::string& param)
 			enemy_name = param.substr(pos_s+11,pos_m-pos_s-11);
 			pos_m = param.find_last_of("@");
 			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
-			
+
 			on_network_game(enemy_name,my_name,true);
 		}else if((param.find("network-game-black,")) != std::string::npos){
 			//start network game with black player
