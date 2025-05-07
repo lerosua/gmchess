@@ -1,8 +1,7 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
- * 
+ *
  */
 
 #include "Board.h"
@@ -27,7 +26,7 @@ const int border_width = 32;
 //const int chessman_width = 57;
 //const int chessman_width = 29;
 
-#define	PLACE_LEFT 0x01
+#define PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
 #define PIECE_START 16  //棋子开始数字 start number of chessman
 #define PIECE_END   48  //棋子结束数字 end number of chessman
@@ -65,7 +64,7 @@ int unescape_character (const char *scanner)
 
 /** 用于在拖放时得到的文件名的转码*/
 /** get the code of when drag the filename*/
-std::string  wind_unescape_string (const char *escaped_string, 
+std::string  wind_unescape_string (const char *escaped_string,
 		const gchar *illegal_characters)
 {
 	const char *in;
@@ -143,7 +142,7 @@ Board::Board(MainWindow& win) :
 
 	/** 加载所需要图片进内存*/
 	load_images();
-	
+
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
@@ -173,22 +172,19 @@ void Board::set_themes(const std::string& themes_)
 	load_images();
 	redraw();
 }
-Glib::RefPtr<Gdk::Pixbuf> Board::get_pic(const std::string& name_)
-{
-    const std::string path = \
-            std::string(DATA_DIR) + \
-            "/themes/" + theme + "/" + name_;
-    return Gdk::Pixbuf::create_from_file(path);
 
+Cairo::RefPtr<Cairo::ImageSurface> Board::get_pic (const std::string &name_)
+{
+	const std::string path = std::string (DATA_DIR) +
+	  "/themes/" + theme + "/" + name_;
+	return Cairo::ImageSurface::create_from_png (path);
 }
 
-Glib::RefPtr<Gdk::Pixbuf> Board::get_spic(const std::string& name_)
+Cairo::RefPtr<Cairo::ImageSurface> Board::get_spic (const std::string &name_)
 {
-    const std::string path = \
-            std::string(DATA_DIR) + \
-            "/themes/" + theme + "-small/" + name_;
-    return Gdk::Pixbuf::create_from_file(path);
-
+	const std::string path = std::string (DATA_DIR) +
+	  "/themes/" + theme + "-small/" + name_;
+	return Cairo::ImageSurface::create_from_png (path);
 }
 
 void Board::load_images()
@@ -252,7 +248,7 @@ void Board::configure_board(int _width)
 		load_images();
 		redraw();
 	}
-	
+
 }
 
 void Board::get_grid_size(int& width, int& height)
@@ -291,41 +287,20 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	return Gdk::Point(x, y);
 }
 
-void Board::on_map()
-{
-	Gtk::DrawingArea::on_map();
-	selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_SHARED, get_window()->get_visual(), chessman_width, chessman_width);
-}
-
 bool Board::on_configure_event(GdkEventConfigure* ev)
 {
-	//if(ui_pixmap)
-	//	return true;
-	ui_pixmap = Gdk::Pixmap::create(this->get_window(),get_width(),get_height());
-
-	redraw();
-
+	return true;
 }
+
 bool Board::on_expose_event(GdkEventExpose* ev)
 {
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			ev->area.x,ev->area.y,
-			ev->area.x,ev->area.y,
-			ev->area.width,ev->area.height);
-			
+	redraw();
 	return true;
 }
 void Board::redraw()
 {
 	draw_bg();
 	draw_board();
-
-	int x,y;
-	ui_pixmap->get_size(x,y);
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			0,0,
-			0,0,
-			x,y);
 }
 
 void Board::redraw_with_line(int mv,bool select)
@@ -333,14 +308,8 @@ void Board::redraw_with_line(int mv,bool select)
 	draw_bg();
 	draw_trace(mv);
 	draw_board();
-	int x,y;
-	ui_pixmap->get_size(x,y);
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			0,0,
-			0,0,
-			x,y);
 	draw_select_frame(select);
-	
+
 }
 
 /**处理点击事件, handle the click events*/
@@ -374,7 +343,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				}
 				/** 对战状态中，选了对方棋子无效*/
 				/** choose the enemy chessman is useless on war */
-				if(is_fight_to_robot()||is_network_game()){ 
+				if(is_fight_to_robot()||is_network_game()){
 					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
 						selected_chessman =-1;
@@ -404,7 +373,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
 				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
 				try_move(selected_x,selected_y);
-				
+
 			}
 
 
@@ -433,93 +402,98 @@ void Board::draw_bg()
 	int bg_width = bg_image->get_width();
 	int bg_height = bg_image->get_height();
 
-	int count_w = get_width() / bg_width + 1;
-	int count_h = get_height() / bg_height + 1;
-	for (int i = 0; i < count_w; i++) {
-		for (int j = 0; j < count_h; j++) {
-			ui_pixmap->draw_pixbuf(get_style()->get_black_gc(), bg_image,
-					0, 0, i * bg_width, j * bg_height, bg_width, bg_height, 
-					Gdk::RGB_DITHER_NONE, 0, 0);
-		}
-	}
+	Glib::RefPtr<Gdk::Window> window = get_window ();
+	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
 
+	Cairo::RefPtr<Cairo::ImageSurface> surface;
+	Cairo::RefPtr<Cairo::Context> bgcr;
 
-	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_black_gc();
-	gc->set_line_attributes(4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	ui_pixmap->draw_rectangle(gc, false, 
-			p1.get_x() - 8, p1.get_y() - 8,
-			width + 8 * 2, height + 8 * 2);
+	surface = Cairo::ImageSurface::create(Cairo::Format::FORMAT_ARGB32, width * 9, height * 10);
+	bgcr = Cairo::Context::create(surface);
 
-	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
-	ui_pixmap->draw_rectangle(gc, false, 
-			p1.get_x(), p1.get_y(),
-			width, height);
+	Cairo::RefPtr<Cairo::Pattern> pattern = Cairo::SurfacePattern::create(bg_image);
+	pattern->set_extend(Cairo::Extend::EXTEND_REPEAT);
+	bgcr->set_source(pattern);
+	bgcr->fill();
+	bgcr->paint();
 
-	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND);
+	cr->set_source(surface, 0, 0);
+	cr->paint();
+
+	// 画棋盘外框
+	cr->save();
+	cr->set_source_rgb(0, 0, 0);
+	cr->set_line_width(4.0);
+	cr->rectangle(p1.get_x () - 8, p1.get_y () - 8, width + 8 * 2, height + 8 * 2);
+	cr->stroke();
+
+	// 画棋盘内框
+	cr->set_line_width(2.0);
+	cr->rectangle(p1.get_x (), p1.get_y (), width, height);
+	cr->stroke();
+
+	cr->set_line_width(1.0);
 	int grid_width;
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 
-	GdkSegment seg[9];
-
-	for (int i = 0; i < 9; i++) {
-		p1 = get_coordinate(0, i);
-		p2 = get_coordinate(8, i);
-		seg[i].x1 = p1.get_x();
-		seg[i].y1 = p1.get_y();
-		seg[i].x2 = p2.get_x();
-		seg[i].y2 = p2.get_y();
+	// 画棋盘横线
+	for (int i = 0; i < 9; i++)
+	{
+		p1 = get_coordinate (0, i);
+		p2 = get_coordinate (8, i);
+		cr->move_to(p1.get_x(), p1.get_y());
+		cr->line_to(p2.get_x(), p2.get_y());
+		cr->stroke();
 	}
-	ui_pixmap->draw_segments(gc, seg, 9);
 
-	for (int i = 0; i < 8; i++) {
-		p1 = get_coordinate(i, 0);
-		p2 = get_coordinate(i, 4);
-		seg[i].x1 = p1.get_x();
-		seg[i].y1 = p1.get_y();
-		seg[i].x2 = p2.get_x();
-		seg[i].y2 = p2.get_y();
+	// 画上方棋盘纵线
+	for (int i = 0; i < 8; i++)
+	{
+		p1 = get_coordinate (i, 0);
+		p2 = get_coordinate (i, 4);
+		cr->move_to(p1.get_x(), p1.get_y());
+		cr->line_to(p2.get_x(), p2.get_y());
+		cr->stroke();
 	}
-	ui_pixmap->draw_segments(gc, seg, 8);
 
-	for (int i = 0; i < 8; i++) {
-		p1 = get_coordinate(i, 5);
-		p2 = get_coordinate(i, 9);
-		seg[i].x1 = p1.get_x();
-		seg[i].y1 = p1.get_y();
-		seg[i].x2 = p2.get_x();
-		seg[i].y2 = p2.get_y();
+	// 画下方棋盘纵线
+	for (int i = 0; i < 8; i++)
+	{
+		p1 = get_coordinate (i, 5);
+		p2 = get_coordinate (i, 9);
+		cr->move_to(p1.get_x(), p1.get_y());
+		cr->line_to(p2.get_x(), p2.get_y());
+		cr->stroke();
 	}
-	ui_pixmap->draw_segments(gc, seg, 8);
 
-	gc->set_line_attributes(2, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_ROUND );
-
-	draw_localize(gc, 0, 3, PLACE_LEFT);
-	draw_localize(gc, 8, 3, PLACE_RIGHT);
+	cr->set_line_width(2.0);    // make the line wider
+	draw_localize (cr, 0, 3, PLACE_LEFT);
+	draw_localize (cr, 8, 3, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		draw_localize(gc, i * 2 + 2, 3, PLACE_ALL);
+		draw_localize(cr, i * 2 + 2, 3, PLACE_ALL);
 	}
 
-	draw_localize(gc, 1, 2, PLACE_ALL);
-	draw_localize(gc, 7, 2, PLACE_ALL);
+	draw_localize(cr, 1, 2, PLACE_ALL);
+	draw_localize(cr, 7, 2, PLACE_ALL);
 
-	draw_localize(gc, 0, 6, PLACE_LEFT);
-	draw_localize(gc, 8, 6, PLACE_RIGHT);
+	draw_localize(cr, 0, 6, PLACE_LEFT);
+	draw_localize(cr, 8, 6, PLACE_RIGHT);
 
 	for (int i = 0; i < 3; i++) {
-		draw_localize(gc,  i * 2 + 2, 6, PLACE_ALL);
+		draw_localize(cr, i * 2 + 2, 6, PLACE_ALL);
 	}
 
-	draw_localize(gc, 1, 7, PLACE_ALL);
-	draw_localize(gc, 7, 7, PLACE_ALL);
+	draw_localize(cr, 1, 7, PLACE_ALL);
+	draw_localize(cr, 7, 7, PLACE_ALL);
 
-	gc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL );
-	draw_palace(gc, 4, 1); 
-	draw_palace(gc, 4, 8); 
+	cr->set_line_width(1.0);
+	draw_palace (cr, 4, 1);
+	draw_palace (cr, 4, 8);
 }
 
-void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
+void Board::draw_localize(Cairo::RefPtr<Cairo::Context> &cr, int x, int y, int place)
 {
 	int width;
 	int height;
@@ -530,50 +504,49 @@ void Board::draw_localize(Glib::RefPtr<Gdk::GC>& gc, int x, int y, int place)
 	Gdk::Point p = get_coordinate(x, y);
 
 	if (place & PLACE_LEFT) {
-		std::vector<Gdk::Point> poss;
-		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - height - 4));
-		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() - 4));
-		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() - 4));
-		ui_pixmap->draw_lines(gc, poss);
+		cr->move_to(p.get_x() + 5, p.get_y () - height - 4);
+		cr->line_to(p.get_x () + 5, p.get_y () - 4);
+		cr->line_to(p.get_x () + 5 + width, p.get_y () - 4);
+		cr->stroke();
 
-		poss.clear();
-		poss.push_back(Gdk::Point(p.get_x() + 5 + width, p.get_y() + 5));
-		poss.push_back(Gdk::Point(p.get_x() + 5, p.get_y() + 5));
-		poss.push_back(Gdk::Point(p.get_x() + 5 , p.get_y() + 5 + height));
-		ui_pixmap->draw_lines(gc, poss);
+		cr->move_to(p.get_x () + 5 + width, p.get_y () + 5);
+		cr->line_to(p.get_x () + 5, p.get_y () + 5);
+		cr->line_to(p.get_x () + 5, p.get_y () + 5 + height);
+		cr->stroke();
 	}
 
 	if (place & PLACE_RIGHT) {
-		std::vector<Gdk::Point> poss;
-		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() - 4));
-		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4));
-		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() - 4 - height));
-		ui_pixmap->draw_lines(gc, poss);
-		poss.clear();
-		poss.push_back(Gdk::Point(p.get_x() - 4 - width, p.get_y() + 5));
-		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5));
-		poss.push_back(Gdk::Point(p.get_x() - 4 , p.get_y() + 5 + height));
-		ui_pixmap->draw_lines(gc, poss);
+		cr->move_to(p.get_x () - 4 - width, p.get_y () - 4);
+		cr->line_to(p.get_x () - 4, p.get_y () - 4);
+		cr->line_to(p.get_x () - 4, p.get_y () - 4 - height);
+		cr->stroke();
+
+		cr->move_to(p.get_x () - 4 - width, p.get_y () + 5);
+		cr->line_to(p.get_x () - 4, p.get_y () + 5);
+		cr->line_to(p.get_x () - 4, p.get_y () + 5 + height);
+		cr->stroke();
 	}
 }
 
-void Board::draw_palace(Glib::RefPtr<Gdk::GC>& gc, int x, int y)
+void Board::draw_palace(Cairo::RefPtr<Cairo::Context> &cr, int x, int y)
 {
 	int width;
 	int height;
 	get_grid_size(width, height);
 	Gdk::Point p = get_coordinate(x, y);
 
-	ui_pixmap->draw_line(gc, p.get_x() - width, p.get_y() - height, p.get_x() + width, p.get_y() + height);
-	ui_pixmap->draw_line(gc, p.get_x() + width, p.get_y() - height, p.get_x() - width, p.get_y() + height);
+	cr->move_to(p.get_x () - width, p.get_y () - height);
+	cr->line_to(p.get_x () + width, p.get_y () + height);
+	cr->move_to(p.get_x () + width, p.get_y () - height);
+	cr->line_to(p.get_x () - width, p.get_y () + height);
+	cr->stroke();
 }
-
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-	//if(chessman<16|| chessman>47)
-	//	return;
-	int chess_type = m_engine.get_chessman_type(chessman);	
+
+
+	int chess_type = m_engine.get_chessman_type(chessman);
 	if(chess_type<0||chess_type>13)
 		return;
 
@@ -581,9 +554,11 @@ void Board::draw_chessman(int x, int y, int chessman)
 	int px = p.get_x() - chessman_width / 2;
 	int py = p.get_y() - chessman_width / 2;
 
-	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[chess_type],
-			0, 0, px, py, chessman_images[chess_type]->get_width(), chessman_images[chess_type]->get_height(), 
-			Gdk::RGB_DITHER_NONE, 0, 0);
+	Glib::RefPtr<Gdk::Window> window = get_window ();
+	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
+	cr->set_source(chessman_images[chess_type], px, py);
+	cr->paint();
 }
 
 void Board::draw_show_can_move()
@@ -609,22 +584,12 @@ void Board::draw_phonily_point(Gdk::Point& p)
 {
 	int px = p.get_x() - 11 / 2;
 	int py = p.get_y() - 11 / 2;
-	//int px = p.get_x() - chessman_width / 2;
-	//int py = p.get_y() - chessman_width / 2;
-	//ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
-	//ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
-	//			0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
-	//			Gdk::RGB_DITHER_NONE, 0, 0);
-	ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, 11, 11);
-	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[PROPMT],
-				0, 0, px, py, chessman_images[PROPMT]->get_width(), chessman_images[PROPMT]->get_height(), 
-				Gdk::RGB_DITHER_NONE, 0, 0);
-	int x,y;
-	ui_pixmap->get_size(x,y);
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			0,0,
-			0,0,
-			x,y);
+
+	Glib::RefPtr<Gdk::Window> window = get_window ();
+	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
+	cr->set_source(chessman_images[PROPMT], px, py);
+	cr->paint();
 }
 
 void Board::draw_select_frame(bool selected)
@@ -633,7 +598,6 @@ void Board::draw_select_frame(bool selected)
 		return;
 
 	/** 目前要做的是根据棋子代号，获取它所在的棋盘9x10坐标*/
-	//Gdk::Point p = get_coordinate(selected_x, selected_y);
 	int sx,sy;
 	m_engine.get_xy_from_chess(selected_chessman,sx,sy,is_rev_board);
 	Gdk::Point p = get_coordinate(sx, sy);
@@ -642,24 +606,12 @@ void Board::draw_select_frame(bool selected)
 	int px = p.get_x() - chessman_width / 2;
 	int py = p.get_y() - chessman_width / 2;
 
-
+	Glib::RefPtr<Gdk::Window> window = get_window ();
+	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
 	if (selected) {
-		ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
-	ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
-				0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(), 
-				Gdk::RGB_DITHER_NONE, 0, 0);
-	} else {
-		ui_pixmap->draw_image (get_style()->get_black_gc(), selected_chessman_image, 0, 0, px, py, -1, -1);
+		cr->set_source(chessman_images[SELECTED_CHESSMAN], px, py);
+		cr->paint();
 	}
-
-
-	int x,y;
-	ui_pixmap->get_size(x,y);
-	this->get_window()->draw_drawable(this->get_style()->get_black_gc(),ui_pixmap,
-			0,0,
-			0,0,
-			x,y);
-
 }
 
 
@@ -677,17 +629,18 @@ void Board::draw_trace(int mv)
 	int src = m_engine.get_move_src(mv);
 	int dst = m_engine.get_move_dst(mv);
 
-	Glib::RefPtr<Gdk::GC> gc = this->get_style()->get_white_gc();
-	gc->set_rgb_fg_color(Gdk::Color(color));
-	Gdk::Point s1 =get_coordinate(m_engine.RANK_X(src)-3,m_engine.RANK_Y(src)-3);
-	Gdk::Point s2 =get_coordinate(m_engine.RANK_X(dst)-3,m_engine.RANK_Y(dst)-3);
+	Glib::RefPtr<Gdk::Window> window = get_window ();
+	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
 
-	gc->set_line_attributes(4,Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL);
-	std::vector<Gdk::Point> poss;
-	poss.push_back(s1);
-	poss.push_back(s2);
-	ui_pixmap->draw_lines(gc, poss);
+	cr->set_source_rgb (0.3, 0.5, 0.9);
 
+	Gdk::Point s1 = get_coordinate (m_engine.RANK_X (src) - 3, m_engine.RANK_Y (src) - 3);
+	Gdk::Point s2 = get_coordinate (m_engine.RANK_X (dst) - 3, m_engine.RANK_Y (dst) - 3);
+
+	cr->set_line_width (4.0);
+	cr->move_to(s1.get_x (), s1.get_y ());
+	cr->line_to(s2.get_x (), s2.get_y ());
+	cr->stroke();
 }
 void Board::first_move()
 {
@@ -746,7 +699,7 @@ void Board::next_move()
 }
 void Board::back_move()
 {
-	
+
 	m_step--;
 	if(m_step<0)
 		m_step =0;
@@ -1135,7 +1088,7 @@ void Board::new_game(BOARD_STATUS _status)
 bool Board::robot_log(const Glib::IOCondition& condition)
 {
 	/*for testing,delete me*/
-	char buf[1024] = {0};
+	char buf[1024] = { 0 };
 	int buf_len = 1024;
 	char* p = buf;
 	for (; buf_len > 0; ) {
@@ -1148,7 +1101,7 @@ bool Board::robot_log(const Glib::IOCondition& condition)
 
 	if (buf_len > 0) {
 		*p = 0;
-		printf("%s", buf);
+		printf ("%s", buf);
 		std::string str_buf(buf);
 		parent.show_textview_engine_log(str_buf);
 
@@ -1322,7 +1275,7 @@ bool Board::on_network_io(const Glib::IOCondition& )
 
 	int fd_cli = -1;
        EC_THROW(-1 == (fd_cli = accept(fd_recv_skt, NULL, 0)));
-       char buf[1024] = {0};
+       char buf[1024];
        size_t len = read(fd_cli, &buf[0], 1023);
        buf[len]=0;
        if (len > 0) {
@@ -1347,7 +1300,7 @@ bool Board::on_network_io(const Glib::IOCondition& )
 			enemy_name = str_buf.substr(pos_s+11,pos_m-pos_s-11);
 			pos_m = str_buf.find_last_of("@");
 			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
-			
+
 			//parent.on_network_game(my_name,enemy_name,true);
 			parent.on_network_game(enemy_name,my_name,true);
 		}else if((pos = str_buf.find("network-game-black,")) != std::string::npos){
