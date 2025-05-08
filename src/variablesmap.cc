@@ -44,15 +44,20 @@ void VariablesMap::connect_widget(const Glib::ustring& widget_name, Glib::ustrin
   m_refGlade->get_widget(widget_name, pWidget);
 
   Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(pWidget); //it mange both Gtk::entry and Gtk::SpinButton
-  //Gtk::ComboBoxEntry* pComboBoxEntry = dynamic_cast<Gtk::ComboBoxEntry*>(pWidget);
+  Gtk::ComboBoxText* pComboBoxText = dynamic_cast<Gtk::ComboBoxText*>(pWidget);
+  Gtk::SpinButton* pSpinButton = dynamic_cast<Gtk::SpinButton*>(pWidget);
   if(pEntry)
   {
     m_mapWidgetsToVariables[pEntry] = (void*)(&variable);
   }
-  //if(pComboBoxEntry)
-  //{
-  //  m_mapWidgetsToVariables[pComboBoxEntry] = (void*)(&variable);
-  //}
+  if(pComboBoxText)
+  {
+    m_mapWidgetsToVariables[pComboBoxText] = (void*)(&variable);
+  }
+  if(pSpinButton)
+  {
+    m_mapWidgetsToVariables[pSpinButton] = (void*)(&variable);
+  }
 }
 
 void VariablesMap::connect_widget(const Glib::ustring& widget_name, double& variable)
@@ -111,7 +116,7 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
 		{
 			//Cast the variable appropriately and set it appropriately:
 			Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(pWidget);
-			//Gtk::ComboBoxEntry* pComboBoxEntry = dynamic_cast<Gtk::ComboBoxEntry*>(pWidget);
+			Gtk::ComboBoxText* pComboBoxText = dynamic_cast<Gtk::ComboBoxText*>(pWidget);
 
 			Gtk::ToggleButton* pToggleButton = dynamic_cast<Gtk::ToggleButton*>(pWidget); //CheckButtons and RadioButtons.
 			Gtk::Scale* pScale = dynamic_cast<Gtk::Scale*>(pWidget);
@@ -127,19 +132,19 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
 				else
 					pEntry->set_text(*pVar);
 			}
-			//if(pComboBoxEntry)
-			//{
-			//	Glib::ustring* pVar = (Glib::ustring*)(pVariable);
-			//	Gtk::Entry* pIEntry = dynamic_cast<Gtk::Entry*>(pComboBoxEntry->get_child());
+			if(pComboBoxText)
+			{
+				Glib::ustring* pVar = (Glib::ustring*)(pVariable);
+				Gtk::Entry* pIEntry = dynamic_cast<Gtk::Entry*>(pComboBoxText->get_child());
 
-			//	if(to_variable){
-			//		if(pIEntry)
-			//			(*pVar) = pIEntry->get_text();
-			//	} else {
-			//		if(pIEntry)
-			//			pIEntry->set_text(*pVar);
-			//	}
-			//}
+				if(to_variable){
+					if(pIEntry)
+						(*pVar) = pIEntry->get_text();
+				} else {
+					if(pIEntry)
+						pIEntry->set_text(*pVar);
+				}
+			}
 			if(pToggleButton)
 			{
 				bool* pVar = (bool*)(pVariable);
@@ -173,10 +178,14 @@ void VariablesMap::transfer_one_widget(Gtk::Widget* pWidget, bool to_variable)
 			}
 			if(pSpinButton){
 				Glib::ustring* pVar = (Glib::ustring*)(pVariable);
-				if(to_variable)
-					(*pVar) = pSpinButton->get_text();
-				else
+				if(to_variable) {
+					char buf[5];
+					int val = pSpinButton->get_value_as_int();
+					sprintf(buf, "%d", val);
+					(*pVar) = buf;
+				} else {
 					pSpinButton->set_value(atoi((*pVar).c_str()));
+				}
 			}
 		}
 	}

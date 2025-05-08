@@ -2,6 +2,7 @@
 /*
  * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
+ * Copyright (C) 2025 yetist <yetist@gmail.com>
  *
  */
 
@@ -15,7 +16,6 @@
 #include "Engine.h"
 #include "Pgnfile.h"
 #include "robot.h"
-//#include "pidgin.h"
 
 class MainWindow;
 

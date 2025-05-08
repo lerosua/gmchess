@@ -1,7 +1,7 @@
 /*
  * Board.h
  * Copyright (C) wind 2009 <xihels@gmail.com>
- *
+ * Copyright (C) 2025 yetist <yetist@gmail.com>
  */
 
 #include "Board.h"
@@ -108,8 +108,7 @@ std::string  wind_unescape_string (const char *escaped_string,
 Board::Board(MainWindow& win) : parent(win)
 {
 
-#if 0
-	std::list<Gtk::TargetEntry> listTargets;
+	std::vector<Gtk::TargetEntry> listTargets;
 	listTargets.push_back(Gtk::TargetEntry("STRING"));
 	listTargets.push_back(Gtk::TargetEntry("text/plain"));
 
@@ -119,7 +118,6 @@ Board::Board(MainWindow& win) : parent(win)
 	this->drag_dest_set(listTargets);
 	this->signal_drag_data_received().connect(
 			sigc::mem_fun(*this, &Board::on_drog_data_received));
-#endif
 
 	/** 加载所需要图片进内存*/
 	load_images();
@@ -219,17 +217,14 @@ void Board::configure_board(int _width)
 	if(is_small_board && _width >=521){
 		is_small_board=false;
 		chessman_width=57;
-		load_images();
-		queue_draw();
 
 	}
 	if(!is_small_board && _width<521){
 		is_small_board=true;
 		chessman_width=29;
-		load_images();
-		queue_draw();
 	}
-
+	load_images();
+	queue_draw();
 }
 
 void Board::get_grid_size(int& width, int& height)
@@ -289,11 +284,9 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	if(is_fight_to_robot()||is_network_game()){
 		if(!is_human_player())
 			return true;
-
 	}
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
-
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
@@ -353,7 +346,6 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		queue_draw();
 
 	}
-
 	return true;
 }
 
@@ -739,7 +731,6 @@ int Board::try_move(int mv)
 		selected_chessman = m_engine.get_piece(dst);
 		printf("move = %d finish move and redraw now\n",mv);
 		selected_chessman=-1;
-
 		std::string iccs_str=m_engine.move_to_iccs_str(mv);
 		/** 对战时的处理*/
 		if(is_fight_to_robot()){
@@ -811,7 +802,6 @@ int Board::try_move(int mv)
 		}
 
 	}
-
 	return 0;
 
 }

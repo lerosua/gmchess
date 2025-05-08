@@ -15,6 +15,9 @@
  *
  * =====================================================================================
  */
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include "MainWindow.h"
 #include <glib/gi18n.h>
 #include <gtkmm/button.h>
@@ -27,12 +30,6 @@
 #include "ConfWindow.h"
 #include "gmchess.h"
 #include "Sound.h"
-
-#ifndef VERSION
-#define version "0.29.6.3"
-#else
-#define version VERSION
-#endif
 
 Glib::ustring ui_info =
 "<ui>"
@@ -69,8 +66,8 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml = Gtk::Builder::create_from_file(main_ui,"main_window");
 	if(!ui_xml)
 		exit(271);
-	Gtk::VBox* main_window =0;
-	Gtk::VBox* box_board=0;
+	Gtk::Box* main_window =0;
+	Gtk::Box* box_board=0;
 
 	ui_xml->get_widget("main_window",main_window);
 	ui_xml->get_widget("vbox_board",box_board);
@@ -119,7 +116,7 @@ MainWindow::MainWindow():menubar(NULL)
 	/** 设置菜单, set the menu*/
 	init_ui_manager();
 	menubar = ui_manager->get_widget("/MenuBar");
-	Gtk::VBox* menu_tool_box=0;
+	Gtk::Box* menu_tool_box=0;
 	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
 
@@ -772,7 +769,7 @@ void MainWindow::on_menu_about()
 		about->set_logo(ui_logo);
 		if(GTKMM_MAJOR_VERSION==2 && GTKMM_MINOR_VERSION>=12)
 			about->set_program_name("GMChess");
-		about->set_version(version);
+		about->set_version(PACKAGE_VERSION);
 		about->set_website("https://lerosua.github.io");
 		about->set_copyright("Copyright (c) 2009 - 2011 lerosua");
 		about->set_comments(_("GMChess is a Chinese chess game written in gtkmm."));

@@ -25,15 +25,16 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	if(!vbox_xml)
 		exit(271);
 
-	Gtk::VBox * vBox = 0;
+	Gtk::Box * vBox = 0;
 	vbox_xml->get_widget("conf_vbox", vBox);
 
 	Gtk::SpinButton* spinbt =0;
 	vbox_xml->get_widget("sb_depth",spinbt);
-	//Gtk::Adjustment* adjust = spinbt->get_adjustment();
-	//adjust->set_lower(1.0);
-	//adjust->set_upper(15.0);
-	//adjust->set_step_increment(1.0);
+	Glib::RefPtr<Gtk::Adjustment> adjust = spinbt->get_adjustment();
+
+	adjust->set_lower(1.0);
+	adjust->set_upper(15.0);
+	adjust->set_step_increment(1.0);
 
 	Gtk::Button* bt = 0;
 	vbox_xml->get_widget("button_ok", bt);
@@ -60,7 +61,7 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	m_theme = GMConf["themes"];
 	m_engine_name = GMConf["engine_name"];
 
-	Gtk::HBox* hbox = 0;
+	Gtk::Box* hbox = 0;
 	vbox_xml->get_widget("hbox_theme", hbox);
 	cbtheme = Gtk::manage(new Gtk::ComboBoxText);
 	cbtheme->append("wood");
