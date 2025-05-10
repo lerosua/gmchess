@@ -1,333 +1,352 @@
 # Chinese translations for gmchess package.
 # Copyright (C) 2009 THE gmchess'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gmchess package.
-#  <lerosua@gmail.com>, 2009.
+# lerosua <lerosua@gmail.com>, 2009.
+# Boyuan Yang <073plan@gmail.com>, 2018.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gmchess 0.29.2\n"
+"Project-Id-Version: gmchess 0.29.6.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-25 21:42+0800\n"
-"PO-Revision-Date: 2010-09-25 21:47+0800\n"
-"Last-Translator: lerosua <lerosua@gmail.com>\n"
-"Language-Team: Chinese (simplified)\n"
-"Language: \n"
+"POT-Creation-Date: 2018-01-29 20:47+0800\n"
+"PO-Revision-Date: 2018-01-29 20:47+0800\n"
+"Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
+"Language-Team: Chinese (Simplified) <debian-l10n-chinese@lists.debian.org>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
 
-#: ../src/MainWindow.cc:124
-msgid "bout"
+#: ../src/MainWindow.cc:115
+msgid "GMChess"
+msgstr "天书棋谈"
+
+#: ../src/MainWindow.cc:132
+msgid "Turn"
 msgstr "回合"
 
-#: ../src/MainWindow.cc:126
-msgid "step"
+#: ../src/MainWindow.cc:134
+msgid "Move"
 msgstr "着法"
 
 #. File menu:
-#: ../src/MainWindow.cc:365
+#: ../src/MainWindow.cc:399
 msgid "_File"
-msgstr "文件"
+msgstr "文件(_F)"
 
-#: ../src/MainWindow.cc:367
+#: ../src/MainWindow.cc:401
 msgid "Open file"
 msgstr "打开文件"
 
-#: ../src/MainWindow.cc:368
+#: ../src/MainWindow.cc:402
 msgid "Open chessman File"
 msgstr "打开棋谱文件"
 
-#: ../src/MainWindow.cc:371
+#: ../src/MainWindow.cc:405
 msgid "Save as"
 msgstr "另存为"
 
-#: ../src/MainWindow.cc:372
+#: ../src/MainWindow.cc:406
 msgid "Save as a chess pgn file"
 msgstr "保存为PGN棋谱"
 
+#: ../src/MainWindow.cc:409
+msgid "Save Board"
+msgstr "保存棋盘"
+
+#: ../src/MainWindow.cc:410
+msgid "Save board to a png file"
+msgstr "将棋盘保存为 png 文件"
+
 #. View menu:
-#: ../src/MainWindow.cc:380
+#: ../src/MainWindow.cc:418
 msgid "_View"
-msgstr "查看"
+msgstr "查看(_V)"
 
 #. Game menu:
-#: ../src/MainWindow.cc:387
+#: ../src/MainWindow.cc:425
 msgid "_Game"
-msgstr "游戏"
+msgstr "游戏(_G)"
 
-#: ../src/MainWindow.cc:388
+#: ../src/MainWindow.cc:426
 msgid "_Fight to AI"
-msgstr "与电脑对战"
+msgstr "与电脑对战(_F)"
 
-#: ../src/MainWindow.cc:390
+#: ../src/MainWindow.cc:428
 msgid "Free Play"
 msgstr "摆棋"
 
-#: ../src/MainWindow.cc:392
-msgid "Change Side"
-msgstr "换边"
+#: ../src/MainWindow.cc:430
+msgid "_Switch colour"
+msgstr "交换棋色(_S)"
 
 #. Help menu:
-#: ../src/MainWindow.cc:395
+#: ../src/MainWindow.cc:433
 msgid "_Help"
-msgstr "帮助"
+msgstr "帮助(_H)"
 
-#: ../src/MainWindow.cc:414
+#: ../src/MainWindow.cc:457
 msgid "Save File"
 msgstr "保存文件"
 
-#: ../src/MainWindow.cc:504
+#: ../src/MainWindow.cc:547
 msgid "Choose File"
 msgstr "选择文件"
 
-#: ../src/MainWindow.cc:547
+#: ../src/MainWindow.cc:590
 msgid "All Files"
 msgstr "所有文件"
 
-#: ../src/MainWindow.cc:563
+#: ../src/MainWindow.cc:606
 msgid "AI Warn"
 msgstr "AI警告"
 
-#: ../src/MainWindow.cc:566
-msgid "Open book view will close the AI game,Are you sure?"
-msgstr "打开棋谱会关闭引擎，继续？"
+#: ../src/MainWindow.cc:609
+msgid "Open book view will close the AI game. Are you sure?"
+msgstr "打开棋谱会停止对战，是否继续？"
 
-#: ../src/MainWindow.cc:608
+#: ../src/MainWindow.cc:653
 msgid "the file maybe not right format for chess"
 msgstr "未支持的棋谱格式"
 
-#: ../src/MainWindow.cc:657
-#: ../src/MainWindow.cc:1013
-#: ../src/MainWindow.cc:1033
-#: ../src/MainWindow.cc:1045
+#: ../src/MainWindow.cc:700 ../src/MainWindow.cc:1103 ../src/MainWindow.cc:1123
+#: ../src/MainWindow.cc:1135
 msgid "Warning"
 msgstr "警告"
 
-#: ../src/MainWindow.cc:660
+#: ../src/MainWindow.cc:703
 msgid "Are you  sure to close the network game?"
-msgstr "您确定是要停止网络对战吗?"
+msgstr "您确认要停止网络对战吗?"
 
-#: ../src/MainWindow.cc:733
-msgid "GMChess is chinese chess game write by gtkmm"
-msgstr "GMChess 是一款用Gtkmm库写成的中国象棋软件"
+#: ../src/MainWindow.cc:758
+msgid "Function not implemented yet"
+msgstr "功能尚未实现"
 
-#: ../src/MainWindow.cc:735
-msgid "This program is licenced under GNU General Public Licence (GPL) version 2."
+#: ../src/MainWindow.cc:777
+msgid "GMChess is a Chinese chess game written in gtkmm."
+msgstr "GMChess 是一款用 Gtkmm 库写成的中国象棋软件。"
+
+#: ../src/MainWindow.cc:779
+msgid "This program is licensed under GNU General Public Licence (GPL) version 2."
 msgstr "此程序在 GNU 通用公共许可证第二版下发布。"
 
-#: ../src/MainWindow.cc:753
+#: ../src/MainWindow.cc:798
 msgid "Black"
 msgstr "黑"
 
-#: ../src/MainWindow.cc:756
+#: ../src/MainWindow.cc:801
 msgid "Red"
 msgstr "红"
 
-#: ../src/MainWindow.cc:821
+#: ../src/MainWindow.cc:864
 msgid "Game: "
 msgstr "游戏: "
 
-#: ../src/MainWindow.cc:822
+#: ../src/MainWindow.cc:865
 msgid "Time: "
 msgstr "时间: "
 
-#: ../src/MainWindow.cc:823
+#: ../src/MainWindow.cc:866
 msgid "Site: "
 msgstr "地点: "
 
-#: ../src/MainWindow.cc:824
+#: ../src/MainWindow.cc:867
 msgid "Result: "
 msgstr "结果: "
 
-#: ../src/MainWindow.cc:825
+#: ../src/MainWindow.cc:868
 msgid "Opening: "
 msgstr "开局信息: "
 
-#: ../src/MainWindow.cc:826
+#: ../src/MainWindow.cc:869
 msgid "Variation:  "
 msgstr "变着: "
 
-#: ../src/MainWindow.cc:902
+#: ../src/MainWindow.cc:945 ../src/MainWindow.cc:992
 msgid "new game"
 msgstr "新游戏"
 
-#: ../src/MainWindow.cc:905
-msgid "Will you  start a new game?"
+#: ../src/MainWindow.cc:948 ../src/MainWindow.cc:995
+msgid "Will you start a new game?"
 msgstr "您确定要开始新游戏吗？"
 
-#: ../src/MainWindow.cc:927
-#: ../src/MainWindow.cc:981
-#: ../data/gmchess.glade.h:21
+#: ../src/MainWindow.cc:970 ../src/MainWindow.cc:1017 ../src/MainWindow.cc:1071
+#: ../data/gmchess.glade.h:33
 msgid "Information"
 msgstr "信息"
 
-#: ../src/MainWindow.cc:928
-msgid "You are play with network game,Please over it first!"
-msgstr "您正在进行网络对战，请先结束它。"
+#: ../src/MainWindow.cc:971
+msgid "You are play online, Please end this game first!"
+msgstr "您正在进行网络对战，请先结束该局比赛！"
 
-#: ../src/MainWindow.cc:944
-#: ../src/MainWindow.cc:972
+#: ../src/MainWindow.cc:1018
+msgid "You are playing online, Please end this game first!"
+msgstr "您正在进行网络对战，请先结束该局比赛！"
+
+#: ../src/MainWindow.cc:1034 ../src/MainWindow.cc:1062
 msgid "be lose"
 msgstr "输了"
 
-#: ../src/MainWindow.cc:947
-#: ../src/MainWindow.cc:975
+#: ../src/MainWindow.cc:1037 ../src/MainWindow.cc:1065
 msgid "Will you resign in this game?"
 msgstr "您确定要认输吗？"
 
-#: ../src/MainWindow.cc:982
+#: ../src/MainWindow.cc:1072
 msgid "You lose the game!"
 msgstr "您输了这局!"
 
-#: ../src/MainWindow.cc:1014
-msgid "Only ask rue game when you are going,so wait a minute!"
-msgstr "只有在您走的时候才能悔棋，请等会!"
+#: ../src/MainWindow.cc:1104
+msgid "You may only take a back move when it's your turn. Please wait a minute!"
+msgstr "只有在您走的时候才能悔棋，请稍等！"
 
-#: ../src/MainWindow.cc:1034
-#: ../src/MainWindow.cc:1046
-msgid "Only rue game when you are going,so wait a minute!"
-msgstr "只有在您走的时候才能悔棋，请等会!"
+#: ../src/MainWindow.cc:1124 ../src/MainWindow.cc:1136
+msgid "You can only take a back move when it's your turn. Please wait a minute!"
+msgstr "只有在您走的时候才能悔棋。请稍等！"
 
 #. robot win
-#: ../src/MainWindow.cc:1061
+#: ../src/MainWindow.cc:1151
 msgid ""
-"You are Lose! \n"
-" Are you want to start a new game?"
+"You Lose!\n"
+"Do you want to start a new game?"
 msgstr ""
-"您输了 ! \n"
-" 您确定要开始新游戏吗？"
+"您输了！\n"
+"您确定要开始新游戏吗？"
 
 #. robot lose
-#: ../src/MainWindow.cc:1066
+#: ../src/MainWindow.cc:1156
 msgid ""
-"Congratuations ! YOU WIN!\n"
-" start a new game click OK"
+"Congratuations, YOU WIN!\n"
+"To start a new game, click OK"
 msgstr ""
-"恭喜！您赢了!\n"
+"恭喜，您赢了！\n"
 "开始新游戏请点确定"
 
 #. robot want to draw
-#: ../src/MainWindow.cc:1071
+#: ../src/MainWindow.cc:1161
 msgid "Draw Game!"
 msgstr "和棋!"
 
 #. robot overload time,lose
-#: ../src/MainWindow.cc:1075
-msgid "The Enemy overload the time, You Win!"
-msgstr "对方超时，您赢得了比赛！"
+#: ../src/MainWindow.cc:1165
+msgid "The opponent used up their time. You Win!"
+msgstr "对方超时。您赢得了比赛！"
 
-#: ../src/MainWindow.cc:1079
-msgid "You overload the time, You Lose!"
-msgstr "您超时了，您输了！"
+#: ../src/MainWindow.cc:1169
+msgid "You used up your time. You Lose!"
+msgstr "您超时了。您输了！"
 
-#: ../src/MainWindow.cc:1085
-msgid "Game End"
-msgstr "游戏结束 "
+#: ../src/MainWindow.cc:1175
+msgid "Game Over"
+msgstr "游戏结束"
 
 #: ../data/gmchess.glade.h:1
+msgid "chess"
+msgstr "象棋"
+
+#: ../data/gmchess.glade.h:2 ../data/confwin.glade.h:21
 msgid " "
 msgstr " "
 
-#: ../data/gmchess.glade.h:2
-#, fuzzy
-msgid "  "
-msgstr " "
-
 #: ../data/gmchess.glade.h:3
-msgid "          "
-msgstr "          "
+msgid "nickname:"
+msgstr "昵称："
 
 #: ../data/gmchess.glade.h:4
 msgid "  Computer "
 msgstr "  电脑 "
 
 #: ../data/gmchess.glade.h:5
+msgid "step time: "
+msgstr "步时: "
+
+#: ../data/gmchess.glade.h:6
+msgid "play time: "
+msgstr "局时: "
+
+#: ../data/gmchess.glade.h:7
+msgid "          "
+msgstr "          "
+
+#: ../data/gmchess.glade.h:8
+msgid "nickname: "
+msgstr "昵称："
+
+#: ../data/gmchess.glade.h:9
 msgid " Human "
 msgstr " 真人 "
 
-#: ../data/gmchess.glade.h:6
+#: ../data/gmchess.glade.h:10
 msgid "1"
 msgstr "1"
 
-#: ../data/gmchess.glade.h:7
+#: ../data/gmchess.glade.h:11
 msgid "2"
 msgstr "2"
 
-#: ../data/gmchess.glade.h:8
+#: ../data/gmchess.glade.h:12
 msgid "3"
 msgstr "3"
 
-#: ../data/gmchess.glade.h:9
+#: ../data/gmchess.glade.h:13
 msgid "4"
 msgstr "4"
 
-#: ../data/gmchess.glade.h:10
+#: ../data/gmchess.glade.h:14
 msgid "5"
 msgstr "5"
 
-#: ../data/gmchess.glade.h:11
+#: ../data/gmchess.glade.h:15
 msgid "6"
 msgstr "6"
 
-#: ../data/gmchess.glade.h:12
+#: ../data/gmchess.glade.h:16
 msgid "7"
 msgstr "7"
 
-#: ../data/gmchess.glade.h:13
+#: ../data/gmchess.glade.h:17
 msgid "8"
 msgstr "8"
 
-#: ../data/gmchess.glade.h:14
+#: ../data/gmchess.glade.h:18
 msgid "9"
 msgstr "9"
 
-#: ../data/gmchess.glade.h:15
-msgid "<b>Comment</b>"
-msgstr "<b>注释</b>"
-
-#: ../data/gmchess.glade.h:16
-msgid "<b>Engine status</b>"
-msgstr "引擎状态"
-
-#: ../data/gmchess.glade.h:17
-msgid "Board Information"
-msgstr "棋盘信息"
-
-#: ../data/gmchess.glade.h:18
-msgid "Book"
-msgstr "棋书"
-
 #: ../data/gmchess.glade.h:19
-msgid "Draw"
-msgstr "和棋"
+msgid "Start"
+msgstr "开始"
 
 #: ../data/gmchess.glade.h:20
-msgid "Engine"
-msgstr "引擎"
+msgid "begin a new game"
+msgstr "开始新游戏"
 
-#: ../data/gmchess.glade.h:22
+#: ../data/gmchess.glade.h:21
 msgid "Lost"
 msgstr "认输"
+
+#: ../data/gmchess.glade.h:22
+msgid "Draw"
+msgstr "和棋"
 
 #: ../data/gmchess.glade.h:23
 msgid "Rue"
 msgstr "悔棋"
 
 #: ../data/gmchess.glade.h:24
-msgid "Start"
-msgstr "开始"
+msgid "nine"
+msgstr "九"
 
 #: ../data/gmchess.glade.h:25
-msgid "chess"
-msgstr "象棋"
-
-#: ../data/gmchess.glade.h:26
 msgid "eight"
 msgstr "八"
 
+#: ../data/gmchess.glade.h:26
+msgid "seven"
+msgstr "七"
+
 #: ../data/gmchess.glade.h:27
-msgid "first station"
-msgstr "初始局面"
+msgid "six"
+msgstr "六"
 
 #: ../data/gmchess.glade.h:28
 msgid "five"
@@ -338,56 +357,138 @@ msgid "four"
 msgstr "四"
 
 #: ../data/gmchess.glade.h:30
-msgid "last move"
-msgstr "最后一着法"
-
-#: ../data/gmchess.glade.h:31
-msgid "next move"
-msgstr "下一着法"
-
-#: ../data/gmchess.glade.h:32
-msgid "nickname:"
-msgstr "昵称: "
-
-#: ../data/gmchess.glade.h:33
-msgid "nickname: "
-msgstr "昵称: "
-
-#: ../data/gmchess.glade.h:34
-msgid "nine"
-msgstr "九"
-
-#: ../data/gmchess.glade.h:35
-msgid "one"
-msgstr "一"
-
-#: ../data/gmchess.glade.h:36
-msgid "play time: "
-msgstr "局时: "
-
-#: ../data/gmchess.glade.h:37
-msgid "preview move"
-msgstr "前一着法"
-
-#: ../data/gmchess.glade.h:38
-msgid "seven"
-msgstr "七"
-
-#: ../data/gmchess.glade.h:39
-msgid "six"
-msgstr "六"
-
-#: ../data/gmchess.glade.h:40
-msgid "step time: "
-msgstr "步时: "
-
-#: ../data/gmchess.glade.h:41
 msgid "three"
 msgstr "三"
 
-#: ../data/gmchess.glade.h:42
+#: ../data/gmchess.glade.h:31
 msgid "two"
 msgstr "二"
+
+#: ../data/gmchess.glade.h:32
+msgid "one"
+msgstr "一"
+
+#: ../data/gmchess.glade.h:34
+msgid "start game with state"
+msgstr "以对应状态开始游戏"
+
+#: ../data/gmchess.glade.h:35
+msgid "first station"
+msgstr "初始局面"
+
+#: ../data/gmchess.glade.h:36
+msgid "preview move"
+msgstr "前一着法"
+
+#: ../data/gmchess.glade.h:37
+msgid "next move"
+msgstr "下一着法"
+
+#: ../data/gmchess.glade.h:38
+msgid "last move"
+msgstr "最后一着法"
+
+#: ../data/gmchess.glade.h:39
+msgid "<b>Comment</b>"
+msgstr "<b>注释</b>"
+
+#: ../data/gmchess.glade.h:40
+msgid "Board Information"
+msgstr "棋盘信息"
+
+#: ../data/gmchess.glade.h:41
+msgid "Book"
+msgstr "棋书"
+
+#: ../data/gmchess.glade.h:42 ../data/confwin.glade.h:6
+msgid "  "
+msgstr "   "
+
+#: ../data/gmchess.glade.h:43
+msgid "<b>Engine status</b>"
+msgstr "<b>引擎状态</b>"
+
+#: ../data/gmchess.glade.h:44
+msgid "Engine"
+msgstr "引擎"
+
+#: ../data/confwin.glade.h:1
+msgid "Size of Board\n"
+msgstr "棋盘大小\n"
+
+#: ../data/confwin.glade.h:3
+msgid "small board"
+msgstr "小棋盘"
+
+#: ../data/confwin.glade.h:4
+msgid "big board"
+msgstr "大棋盘"
+
+#: ../data/confwin.glade.h:5
+msgid "themes"
+msgstr "主题"
+
+#: ../data/confwin.glade.h:7
+msgid "trace line color"
+msgstr "轨迹颜色"
+
+#: ../data/confwin.glade.h:8
+msgid "<b>Aspect</b>"
+msgstr "<b>界面</b>"
+
+#: ../data/confwin.glade.h:9
+msgid "select Engine"
+msgstr "选择引擎"
+
+#: ../data/confwin.glade.h:10
+msgid "default is eleeye_engine"
+msgstr "默认为 eleeye_engine"
+
+#: ../data/confwin.glade.h:11
+msgid "eleeye_engine"
+msgstr "eleeye_engine"
+
+#: ../data/confwin.glade.h:12
+msgid "use open book"
+msgstr ""
+
+#: ../data/confwin.glade.h:13
+msgid "Search Depth"
+msgstr "搜索深度"
+
+#: ../data/confwin.glade.h:14
+msgid "step time:"
+msgstr "步时: "
+
+#: ../data/confwin.glade.h:15
+msgid "240"
+msgstr "240"
+
+#: ../data/confwin.glade.h:16
+msgid "sec"
+msgstr "秒"
+
+#: ../data/confwin.glade.h:17
+msgid "play time:"
+msgstr "局时: "
+
+#: ../data/confwin.glade.h:18
+msgid "40"
+msgstr "40"
+
+#: ../data/confwin.glade.h:19
+msgid "min"
+msgstr "分"
+
+#: ../data/confwin.glade.h:20
+msgid "<b>Engine</b>"
+msgstr "<b>引擎</b>"
+
+#~ msgid "Only rue game when you are going,so wait a minute!"
+#~ msgstr "只有在您走的时候才能悔棋，请等会!"
+
+#~ msgid "Game End"
+#~ msgstr "游戏结束"
 
 #~ msgid "end game"
 #~ msgstr "结束游戏"

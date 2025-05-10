@@ -1,5 +1,5 @@
 /*
-CCM->PGN Convertor - a Chinese Chess Score Convertion Program
+CCM->PGN Converter - a Chinese Chess Score Conversion Program
 Designed by Morning Yellow, Version: 3.14, Last Modified: Jun. 2008
 Copyright (C) 2004-2007 www.elephantbase.net
 
@@ -710,7 +710,7 @@ int main(int argc, char **argv)
 	int (*fun) (const char *szFile, const char *szPgnFile,
 		     const EccoApiStruct & EccoApi);
 	if (argc < 2) {
-		printf("=== PGN Convertor ===\n");
+		printf("=== PGN Converter ===\n");
 		printf("Usage: pgnconvert File [PGN-File]\n");
 		printf("It support [.ccm|.che|.chn|.mxq|.xqf] \n");
 		return 0;

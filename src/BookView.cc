@@ -3,7 +3,7 @@
  *
  *       Filename:  BookView.cpp
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  0.11
  *        Created:  2009年03月31日 13时55分18秒
@@ -29,7 +29,7 @@
 BookView::BookView(MainWindow* parent):m_parent(parent)
 {
 
-	this->set_flags(Gtk::CAN_FOCUS);
+	this->set_can_focus(true);
 	this->set_rules_hint(false);
 
 	m_refTreeModel = Gtk::TreeStore::create(m_columns);
@@ -101,7 +101,7 @@ void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& f_li
 	(*iter)[m_columns.title] = f_line;
 	(*iter)[m_columns.type] = MEMBER;
 	(*iter)[m_columns.path]= f_path;
-	
+
 
 
 }
@@ -153,7 +153,7 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 		/*
 		if(GROUP_CHANNEL == (*iter)[m_columns.type])
 			return false;
-		Gtk::Menu* pop_menu = 
+		Gtk::Menu* pop_menu =
 			parent->get_channels_pop_menu();
 		if (pop_menu)
 			pop_menu->popup(ev->button, ev->time);
@@ -166,7 +166,7 @@ bool BookView::on_button_press_event(GdkEventButton * ev)
 
 int BookView::load_book_dir(const char* Path)
 {
- 
+
 	DIR *dirp;
 	struct dirent * node;
 	char cPath[1024];

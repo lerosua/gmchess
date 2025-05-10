@@ -1,2 +1,4 @@
 data/gmchess.desktop.in
 src/BookView.cc
+data/confwin.glade
+.pc/0001-fix-the-warning-from-cppcheck.patch/src/MainWindow.cc

@@ -1,7 +1,27 @@
-GMChess program is write by gtkmm and c++.
-it release under GPLv2 .
-and the chess engine base on xqwizard, which on http://sourceforge.net/projects/xqwizard/.
-the xqwizard also release by GPLv2.
-and gmchess copy some picture and some files(example like book.dat).
+Introduction
+------------
 
-you can see the GPLv2 detail on file which name COPYING in source code.
+GMChess program is write in gtkmm and c++.
+It is released under GPLv2.
+The chess engine is based on xqwizard, which can be found on
+https://sourceforge.net/projects/xqwizard/.
+xqwizard is also released under GPLv2.
+GMchess also copied some pictures and some files from that
+(for example, book.dat).
+
+The COPYING file provided in the source repository is a copy of GPLv2.
+
+Upstream maintenance status
+---------------------------
+
+GMChess upstream dead together with the decay of Google Code platform.
+The original author migrated his code onto https://github.com/lerosua/gmchess
+but no development happened since.
+
+This version fo GMChess is from Debian Project and applied several patches
+and fixes based on the last release version 0.29.6. Were there any suggestions
+and bug reports, please visit Debian Package Tracker for gmchess:
+
+    https://tracker.debian.org/pkg/gmchess
+
+ -- Boyuan Yang <073plan@gmail.com>  Thu, 25 Jan 2018 00:17:44 +0800

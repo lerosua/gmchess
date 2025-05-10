@@ -1,13 +1,14 @@
-
 [Desktop Entry]
 Name=Chinese chess
-Name[zh_CN]=天书棋谈
+Name[zh_CN]=天书象棋
 Comment=Play the popular chinese chess game
-Comment[zh_CN]=玩流行的中国象棋游戏
-Exec=gmchess
+Comment[zh_CN]=中国象棋游戏，支持人机对战、打谱、保存棋谱
+Exec=gmchess %f
 Icon=gmchess
 Terminal=false
 Type=Application
-Categories=GNOME;GTK;Game;BoardGame;
+MimeType=application/xiangqi-pgn;application/xiangqi-xqf;application/xiangqi-mxq;application/xiangqi-che;application/xiangqi-ccm;application/xiangqi-chn;application/xiangqi-xqi;
+Keywords=Xiangqi;Chess;Chinese;
+Keywords[zh_CN]=Xiangqi;Chess;Chinese;象棋;中国象棋;
+Categories=GTK;Game;BoardGame;
 StartupNotify=true
-Encoding=UTF-8

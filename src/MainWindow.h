@@ -1,27 +1,26 @@
 /*
  * =====================================================================================
- * 
+ *
  *       Filename:  MainWindow.h
- * 
+ *
  *    Description:  主窗口
- * 
+ *
  *        Version:  1.0
  *        Created:  2009年02月14日 07时49分10秒 CST
  *       Revision:  none
  *       Compiler:  gcc
- * 
+ *
  *         Author:  lerosua (), lerosua@gmail.com
  *        Company:  Cyclone
- * 
+ *
  * =====================================================================================
  */
 
-#ifndef  MAINWINDOW_FILE_HEADER_INC
-#define  MAINWINDOW_FILE_HEADER_INC
+#ifndef  GMCHESS_MAINWINDOW_FILE_HEADER_INC
+#define  GMCHESS_MAINWINDOW_FILE_HEADER_INC
 
 #include <gtkmm.h>
 #include <gtkmm/window.h>
-//#include <libglademm/xml.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include "Board.h"
@@ -35,7 +34,6 @@ class MainWindow:public Gtk::Window
 {
 	public:
 		MainWindow();
-		~MainWindow();
 		/** 回到最初局面*/
 		void on_first_move();
 		/** 去到最后的局面*/
@@ -133,7 +131,7 @@ class MainWindow:public Gtk::Window
 		};
 		Columns m_columns;
 		Glib::RefPtr<Gtk::ListStore>	m_refTreeModel;
-		
+
 	private:
 		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
 		Board*				board;
@@ -173,4 +171,4 @@ class MainWindow:public Gtk::Window
 };
 
 
-#endif   /* ----- #ifndef MAINWINDOW_FILE_HEADER_INC  ----- */
+#endif   /* ----- #ifndef GMCHESS_MAINWINDOW_FILE_HEADER_INC  ----- */

@@ -18,7 +18,7 @@
 #ifndef GMROBOT_H_
 #define GMROBOT_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <gtkmm.h>
 

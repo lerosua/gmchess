@@ -105,11 +105,12 @@ class Engine {
 		inline int RANK_X(int sq) {
 			  return sq & 15;
 		}
-		
-		inline int side_tag(int sd) {
-			  int pc = 16 + (sd << 4);
-			    return pc;
-		}
+
+        inline int side_tag(int sd) {
+             int pc = 16 + (sd << 4); // 16 + (sd * 16);
+             return pc;
+        }
+
 		/** 棋子类型转成FEN串字符 */
 		/** chess type convert to FEN character */
 		inline char piece_to_fen(int pt) {
@@ -169,10 +170,10 @@ class Engine {
 		inline int get_chessman_xy(int f_chess){return chessmans[f_chess] ; }
 
 		/** 得到着法的起点 */
-		/** get the moves start postion*/
+		/** get the moves start position*/
 		int get_move_src(int mv){ return (int)mv & 255 ;}
 		/** 得到着法的终点 */
-		/** get the moves end postion */
+		/** get the moves end position */
 		int get_move_dst(int mv){ return (int) (mv >>8)&255 ; }
 		/** 把着法转成ICCS坐标格式，比如 h2e2（炮二平五)*/
 		/**  convert moves to iccs format h2e2（炮二平五)*/
@@ -198,7 +199,7 @@ class Engine {
 		 *	  the high level do move, it call do_move and logic_move 
 		 * @param mv 着法
 		 * @return 真即执行着法成功，false 执行失败
-		 *	   retrun true means sucess. false means fail.
+		 *	   return true means success. false means fail.
 		 */
 		bool make_move(int mv);
 		/** 无检测执行着法 */
@@ -240,13 +241,13 @@ class Engine {
 		/** add the eated chessman to moves */
 		int set_move_eat(int mv,int eated) { return mv + (eated <<16) ;}
 		/** 由目标及起点获得绊相角的位置坐标 */
-		/** get the bishop leg from target and start postion */
+		/** get the bishop leg from target and start position */
 		int get_bishop_leg(int f_src,int f_dst)	{ return f_src + (f_dst-f_src)/2;}
 		/** 绊马脚用到的比较函数*/
 		/** compare the knight leg */
 		int knight_cmp(int x,int y);
 		/** 由目标及起点获得绊马脚的位置坐标 */
-		/**  get the knight_ leg from target and start postion */
+		/**  get the knight_ leg from target and start position */
 		int get_knight_leg(int f_src,int f_dst)	;
 		/** 清理棋盘及棋子数组*/
 		/** clean all the chessman of board */

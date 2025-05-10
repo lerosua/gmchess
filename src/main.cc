@@ -1,11 +1,11 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
-/*
- * main.cc
- * Copyright (C) wind 2009 <xihels@gmail.com>
- * 
+/**
+ * @file main.cc
+ * @author wind
+ * @brief Main entry of gmchess executable
+ * @details Copyright (C) wind 2009 <xihels@gmail.com>
  */
 
-//#include <libglademm/xml.h>
 #include <iostream>
 #include <gtkmm.h>
 #include <gtkmm/main.h>
@@ -27,7 +27,12 @@
 #endif
 
 TGMConf GMConf;
-//检测单一实例
+
+
+/**
+ * @brief 检测单一实例
+ * @todo Consider implementing this function with D-Bus
+ */
 int singleon(const std::string& url)
 {
 	int sockfd;
@@ -61,28 +66,28 @@ int singleon(const std::string& url)
 	EC_THROW(-1 == listen(sockfd,128));
 	return sockfd;
 }
+
+
 int main (int argc, char *argv[])
 {
+    std::string url;
 
-	std::string url;
+    if (argc == 2) {
+        url = std::string(argv[1]);
+    } else {
+        url = std::string("");
+    }
 
-	if(2==argc){
-		url = std::string(argv[1]);
-	}
-	else{
-		url=std::string("");
+    int fd_io = singleon(url);
+    bindtextdomain (GETTEXT_PACKAGE, GMCHESS_LOCALEDIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+    textdomain (GETTEXT_PACKAGE);
 
-	}
-	int fd_io = singleon(url);
-	bindtextdomain (GETTEXT_PACKAGE, GMCHESS_LOCALEDIR);
-	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-	textdomain (GETTEXT_PACKAGE);
-
-	Gtk::Main kit(argc, argv);
-	MainWindow win;
-	win.watch_socket(fd_io);
-	win.start_with(url);
-	kit.run(win);
-	return 0;
+    Gtk::Main kit(argc, argv);
+    MainWindow win;
+    win.watch_socket(fd_io);
+    win.start_with(url);
+    kit.run(win);
+    return 0;
 }
 

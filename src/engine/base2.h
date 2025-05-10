@@ -46,6 +46,7 @@ inline bool AbsolutePath(const char *sz) {
   return sz[0] == '/' || (sz[0] == '~' && sz[1] == '/');
 }
 
+// XXX: not portable
 inline void GetSelfExe(char *szDst) {
   readlink("/proc/self/exe", szDst, PATH_MAX_CHAR);
 }

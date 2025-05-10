@@ -1,4 +1,4 @@
-.TH GMCHESS 6 "08 july 2009" "gmchess-0.20" 
+.TH GMCHESS 6 "8 February 2018" "gmchess 0.29.6.3"
 .RS
 .RE
 .RE
@@ -20,9 +20,9 @@
 .fam T
 .fi
 .SH DESCRIPTION
-\fBgmchess\fP is a game of conventional chinese chess. 
-The AI isn't wonderful, but provides a challenging enough game to all but the
-most highly skilled players.
+\fBgmchess\fP is a game of traditional Chinese chess.
+While AI isn't wonderful, it provides a challenging enough game to all but the
+most skilled players.
 .RE
 .PP
 
@@ -32,12 +32,14 @@ most highly skilled players.
 .PP
 
 .SH AUTHOR
-Written by wind <xihels@gmail.com>, lerosua <lerosua@gmail.com>
+Written by wind <xihels@gmail.com> and lerosua <lerosua@gmail.com>.
 .RE
 .PP
 
 .SH RESOURCES
-Main web site: http://gmchess.googlecode.com
+Placeholder GitHub repository: https://github.com/lerosua/gmchess
+.br
+Debian source code repository: https://salsa.debian.org/chinese-team/gmchess
 .RE
 .PP
 
