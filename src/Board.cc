@@ -267,10 +267,10 @@ bool Board::on_draw (const ::Cairo::RefPtr<::Cairo::Context> &cr)
 {
 	draw_bg();
 	int mv = m_engine.get_last_move_from_snapshot();
-	if (mv > 0) {
-	    draw_trace(mv);
-	}
 	draw_board();
+	if (mv > 0) {
+		draw_trace(mv);
+	}
 	draw_select_frame(true);
 	draw_show_can_move();
 	return true;
@@ -579,6 +579,19 @@ void Board::draw_board()
 	}
 }
 
+void Board::calcVertexes(double start_x, double start_y, double end_x, double end_y, double& x1, double& y1, double& x2, double& y2)
+{
+	double arrow_lenght = chessman_width / 2.0;
+	double arrow_degrees = 0.5;
+
+	double angle = atan2 (end_y - start_y, end_x - start_x) + M_PI;
+
+	x1 = end_x + arrow_lenght * cos(angle - arrow_degrees);
+	y1 = end_y + arrow_lenght * sin(angle - arrow_degrees);
+	x2 = end_x + arrow_lenght * cos(angle + arrow_degrees);
+	y2 = end_y + arrow_lenght * sin(angle + arrow_degrees);
+}
+
 void Board::draw_trace(int mv)
 {
 	int src = m_engine.get_move_src(mv);
@@ -598,7 +611,22 @@ void Board::draw_trace(int mv)
 	cr->move_to(s1.get_x (), s1.get_y ());
 	cr->line_to(s2.get_x (), s2.get_y ());
 	cr->stroke();
+
+	// 画箭头
+	double x1;
+	double y1;
+	double x2;
+	double y2;
+	calcVertexes(s1.get_x (), s1.get_y (), s2.get_x (), s2.get_y (), x1, y1, x2, y2);
+	cr->move_to (s2.get_x (), s2.get_y ());
+	cr->line_to (x1, y1);
+	cr->line_to (x2, y2);
+	cr->close_path();
+
+	cr->set_source_rgba (rgba.get_red(), rgba.get_green(), rgba.get_blue(), 0.89);
+	cr->fill();
 }
+
 void Board::first_move()
 {
 	m_step = 0;

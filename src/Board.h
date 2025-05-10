@@ -87,6 +87,8 @@ class Board : public Gtk::DrawingArea
 		void draw_phonily_point (Gdk::Point &p);
 		void draw_localize(Cairo::RefPtr<Cairo::Context> &cr, int x, int y, int place);
 		void draw_palace(Cairo::RefPtr<Cairo::Context> &cr, int x, int y);
+		void calcVertexes(double start_x, double start_y, double end_x, double end_y, double& x1, double& y1, double& x2, double& y2);
+
 		/** 处理拖文件事件*/
 		/** handle the event of drog */
 		void on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
