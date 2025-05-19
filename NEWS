@@ -1,3 +1,7 @@
+2025-05-19 gmchess 0.29.6.4
+
+* Fix compile
+
 2018-02-08 gmchess 0.29.6.3
 
 * Fix a typo that could lead to crashing.

@@ -1,5 +1,5 @@
 project('gmchess', 'cpp',
-  version: '0.29.6.3',
+  version: '0.29.6.4',
   meson_version: '>=1.4.0',
   license: 'GPL2',
   default_options : [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11'],
