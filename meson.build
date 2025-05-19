@@ -108,9 +108,13 @@ if not libdl_dep.found()
   error('can not found libdl')
 endif
 
-libiconv_dep = cpp.find_library('iconv', required: true)
+libiconv_dep = cpp.find_library('iconv', required: false)
 if not libiconv_dep.found()
-  error('can not found libiconv')
+  # Fallback to glibc's iconv
+  libiconv_dep = cpp.find_library('c', required: false)
+  if not cpp.has_function('iconv_open', prefix: '#include <iconv.h>')
+    error('iconv functionality not found')
+  endif
 endif
 
 configure_file(
