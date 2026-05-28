@@ -21,6 +21,7 @@ gmchess_sources = [
 	'BookView.cc',
 	'Sound.cc',
 	'robot.cc',
+	'paths.cc',
 	'ec_throw.cpp',
 	'ConfWindow.cc',
 	'MainWindow.cc',

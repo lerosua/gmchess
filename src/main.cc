@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include "MainWindow.h"
 #include "ec_throw.h"
@@ -41,6 +42,7 @@ static int singleon(const std::string& url)
 	struct sockaddr_in srvaddr;
 
 	EC_THROW(-1 == (sockfd=socket(AF_INET,SOCK_STREAM,0)));
+	EC_THROW(-1 == fcntl(sockfd, F_SETFD, FD_CLOEXEC));
 	memset(&srvaddr, 0, sizeof(srvaddr));
 	srvaddr.sin_family=AF_INET;
 	srvaddr.sin_port=htons(GMPORT);

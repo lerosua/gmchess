@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include "robot.h"
+#include "paths.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <signal.h>
@@ -162,20 +163,8 @@ void Robot::start()
 	if (start_callback)
 		start_callback();
 	const char* argv[2];
-	//argv[0]="eleeye_engine";
-        // Try to locate the engine executable under the same directory of the "gmchess" executable
-        char path[256];
-        EC_THROW(-1 == readlink("/proc/self/exe", path, sizeof(path) - 1));
-        char* lastSlash = strrchr(path, '/');
-        *lastSlash = '\0';
-        strcat(path, "/");
-        strcat(path, get_engine().c_str());
-        if (access(path, F_OK) != -1) {
-            argv[0] = path;
-        } else {
-            // If not, let the system try it under PATH
-            argv[0] = get_engine().c_str();
-        }
+	const std::string engine_path = gmchess_engine_path(get_engine());
+	argv[0] = engine_path.c_str();
 	argv[1]=NULL;
 	my_system((char* const *)argv);
 

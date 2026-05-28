@@ -9,7 +9,9 @@
 #include "MainWindow.h"
 #include "Sound.h"
 #include "ec_throw.h"
+#include "paths.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -211,6 +213,9 @@ cairo_surface_t* Board::get_pic (const std::string &name_)
 {
 	const std::string path = std::string (DATA_DIR) +
 	  "/themes/" + theme + "/" + name_;
+	if(!g_file_test(path.c_str(), G_FILE_TEST_EXISTS))
+		return cairo_image_surface_create_from_png(
+				gmchess_data_path("themes/" + theme + "/" + name_).c_str());
 	return cairo_image_surface_create_from_png(path.c_str());
 }
 
@@ -218,6 +223,9 @@ cairo_surface_t* Board::get_spic (const std::string &name_)
 {
 	const std::string path = std::string (DATA_DIR) +
 	  "/themes/" + theme + "-small/" + name_;
+	if(!g_file_test(path.c_str(), G_FILE_TEST_EXISTS))
+		return cairo_image_surface_create_from_png(
+				gmchess_data_path("themes/" + theme + "-small/" + name_).c_str());
 	return cairo_image_surface_create_from_png(path.c_str());
 }
 
@@ -303,15 +311,19 @@ BoardPixel Board::get_position(int pos_x, int pos_y)
 	int grid_width;
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
-	pos_x -= border_width;
-	pos_y -= border_width;
-	pos_x += grid_width / 2;
-	pos_y += grid_height / 2;
-	int x = pos_x / grid_width;
-	int y = pos_y / grid_height;
-	int offset_x = pos_x - x * grid_width;
-	int offset_y = pos_y - y * grid_height;
-	if ((offset_x > chessman_width ) || (offset_y > chessman_width ))
+
+	if(grid_width <= 0 || grid_height <= 0)
+		return BoardPixel(-1, -1);
+
+	int x = (pos_x - border_width + grid_width / 2) / grid_width;
+	int y = (pos_y - border_width + grid_height / 2) / grid_height;
+	if(x < 0 || x > 8 || y < 0 || y > 9)
+		return BoardPixel(-1, -1);
+
+	BoardPixel center = get_coordinate(x, y);
+	const int hit_radius = std::max(chessman_width / 2, 8);
+	if(std::abs(pos_x - center.x) > hit_radius ||
+			std::abs(pos_y - center.y) > hit_radius)
 		return BoardPixel(-1, -1);
 	return BoardPixel(x, y);
 }

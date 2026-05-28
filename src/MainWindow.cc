@@ -16,6 +16,7 @@
 #include "ConfWindow.h"
 #include "Sound.h"
 #include "gmchess.h"
+#include "paths.h"
 
 #include <glib/gi18n.h>
 #include <cstdio>
@@ -267,7 +268,8 @@ MainWindow::MainWindow(GtkApplication* app)
 	gtk_window_set_title(GTK_WINDOW(window), _("GMChess"));
 
 	GError* error = NULL;
-	ui_logo = GDK_PAINTABLE(gdk_texture_new_from_filename(DATA_DIR"/gmchess.png", &error));
+	ui_logo = GDK_PAINTABLE(gdk_texture_new_from_filename(
+				gmchess_data_path("gmchess.png").c_str(), &error));
 	if(error)
 		g_error_free(error);
 
@@ -382,8 +384,10 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	GtkWidget* players = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
 	gtk_box_append(GTK_BOX(content), players);
 
-	p1_image = GTK_IMAGE(remember_widget("image_p1", gtk_image_new_from_file(DATA_DIR"/play.png")));
-	p2_image = GTK_IMAGE(remember_widget("image_p2", gtk_image_new_from_file(DATA_DIR"/play.png")));
+	p1_image = GTK_IMAGE(remember_widget("image_p1",
+				gtk_image_new_from_file(gmchess_data_path("play.png").c_str())));
+	p2_image = GTK_IMAGE(remember_widget("image_p2",
+				gtk_image_new_from_file(gmchess_data_path("play.png").c_str())));
 	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_image));
 	p1_name = GTK_LABEL(remember_widget("P1_name", gtk_label_new("Computer")));
 	p1_step_time = GTK_LABEL(remember_widget("P1_step_time", gtk_label_new("")));
