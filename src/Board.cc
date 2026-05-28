@@ -124,7 +124,9 @@ Board::Board(MainWindow& win) : parent(win)
 
 	p_pgnfile=new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
-	m_robot.set_out_slot(sigc::mem_fun(*this, &Board::robot_log));
+	m_robot.set_out_callback([this](GIOCondition condition) {
+			return robot_log(condition);
+			});
 	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
 
 	this->show_all();
@@ -1069,7 +1071,7 @@ void Board::new_game(BOARD_STATUS _status)
 }
 
 
-bool Board::robot_log(const Glib::IOCondition& condition)
+bool Board::robot_log(GIOCondition)
 {
 	/*for testing,delete me*/
 	char buf[1024] = { 0 };

@@ -19,11 +19,17 @@
 #define GMROBOT_H_
 
 #include <cstdlib>
+#include <functional>
+#include <glib.h>
 #include <iostream>
-#include <glibmm.h>
+#include <string>
+#include <unistd.h>
 
 class Robot {
 	public:
+		typedef std::function<bool(GIOCondition)> OutputCallback;
+		typedef std::function<void()> EventCallback;
+
 		Robot();
 		~Robot();
 		void send_ctrl_command(const char* c);
@@ -35,34 +41,33 @@ class Robot {
 
 		bool running() const;
 		bool pausing() const { return is_pause; }
-		void set_out_slot(const sigc::slot<bool, Glib::IOCondition>& slot)
-		{ out_slot = slot; }
+		void set_out_callback(const OutputCallback& callback)
+		{ out_callback = callback; }
+		void set_start_callback(const EventCallback& callback)
+		{ start_callback = callback; }
+		void set_stop_callback(const EventCallback& callback)
+		{ stop_callback = callback; }
 
 		ssize_t get_robot_log(char* buf, size_t count) 
 		{ return read(child_tem, buf, count); }
-
-		typedef const sigc::signal<void> type_signal_stop;
-		type_signal_stop signal_stop() const
-		{ return signal_stop_; }
-
-		typedef const sigc::signal<void> type_signal_start;
-		type_signal_start signal_start() const
-		{ return signal_start_; }	
 	protected:
 		int my_system(char* const argv[]);
 	private:
-		void wait_robot_exit(GPid, int);
+		static gboolean robot_io_cb(GIOChannel* source, GIOCondition condition, gpointer data);
+		static void robot_child_watch_cb(GPid pid, gint status, gpointer data);
+
+		void wait_robot_exit(GPid, gint);
 		virtual void on_robot_exit() {};
 		void set_s_pipe();
 		void set_m_pipe();
 		void create_pipe();
 		void close_pipe();
 
-		sigc::slot<bool, Glib::IOCondition> 	out_slot;
-		sigc::connection 		ptm_conn;
-		sigc::connection 		wait_conn;
-		type_signal_stop  		signal_stop_;
-		type_signal_start 		signal_start_;
+		OutputCallback	out_callback;
+		EventCallback	stop_callback;
+		EventCallback	start_callback;
+		guint		ptm_source_id;
+		guint		wait_source_id;
 		int		child_tem; 	// 主进程和子进程的连接管道的主进程则
 		int 	child_tem2; 	// 子进程端的标准输入，输出
 		int		child_pid;	/* robot's pid (internal)*/

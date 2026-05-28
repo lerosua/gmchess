@@ -16,7 +16,6 @@
  * =====================================================================================
  */
 #include "robot.h"
-#include <gdk/gdkx.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <signal.h>
@@ -28,6 +27,20 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+
+gboolean Robot::robot_io_cb(GIOChannel*, GIOCondition condition, gpointer data)
+{
+	Robot* robot = static_cast<Robot*>(data);
+	if (!robot->out_callback)
+		return G_SOURCE_REMOVE;
+
+	return robot->out_callback(condition) ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
+}
+
+void Robot::robot_child_watch_cb(GPid pid, gint status, gpointer data)
+{
+	static_cast<Robot*>(data)->wait_robot_exit(pid, status);
+}
 
 void  set_signals()
 {
@@ -108,6 +121,8 @@ void Robot::set_m_pipe()
 	Robot::Robot()
 	:is_running(false)
 	,is_pause(false)
+	,ptm_source_id(0)
+	,wait_source_id(0)
 	 ,child_pid(-1)
 {
 	engine_name = "eleeye_engine";
@@ -120,15 +135,21 @@ Robot::~Robot()
 {
 }
 
-void Robot::wait_robot_exit(GPid pid, int)
+void Robot::wait_robot_exit(GPid, gint)
 {
 	if (child_pid != -1) {
-		ptm_conn.disconnect();
+		if (ptm_source_id != 0) {
+			g_source_remove(ptm_source_id);
+			ptm_source_id = 0;
+		}
+		wait_source_id = 0;
 
 		waitpid(child_pid, NULL, 0);
 		child_pid = -1;
 
 		is_running = false;
+		if (stop_callback)
+			stop_callback();
 		on_robot_exit();
 		printf(" i have exit ======\n");
 	}
@@ -138,7 +159,8 @@ void Robot::wait_robot_exit(GPid pid, int)
 void Robot::start()
 {
 	printf("%s:%d\n",__func__,__LINE__);
-	signal_start().emit();
+	if (start_callback)
+		start_callback();
 	const char* argv[2];
 	//argv[0]="eleeye_engine";
         // Try to locate the engine executable under the same directory of the "gmchess" executable
@@ -164,11 +186,11 @@ int Robot::my_system(char* const argv[])
 {
 	extern char **environ;
 	create_pipe();
-	assert(!out_slot.empty());
+	assert(out_callback);
 	printf("%s:%d\n",__func__,__LINE__);
-	ptm_conn = Glib::signal_io().connect(
-			out_slot,
-			child_tem, Glib::IO_IN);
+	GIOChannel* io_channel = g_io_channel_unix_new(child_tem);
+	ptm_source_id = g_io_add_watch(io_channel, G_IO_IN, robot_io_cb, this);
+	g_io_channel_unref(io_channel);
 
 	printf("%s:%d\n",__func__,__LINE__);
 
@@ -192,8 +214,7 @@ int Robot::my_system(char* const argv[])
 	set_m_pipe();
 
 
-	wait_conn = Glib::signal_child_watch().connect(
-			sigc::mem_fun(*this, &Robot::wait_robot_exit), pid, 0);
+	wait_source_id = g_child_watch_add(pid, robot_child_watch_cb, this);
 
 	is_running = true;
 	return pid;
@@ -216,8 +237,14 @@ void Robot::send_ctrl_command(const char* c)
 void Robot::stop()
 {
 	if (child_pid != -1) {
-		ptm_conn.disconnect();
-		wait_conn.disconnect();
+		if (ptm_source_id != 0) {
+			g_source_remove(ptm_source_id);
+			ptm_source_id = 0;
+		}
+		if (wait_source_id != 0) {
+			g_source_remove(wait_source_id);
+			wait_source_id = 0;
+		}
 
 		for (;;) {
 			kill(-child_pid, SIGKILL);
@@ -225,6 +252,8 @@ void Robot::stop()
 			if (-1 == ret)
 				break;
 		}
+		if (stop_callback)
+			stop_callback();
 		on_robot_exit();
 
 		child_pid = -1;	
@@ -238,4 +267,3 @@ void Robot::pause()
 	is_pause = !is_pause;
 	send_ctrl_command("pause\n");
 }
-

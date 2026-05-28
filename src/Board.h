@@ -11,6 +11,7 @@
 
 #include <gtkmm.h>
 #include <iostream>
+#include <glib.h>
 #include <gtkmm/drawingarea.h>
 #include "gmchess.h"
 #include "Engine.h"
@@ -113,7 +114,7 @@ class Board : public Gtk::DrawingArea
 		void start_network ();
 		/** 读取AI的输出，并根据输出的着法走棋*/
 		/** read the output of AI,then go chess*/
-		bool robot_log (const Glib::IOCondition &condition);
+		bool robot_log (GIOCondition condition);
 		/** 回到最初局面*/
 		/** return the first station*/
 		void first_move ();

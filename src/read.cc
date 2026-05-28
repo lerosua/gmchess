@@ -1,4 +1,5 @@
-#include <gtkmm.h>
+#include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <locale.h>
@@ -9,7 +10,31 @@ union Hanzi{
 		uint32_t digit;
 	};
 
-char word_to_pos(const Glib::ustring& word)
+static std::string next_utf8_char(const std::string& text, size_t& pos)
+{
+	if(pos >= text.size())
+		return std::string();
+
+	const unsigned char c = static_cast<unsigned char>(text[pos]);
+	size_t len = 1;
+	if((c & 0x80) == 0)
+		len = 1;
+	else if((c & 0xe0) == 0xc0)
+		len = 2;
+	else if((c & 0xf0) == 0xe0)
+		len = 3;
+	else if((c & 0xf8) == 0xf0)
+		len = 4;
+
+	if(pos + len > text.size())
+		len = text.size() - pos;
+
+	std::string out = text.substr(pos, len);
+	pos += len;
+	return out;
+}
+
+char word_to_pos(const std::string& word)
 {
 	if(false){
 	}
@@ -27,7 +52,7 @@ char word_to_pos(const Glib::ustring& word)
 		return -1;
 }
 
-char word_to_digit(const Glib::ustring& word)
+char word_to_digit(const std::string& word)
 {
 	if(false){
 	}
@@ -55,7 +80,7 @@ char word_to_digit(const Glib::ustring& word)
 
 
 }
-char word_to_action(const Glib::ustring& word)
+char word_to_action(const std::string& word)
 {
 	if(false){
 	}
@@ -70,7 +95,7 @@ char word_to_action(const Glib::ustring& word)
 }
 
 
-char word_to_code(const Glib::ustring& word)
+char word_to_code(const std::string& word)
 {
 	if(false){
 	}
@@ -102,7 +127,7 @@ char word_to_code(const Glib::ustring& word)
 		return -1;
 }
 
-bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name)
+bool get_label(std::string& dst_str, const std::string& line_str, const std::string& name)
 {
 
 	size_t pos = line_str.find(name);
@@ -111,7 +136,7 @@ bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib
 	pos = line_str.find_first_of("\"");
 	if(pos == std::string::npos)
 		return false;
-	Glib::ustring tmp = line_str.substr(pos+1,std::string::npos);
+	std::string tmp = line_str.substr(pos+1,std::string::npos);
 	size_t end_pos = tmp.find_first_of("\"");
 	dst_str = tmp.substr(0,end_pos);
 	/*
@@ -138,7 +163,7 @@ int fun(void)
 	while(std::getline(file,line)){
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos){
-			Glib::ustring dst_str;
+			std::string dst_str;
 			get_label(dst_str,line,"Site");
 			get_label(dst_str,line,"Red ");
 			get_label(dst_str,line,"RedTeam");
@@ -146,25 +171,19 @@ int fun(void)
 			continue;
 		}
 #if 1
-		 Glib::ustring uline(line);
-		std::cout<<uline<<std::endl;
+		std::cout<<line<<std::endl;
 
-		int i=0;
+		size_t i=0;
 		
 		do{
-			Glib::ustring word;
-			word.assign(1,uline[i]);
-			i++;
+			std::string word = next_utf8_char(line, i);
 			int c = word_to_code(word);
 			if(c == -1)
 				continue;
 			std::cout << word<<" ";
-			Glib::ustring word2;
-			Glib::ustring word3;
-			Glib::ustring word4;
-			word2.assign(1,uline[i++]);
-			word3.assign(1,uline[i++]);
-			word4.assign(1,uline[i++]);
+			std::string word2 = next_utf8_char(line, i);
+			std::string word3 = next_utf8_char(line, i);
+			std::string word4 = next_utf8_char(line, i);
 			std::cout << word2<<" ";
 			std::cout << word3<<" ";
 			std::cout << word4<<" ";
@@ -185,7 +204,7 @@ int fun(void)
 			std::cout<<red.word[0]<<red.word[1]<<red.word[2]<<red.word[3]<<" == "<<red.digit<<std::endl;
 
 
-		}while(i<uline.length());
+		}while(i<line.length());
 		
 		std::cout<<std::endl;
 #endif
@@ -198,9 +217,9 @@ int fun(void)
 int main()
 {
 	 setlocale(LC_ALL, "zh_CN.UTF-8");
-	Glib::ustring text = "炮二平四";
-	Glib::ustring word;
-	word.assign(1,text[0]);
+	std::string text = "炮二平四";
+	size_t pos = 0;
+	std::string word = next_utf8_char(text, pos);
 	std::cout << word << std::endl;
 	std::cout << "text.length()= "<<text.length()<<std::endl;
 	if(word == "炮")
