@@ -526,10 +526,17 @@ void Board::draw_chessman(int x, int y, int chessman)
 		return;
 
 	BoardPixel p = get_coordinate(x, y);
-	int px = p.x - chessman_width / 2;
-	int py = p.y - chessman_width / 2;
+	draw_surface_centered(chessman_images[chess_type], p.x, p.y);
+}
 
-	cairo_set_source_surface(active_cr, chessman_images[chess_type], px, py);
+void Board::draw_surface_centered(cairo_surface_t* surface, int center_x, int center_y)
+{
+	if(!surface)
+		return;
+
+	const double px = center_x - cairo_image_surface_get_width(surface) / 2.0;
+	const double py = center_y - cairo_image_surface_get_height(surface) / 2.0;
+	cairo_set_source_surface(active_cr, surface, px, py);
 	cairo_paint(active_cr);
 }
 
@@ -551,10 +558,7 @@ void Board::draw_show_can_move()
 
 void Board::draw_phonily_point(BoardPixel& p)
 {
-	int px = p.x - 11 / 2;
-	int py = p.y - 11 / 2;
-	cairo_set_source_surface(active_cr, chessman_images[PROPMT], px, py);
-	cairo_paint(active_cr);
+	draw_surface_centered(chessman_images[PROPMT], p.x, p.y);
 }
 
 void Board::draw_select_frame(bool selected)
@@ -566,11 +570,8 @@ void Board::draw_select_frame(bool selected)
 	m_engine.get_xy_from_chess(selected_chessman,sx,sy,is_rev_board);
 	BoardPixel p = get_coordinate(sx, sy);
 
-	int px = p.x - chessman_width / 2;
-	int py = p.y - chessman_width / 2;
 	if (selected) {
-		cairo_set_source_surface(active_cr, chessman_images[SELECTED_CHESSMAN], px, py);
-		cairo_paint(active_cr);
+		draw_surface_centered(chessman_images[SELECTED_CHESSMAN], p.x, p.y);
 	}
 }
 

@@ -51,6 +51,7 @@ class Board
 		void get_grid_size (int &width, int &height);
 		void draw_bg ();
 		void draw_chessman (int x, int y, int chess_type);
+		void draw_surface_centered (cairo_surface_t* surface, int center_x, int center_y);
 		void draw_board ();
 		void draw_select_frame (bool selected = true);
 		void draw_show_can_move ();
