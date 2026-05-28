@@ -7,14 +7,15 @@
  */
 
 #include <iostream>
-#include <gtkmm.h>
-#include <gtkmm/main.h>
+#include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <cstring>
 #include <netdb.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include "MainWindow.h"
 #include "ec_throw.h"
 #ifdef HAVE_CONFIG_H
@@ -33,7 +34,7 @@ TGMConf GMConf;
  * @brief 检测单一实例
  * @todo Consider implementing this function with D-Bus
  */
-int singleon(const std::string& url)
+static int singleon(const std::string& url)
 {
 	int sockfd;
 	//struct hostent *he;
@@ -55,7 +56,8 @@ int singleon(const std::string& url)
 		else{
 			//把参数发送给另一个gmchess再退出
 			if( 0 == connect(sockfd,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
-				write(sockfd,url.c_str(),url.size());
+				ssize_t written = write(sockfd,url.c_str(),url.size());
+				(void)written;
 				close(sockfd);
 				exit(0);
 
@@ -83,11 +85,10 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    Gtk::Main kit(argc, argv);
+    gtk_init(&argc, &argv);
     MainWindow win;
     win.watch_socket(fd_io);
     win.start_with(url);
-    kit.run(win);
+    gtk_main();
     return 0;
 }
-

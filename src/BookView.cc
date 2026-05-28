@@ -5,17 +5,8 @@
  *
  *    Description:
  *
- *        Version:  0.11
- *        Created:  2009年03月31日 13时55分18秒
- *       Revision:  none
- *       Compiler:  g++
- *
- *         Author:  lerosua@gmail.com
- *        Company:  cyclone
- *
  * =====================================================================================
  */
-
 
 #include "MainWindow.h"
 #include "BookView.h"
@@ -24,149 +15,159 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
+#include <cstring>
 
+enum {
+	COL_TITLE,
+	COL_PATH,
+	COL_TYPE,
+	N_COLUMNS
+};
 
-BookView::BookView(MainWindow* parent):m_parent(parent)
+gboolean BookView::button_press_cb(GtkWidget*, GdkEventButton* event, gpointer data)
 {
-
-	this->set_can_focus(true);
-	this->set_rules_hint(false);
-
-	m_refTreeModel = Gtk::TreeStore::create(m_columns);
-	this->set_model( m_refTreeModel);
-	this->append_column(_("Book"), m_columns.title);
-
-
-	this->show();
+	return static_cast<BookView*>(data)->on_button_press_event(event);
 }
 
+BookView::BookView(MainWindow* parent)
+	: treeview(gtk_tree_view_new())
+	, tree_model(gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT))
+	, m_parent(parent)
+{
+	gtk_widget_set_can_focus(treeview, TRUE);
+	gtk_tree_view_set_model(GTK_TREE_VIEW(treeview), GTK_TREE_MODEL(tree_model));
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview),
+			-1, _("Book"), gtk_cell_renderer_text_new(), "text", COL_TITLE, NULL);
+	gtk_widget_add_events(treeview, GDK_BUTTON_PRESS_MASK);
+	g_signal_connect(treeview, "button-press-event", G_CALLBACK(button_press_cb), this);
+	gtk_widget_show(treeview);
+}
 
 BookView::~BookView()
 {
+	g_object_unref(tree_model);
 }
 
-Gtk::TreeModel::iterator BookView::add_group(const Glib::ustring& group)
+bool BookView::add_group(GtkTreeIter* iter, const std::string& group)
 {
-	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
-	(*iter)[m_columns.title]=group;
-	(*iter)[m_columns.type] = GROUP;
-
-	return iter;
+	gtk_tree_store_append(tree_model, iter, NULL);
+	gtk_tree_store_set(tree_model, iter,
+			COL_TITLE, group.c_str(),
+			COL_PATH, "",
+			COL_TYPE, GROUP,
+			-1);
+	return true;
 }
 
-Gtk::TreeModel::iterator BookView::add_group(const Glib::ustring& g_parent,const Glib::ustring& group)
+bool BookView::add_group(GtkTreeIter* iter, const std::string& g_parent, const std::string& group)
 {
+	if(g_parent == "book")
+		return add_group(iter, group);
 
-	if(g_parent=="book"){
-		return add_group(group);
-	}
-	Gtk::TreeModel::Children children = m_refTreeModel->children();
-	Gtk::TreeModel::iterator listiter;
-	listiter = getListIter(children,g_parent);
-	if(listiter == children.end())
-		listiter = add_group(g_parent);
+	GtkTreeIter parent_iter;
+	if(!get_list_iter(&parent_iter, NULL, g_parent))
+		add_group(&parent_iter, g_parent);
 
-	Gtk::TreeModel::iterator iter = m_refTreeModel->append(listiter->children());
-	(*iter)[m_columns.title]=group;
-	(*iter)[m_columns.type] = GROUP;
-
-	return iter;
+	gtk_tree_store_append(tree_model, iter, &parent_iter);
+	gtk_tree_store_set(tree_model, iter,
+			COL_TITLE, group.c_str(),
+			COL_PATH, "",
+			COL_TYPE, GROUP,
+			-1);
+	return true;
 }
 
-
-
-void BookView::add_line(const Glib::ustring& groupname,const Glib::ustring& f_line,const Glib::ustring& f_path)
+void BookView::add_line(const std::string& groupname, const std::string& f_line, const std::string& f_path)
 {
-	Gtk::TreeModel::Children children = m_refTreeModel->children();
-	Gtk::TreeModel::iterator listiter;
-	listiter = getListIter(children,groupname);
-	if(listiter == children.end()){
-		//listiter = add_group(groupname);
-
-		Gtk::TreeModel::iterator t_iter=children.begin();
-		Gtk::TreeModel::Children grandson= (*t_iter)->children();
-		do{
-			listiter = getListIter(grandson,groupname);
-			if(listiter != grandson.end())
-				break;
-			t_iter++;
-			grandson= (*t_iter)->children();
-		}while(t_iter!=children.end());
-
-		if(listiter == grandson.end())
+	GtkTreeIter group_iter;
+	if(!get_list_iter(&group_iter, NULL, groupname)) {
+		GtkTreeIter root_iter;
+		bool found = false;
+		if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_model), &root_iter)) {
+			do {
+				if(get_list_iter(&group_iter, &root_iter, groupname)) {
+					found = true;
+					break;
+				}
+			} while(gtk_tree_model_iter_next(GTK_TREE_MODEL(tree_model), &root_iter));
+		}
+		if(!found)
 			return;
 	}
 
-	Gtk::TreeModel::iterator iter = m_refTreeModel->append(listiter->children());
-	(*iter)[m_columns.title] = f_line;
-	(*iter)[m_columns.type] = MEMBER;
-	(*iter)[m_columns.path]= f_path;
-
-
-
+	GtkTreeIter iter;
+	gtk_tree_store_append(tree_model, &iter, &group_iter);
+	gtk_tree_store_set(tree_model, &iter,
+			COL_TITLE, f_line.c_str(),
+			COL_PATH, f_path.c_str(),
+			COL_TYPE, MEMBER,
+			-1);
 }
 
-Gtk::TreeModel::iterator BookView::getListIter(Gtk::TreeModel::
-		Children children, const std::string& groupname)
+bool BookView::get_list_iter(GtkTreeIter* iter, GtkTreeIter* parent, const std::string& groupname)
 {
-	return find_if(children.begin(),
-			children.end(),
-			bind2nd(Compare(m_columns),groupname));
-}
-
-
-bool BookView::on_button_press_event(GdkEventButton * ev)
-{
-	bool result = Gtk::TreeView::on_button_press_event(ev);
-
-	Glib::RefPtr < Gtk::TreeSelection > selection =
-		this->get_selection();
-	Gtk::TreeModel::iterator iter = selection->get_selected();
-	if (!selection->count_selected_rows())
-		return result;
-
-	Gtk::TreeModel::Path path(iter);
-	Gtk::TreeViewColumn * tvc;
-	int cx, cy;
-	/** get_path_at_pos() 是为确认鼠标是否在选择行上点击的*/
-	if (!this->
-			get_path_at_pos((int) ev->x, (int) ev->y, path, tvc, cx, cy))
+	GtkTreeModel* model = GTK_TREE_MODEL(tree_model);
+	if(!gtk_tree_model_iter_children(model, iter, parent))
 		return false;
 
-	if ((ev->type == GDK_2BUTTON_PRESS ||
-				ev->type == GDK_3BUTTON_PRESS) && ev->button != 3) {
-		if(GROUP != (*iter)[m_columns.type]){
-			Glib::ustring t_file = (*iter)[m_columns.path];
-			DLOG("open file %s \n",t_file.c_str());
-			m_parent->open_file(t_file.c_str());
-		}
-		else {
-			if(this->row_expanded(path))
-				this->collapse_row(path);
-			else{
-				this->expand_row(path,false);
-				this->scroll_to_row(path);
-			}
-		}
-	} else if ((ev->type == GDK_BUTTON_PRESS)
-			&& (ev->button == 3)) {
-		/*
-		if(GROUP_CHANNEL == (*iter)[m_columns.type])
-			return false;
-		Gtk::Menu* pop_menu =
-			parent->get_channels_pop_menu();
-		if (pop_menu)
-			pop_menu->popup(ev->button, ev->time);
-		return true;
-		*/
-	}
+	do {
+		gchar* title = NULL;
+		gtk_tree_model_get(model, iter, COL_TITLE, &title, -1);
+		const bool matched = title && groupname == title;
+		g_free(title);
+		if(matched)
+			return true;
+	} while(gtk_tree_model_iter_next(model, iter));
+
 	return false;
 }
 
+gboolean BookView::on_button_press_event(GdkEventButton* ev)
+{
+	GtkTreePath* path = NULL;
+	GtkTreeViewColumn* tvc = NULL;
+	int cx, cy;
+	if(!gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(treeview), (int)ev->x, (int)ev->y,
+				&path, &tvc, &cx, &cy))
+		return FALSE;
+
+	GtkTreeIter iter;
+	GtkTreeModel* model = GTK_TREE_MODEL(tree_model);
+	if(!gtk_tree_model_get_iter(model, &iter, path)) {
+		gtk_tree_path_free(path);
+		return FALSE;
+	}
+
+	GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
+	gtk_tree_selection_select_iter(selection, &iter);
+
+	if ((ev->type == GDK_2BUTTON_PRESS ||
+				ev->type == GDK_3BUTTON_PRESS) && ev->button != 3) {
+		gint type = GROUP;
+		gchar* file = NULL;
+		gtk_tree_model_get(model, &iter, COL_TYPE, &type, COL_PATH, &file, -1);
+		if(GROUP != type){
+			DLOG("open file %s \n", file ? file : "");
+			if(file)
+				m_parent->open_file(file);
+		}
+		else {
+			if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(treeview), path))
+				gtk_tree_view_collapse_row(GTK_TREE_VIEW(treeview), path);
+			else{
+				gtk_tree_view_expand_row(GTK_TREE_VIEW(treeview), path, FALSE);
+				gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(treeview), path, NULL, FALSE, 0, 0);
+			}
+		}
+		g_free(file);
+	}
+
+	gtk_tree_path_free(path);
+	return FALSE;
+}
 
 int BookView::load_book_dir(const char* Path)
 {
-
 	DIR *dirp;
 	struct dirent * node;
 	char cPath[1024];
@@ -176,7 +177,6 @@ int BookView::load_book_dir(const char* Path)
 		printf("Unable to create folder %s\n", Path);
 		return -1;
 	}
-
 
 	if((dirp= opendir(Path))==NULL){
 		printf("Could not read folder %s\n",Path);
@@ -192,17 +192,12 @@ int BookView::load_book_dir(const char* Path)
 		strcat(cPath,"/");
 		strcat(cPath,node->d_name);
 
-		//stat(node->d_name, &pStat);
 		stat(cPath, &pStat);
 		if(S_ISDIR(pStat.st_mode)){
-			//printf(" dir = %s \n",cPath);
-			/** 是目录，继续打开读*/
-			/**  it is a directory,continue read */
-			add_group(basename((char*)Path),basename(cPath));
+			GtkTreeIter iter;
+			add_group(&iter, basename((char*)Path), basename(cPath));
 			load_book_dir(cPath);
-
 		}else{
-			//printf(" add file = %s\n",basename(node->d_name));
 			add_line(basename((char*)Path),node->d_name,cPath);
 		}
 	}

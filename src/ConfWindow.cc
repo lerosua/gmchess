@@ -17,37 +17,66 @@
  */
 
 #include "ConfWindow.h"
-#include "MainWindow.h"
+#include "gmchess.h"
 
-ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
+#include <cstdlib>
+
+static GtkWidget* builder_widget(GtkBuilder* builder, const char* name)
 {
-	vbox_xml = Gtk::Builder::create_from_file(conf_ui,"conf_vbox");
-	if(!vbox_xml)
+	return GTK_WIDGET(gtk_builder_get_object(builder, name));
+}
+
+void ConfWindow::button_save_cb(GtkButton*, gpointer data)
+{
+	static_cast<ConfWindow*>(data)->on_button_save();
+}
+
+void ConfWindow::button_cancel_cb(GtkButton*, gpointer data)
+{
+	static_cast<ConfWindow*>(data)->on_button_cancel();
+}
+
+void ConfWindow::color_set_cb(GtkColorButton*, gpointer data)
+{
+	static_cast<ConfWindow*>(data)->on_button_color_set();
+}
+
+gboolean ConfWindow::delete_event_cb(GtkWidget*, GdkEvent*, gpointer data)
+{
+	return static_cast<ConfWindow*>(data)->on_delete_event();
+}
+
+ConfWindow::ConfWindow(GtkWindow* parent_window)
+	: builder(NULL)
+	, window(NULL)
+	, cbtheme(NULL)
+	, colorBt(NULL)
+	, m_usebook(false)
+{
+	builder = gtk_builder_new_from_file(conf_ui);
+	if(!builder)
 		exit(271);
 
-	Gtk::Box * vBox = 0;
-	vbox_xml->get_widget("conf_vbox", vBox);
+	GtkWidget* vbox = builder_widget(builder, "conf_vbox");
 
-	Gtk::SpinButton* spinbt =0;
-	vbox_xml->get_widget("sb_depth",spinbt);
-	Glib::RefPtr<Gtk::Adjustment> adjust = spinbt->get_adjustment();
+	GtkSpinButton* spinbt = GTK_SPIN_BUTTON(builder_widget(builder, "sb_depth"));
+	GtkAdjustment* adjust = gtk_spin_button_get_adjustment(spinbt);
+	gtk_adjustment_set_lower(adjust, 1.0);
+	gtk_adjustment_set_upper(adjust, 15.0);
+	gtk_adjustment_set_step_increment(adjust, 1.0);
 
-	adjust->set_lower(1.0);
-	adjust->set_upper(15.0);
-	adjust->set_step_increment(1.0);
+	GtkButton* bt = GTK_BUTTON(builder_widget(builder, "button_ok"));
+	g_signal_connect(bt, "clicked", G_CALLBACK(button_save_cb), this);
+	bt = GTK_BUTTON(builder_widget(builder, "button_cancel"));
+	g_signal_connect(bt, "clicked", G_CALLBACK(button_cancel_cb), this);
 
-	Gtk::Button* bt = 0;
-	vbox_xml->get_widget("button_ok", bt);
-	bt->signal_clicked().connect(sigc::mem_fun(*this,&ConfWindow::on_button_save));
-	bt = 0;
-	vbox_xml->get_widget("button_cancel", bt);
-	bt->signal_clicked().connect(sigc::mem_fun(*this,&ConfWindow::on_button_cancel));
-	vbox_xml->get_widget("colorbutton",colorBt);
-	colorBt->signal_color_set().connect(sigc::mem_fun(*this, &ConfWindow::on_button_color_set));
+	colorBt = GTK_COLOR_BUTTON(builder_widget(builder, "colorbutton"));
+	g_signal_connect(colorBt, "color-set", G_CALLBACK(color_set_cb), this);
 
 	m_line_color = GMConf["line_color"];
-	colorBt->set_color(Gdk::Color(m_line_color));
-
+	GdkRGBA color;
+	if(gdk_rgba_parse(&color, m_line_color.c_str()))
+		gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(colorBt), &color);
 
 	std::string& size_big = GMConf["desktop_size"];
 	m_size_big = (!size_big.empty())&&(size_big[0]=='1');
@@ -61,65 +90,81 @@ ConfWindow::ConfWindow(MainWindow * parent_):parent(parent_)
 	m_theme = GMConf["themes"];
 	m_engine_name = GMConf["engine_name"];
 
-	Gtk::Box* hbox = 0;
-	vbox_xml->get_widget("hbox_theme", hbox);
-	cbtheme = Gtk::manage(new Gtk::ComboBoxText);
-	cbtheme->append("wood");
-	cbtheme->append("west");
-	if(m_theme == "wood")
-		cbtheme->set_active_text("wood");
-	else
-		cbtheme->set_active_text("west");
-	hbox->pack_start(*cbtheme);
+	GtkBox* hbox = GTK_BOX(builder_widget(builder, "hbox_theme"));
+	cbtheme = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
+	gtk_combo_box_text_append_text(cbtheme, "wood");
+	gtk_combo_box_text_append_text(cbtheme, "west");
+	gtk_combo_box_set_active(GTK_COMBO_BOX(cbtheme), m_theme == "wood" ? 0 : 1);
+	gtk_box_pack_start(hbox, GTK_WIDGET(cbtheme), FALSE, FALSE, 0);
 
-	m_pVariablesMap = new VariablesMap(vbox_xml);
-	m_pVariablesMap->connect_widget("b_radiobutton",m_size_big);
-	m_pVariablesMap->connect_widget("cb_book",m_usebook);
-	m_pVariablesMap->connect_widget("sb_depth",m_depth);
-	m_pVariablesMap->connect_widget("entry_step_time",m_step_time);
-	m_pVariablesMap->connect_widget("entry_play_time",m_play_time);
-	m_pVariablesMap->connect_widget("entry_engine_name", m_engine_name);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(builder_widget(builder, "b_radiobutton")), m_size_big);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(builder_widget(builder, "cb_book")), m_usebook);
+	gtk_spin_button_set_value(spinbt, atof(m_depth.c_str()));
+	gtk_entry_set_text(GTK_ENTRY(builder_widget(builder, "entry_step_time")), m_step_time.c_str());
+	gtk_entry_set_text(GTK_ENTRY(builder_widget(builder, "entry_play_time")), m_play_time.c_str());
+	gtk_entry_set_text(GTK_ENTRY(builder_widget(builder, "entry_engine_name")), m_engine_name.c_str());
 
-	m_pVariablesMap->transfer_variables_to_widgets();
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_add(GTK_CONTAINER(window), vbox);
+	gtk_window_set_title(GTK_WINDOW(window), "GMChess Preferences");
+	if(parent_window)
+		gtk_window_set_transient_for(GTK_WINDOW(window), parent_window);
+	g_signal_connect(window, "delete-event", G_CALLBACK(delete_event_cb), this);
 
-	this->add(*vBox);
-	this->set_transient_for(*parent);
-	show_all();
-
+	gtk_widget_show_all(window);
 }
 
 ConfWindow::~ConfWindow()
 {
-	delete m_pVariablesMap;
+	if(window)
+		gtk_widget_destroy(window);
+	if(builder)
+		g_object_unref(builder);
+}
+
+void ConfWindow::raise()
+{
+	gtk_window_present(GTK_WINDOW(window));
 }
 
 void ConfWindow::on_button_save()
 {
 	write_to_GMConf();
-	signal_quit_.emit();
+	if(quit_callback)
+		quit_callback();
 	on_button_cancel();
 }
-
 
 void ConfWindow::on_button_cancel()
 {
-	parent->on_conf_window_close();
+	if(close_callback)
+		close_callback();
 }
+
 void ConfWindow::on_button_color_set()
 {
-	Gdk::Color _color = colorBt->get_color();
-	m_line_color = _color.to_string();
-
+	GdkRGBA color;
+	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(colorBt), &color);
+	gchar* color_string = gdk_rgba_to_string(&color);
+	m_line_color = color_string;
+	g_free(color_string);
 }
-bool ConfWindow::on_delete_event(GdkEventAny*)
+
+gboolean ConfWindow::on_delete_event()
 {
 	on_button_cancel();
-
-  return true;
+	return TRUE;
 }
+
 void ConfWindow::write_to_GMConf()
 {
-	m_pVariablesMap->transfer_widgets_to_variables();
+	m_usebook = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(builder_widget(builder, "cb_book")));
+	m_size_big = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(builder_widget(builder, "b_radiobutton")));
+	m_depth = std::to_string(gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(builder_widget(builder, "sb_depth"))));
+	m_step_time = gtk_entry_get_text(GTK_ENTRY(builder_widget(builder, "entry_step_time")));
+	m_play_time = gtk_entry_get_text(GTK_ENTRY(builder_widget(builder, "entry_play_time")));
+	m_engine_name = gtk_entry_get_text(GTK_ENTRY(builder_widget(builder, "entry_engine_name")));
+
 	GMConf["usebook"] = m_usebook? "1":"0";
 	GMConf["desktop_size"] = m_size_big?"1":"0";
 	GMConf["engine_depth"] = m_depth;
@@ -128,9 +173,10 @@ void ConfWindow::write_to_GMConf()
 	GMConf["engine_name"] = m_engine_name;
 	GMConf["line_color"] = m_line_color;
 
-	if(cbtheme->get_active_text() == "wood")
+	gchar* active_theme = gtk_combo_box_text_get_active_text(cbtheme);
+	if(active_theme && std::string(active_theme) == "wood")
 		GMConf["themes"] = "wood";
 	else
 		GMConf["themes"] = "west";
-
+	g_free(active_theme);
 }

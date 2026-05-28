@@ -23,21 +23,20 @@ gmchess_sources = [
 	'robot.cc',
 	'ec_throw.cpp',
 	'ConfWindow.cc',
-	'variablesmap.cc',
 	'MainWindow.cc',
   ]
 
-if gtkmm_dep.found()
+if gtk_dep.found()
   executable('gmchess',
     gmchess_sources,
     include_directories : [
       include_directories('.'),
       include_directories('..'),
       ],
-    dependencies : [gtkmm_dep, libiconv_dep],
+    dependencies : [gtk_dep, libiconv_dep],
     link_with : gmchess_core,
     install: true,
   )
 else
-  message('gtkmm-3.0 not found; building core and engine targets only')
+  message('gtk+-3.0 not found; building core and engine targets only')
 endif

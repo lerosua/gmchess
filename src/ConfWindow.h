@@ -22,44 +22,51 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <gtkmm.h>
-#include "variablesmap.h"
+#include <functional>
+#include <gtk/gtk.h>
+#include <string>
 
 #define conf_ui DATA_DIR"/confwin.glade"
 
-class MainWindow;
-class ConfWindow: public Gtk::Window
+class ConfWindow
 {
 
 	public:
-		ConfWindow(MainWindow* parent_);
+		typedef std::function<void()> Callback;
+
+		ConfWindow(GtkWindow* parent_window);
 		~ConfWindow();
 		void on_button_save();
 		void on_button_cancel();
 		void on_button_color_set();
-		bool on_delete_event(GdkEventAny*);
-		typedef sigc::signal<void> type_signal_quit;
-		type_signal_quit signal_quit()
-		{ return signal_quit_; }
+		gboolean on_delete_event();
+		void raise();
+		void set_quit_callback(const Callback& callback)
+		{ quit_callback = callback; }
+		void set_close_callback(const Callback& callback)
+		{ close_callback = callback; }
 		void write_to_GMConf();
 	private:
-		typedef Glib::RefPtr < Gtk::Builder> GBuilderXML;
-		GBuilderXML			vbox_xml;
-		MainWindow* parent;
-		type_signal_quit signal_quit_;
-		VariablesMap* m_pVariablesMap;
-		Gtk::ComboBoxText* cbtheme;
-		Gtk::ColorButton* colorBt;
-		Glib::ustring			m_depth = "10";
-		Glib::ustring			m_step_time = "240";
-		Glib::ustring			m_play_time = "40";
-		Glib::ustring			m_theme;
-		Glib::ustring			m_engine_name;
-		Glib::ustring			m_line_color;
+		static void button_save_cb(GtkButton* button, gpointer data);
+		static void button_cancel_cb(GtkButton* button, gpointer data);
+		static void color_set_cb(GtkColorButton* button, gpointer data);
+		static gboolean delete_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data);
+
+		GtkBuilder*		builder;
+		GtkWidget*		window;
+		GtkComboBoxText*	cbtheme;
+		GtkColorButton*	colorBt;
+		Callback		quit_callback;
+		Callback		close_callback;
+		std::string		m_depth = "10";
+		std::string		m_step_time = "240";
+		std::string		m_play_time = "40";
+		std::string		m_theme;
+		std::string		m_engine_name;
+		std::string		m_line_color;
 		bool				m_size_big = true;
 		bool				m_usebook;
 
 };
 
 #endif   /* ----- #ifndef CONFWINDOW_FILE_HEADER_INC  ----- */
-

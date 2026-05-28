@@ -5,34 +5,31 @@
  */
 
 #include "Board.h"
-#include <vector>
-#include <string.h>
-#include <cassert>
-#include <netdb.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
 #include "Engine.h"
 #include "MainWindow.h"
 #include "Sound.h"
 #include "ec_throw.h"
 
-/** 边界的宽度*/
-/**  width of border */
+#include <cassert>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+
 const int border_width = 32;
-/** 棋子的宽度*/
-/** width of chessman */
-//const int chessman_width = 57;
-//const int chessman_width = 29;
 
 #define PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
-#define PIECE_START 16  //棋子开始数字 start number of chessman
-#define PIECE_END   48  //棋子结束数字 end number of chessman
+#define PIECE_START 16
+#define PIECE_END   48
 #define PLACE_ALL PLACE_LEFT | PLACE_RIGHT
-#define IMGAGE_DIR DATA_DIR"/themes/west/"
-#define IMGAGE_SMALL_DIR DATA_DIR"/themes/west-small/"
 #define HEX_ESCAPE '%'
 
 int hex_to_int (gchar c);
@@ -50,24 +47,17 @@ int hex_to_int (gchar c)
 
 int unescape_character (const char *scanner)
 {
-	int first_digit;
-	int second_digit;
-
-	first_digit = hex_to_int (*scanner++);
-	if (first_digit < 0) {
+	int first_digit = hex_to_int (*scanner++);
+	if (first_digit < 0)
 		return -1;
-	}
 
-	second_digit = hex_to_int (*scanner++);
-	if (second_digit < 0) {
+	int second_digit = hex_to_int (*scanner++);
+	if (second_digit < 0)
 		return -1;
-	}
 
 	return (first_digit << 4) | second_digit;
 }
 
-/** 用于在拖放时得到的文件名的转码*/
-/** get the code of when drag the filename*/
 std::string  wind_unescape_string (const char *escaped_string,
 		const gchar *illegal_characters)
 {
@@ -75,11 +65,9 @@ std::string  wind_unescape_string (const char *escaped_string,
 	char *out;
 	int character;
 
-	if (escaped_string == NULL) {
+	if (escaped_string == NULL)
 		return std::string();
-	}
 
-	//result = g_malloc (strlen (escaped_string) + 1);
 	char result[strlen (escaped_string) + 1];
 
 	out = result;
@@ -87,8 +75,6 @@ std::string  wind_unescape_string (const char *escaped_string,
 		character = *in;
 		if (*in == HEX_ESCAPE) {
 			character = unescape_character (in + 1);
-
-			/* Check for an illegal character. We consider '\0' illegal here. */
 			if (character <= 0
 					|| (illegal_characters != NULL
 						&& strchr (illegal_characters, (char)character) != NULL)) {
@@ -102,74 +88,140 @@ std::string  wind_unescape_string (const char *escaped_string,
 	*out = '\0';
 	assert ((size_t)(out - result) <= strlen (escaped_string));
 	return std::string(result);
-
 }
 
-Board::Board(MainWindow& win) : parent(win)
+gboolean Board::draw_cb(GtkWidget*, cairo_t* cr, gpointer data)
 {
+	return static_cast<Board*>(data)->on_draw(cr);
+}
 
-	std::vector<Gtk::TargetEntry> listTargets;
-	listTargets.push_back(Gtk::TargetEntry("STRING"));
-	listTargets.push_back(Gtk::TargetEntry("text/plain"));
+gboolean Board::button_press_cb(GtkWidget*, GdkEventButton* event, gpointer data)
+{
+	return static_cast<Board*>(data)->on_button_press_event(event);
+}
 
+void Board::drag_data_received_cb(GtkWidget*, GdkDragContext* context, gint, gint,
+		GtkSelectionData* selection_data, guint, guint time, gpointer data)
+{
+	static_cast<Board*>(data)->on_drog_data_received(selection_data, time);
+	gtk_drag_finish(context, FALSE, FALSE, time);
+}
 
-	this->set_size_request(221,277);
+gboolean Board::timer_cb(gpointer data)
+{
+	return static_cast<Board*>(data)->go_time() ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
+}
 
-	this->drag_dest_set(listTargets);
-	this->signal_drag_data_received().connect(
-			sigc::mem_fun(*this, &Board::on_drog_data_received));
+gboolean Board::network_io_cb(GIOChannel*, GIOCondition condition, gpointer data)
+{
+	return static_cast<Board*>(data)->on_network_io(condition) ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
+}
 
-	/** 加载所需要图片进内存*/
+Board::Board(MainWindow& win)
+	: parent(win)
+	, area(gtk_drawing_area_new())
+	, active_cr(NULL)
+	, bg_image(NULL)
+{
+	for(int i = 0; i < 18; ++i)
+		chessman_images[i] = NULL;
+
+	GtkTargetEntry listTargets[] = {
+		{ (gchar*)"STRING", 0, 0 },
+		{ (gchar*)"text/plain", 0, 0 }
+	};
+
+	gtk_widget_set_size_request(area, 221, 277);
+	gtk_drag_dest_set(area, GTK_DEST_DEFAULT_ALL, listTargets, 2, GDK_ACTION_COPY);
+	g_signal_connect(area, "drag-data-received", G_CALLBACK(drag_data_received_cb), this);
+	g_signal_connect(area, "draw", G_CALLBACK(draw_cb), this);
+	g_signal_connect(area, "button-press-event", G_CALLBACK(button_press_cb), this);
+
 	load_images();
 
-	p_pgnfile=new Pgnfile(m_engine);
+	p_pgnfile = new Pgnfile(m_engine);
 	m_engine.init_snapshot(start_fen);
 	m_robot.set_out_callback([this](GIOCondition condition) {
 			return robot_log(condition);
 			});
-	this->set_events(Gdk::BUTTON_PRESS_MASK|Gdk::EXPOSURE_MASK);
-
-	this->show_all();
-
+	gtk_widget_add_events(area, GDK_BUTTON_PRESS_MASK | GDK_EXPOSURE_MASK);
+	gtk_widget_show_all(area);
 }
-
 
 Board::~Board()
 {
-	if(timer.connected())
-		timer.disconnect();
+	stop_timer();
+	if(network_io_id != 0)
+		g_source_remove(network_io_id);
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
+	release_images();
+	delete p_pgnfile;
+}
+
+void Board::release_images()
+{
+	if(bg_image) {
+		cairo_surface_destroy(bg_image);
+		bg_image = NULL;
+	}
+	for(int i = 0; i < 18; ++i) {
+		if(chessman_images[i]) {
+			cairo_surface_destroy(chessman_images[i]);
+			chessman_images[i] = NULL;
+		}
+	}
+}
+
+void Board::queue_draw()
+{
+	gtk_widget_queue_draw(area);
+}
+
+void Board::stop_timer()
+{
+	if(timer_id != 0) {
+		g_source_remove(timer_id);
+		timer_id = 0;
+	}
+}
+
+void Board::start_timer()
+{
+	stop_timer();
+	timer_id = g_timeout_add(1000, timer_cb, this);
 }
 
 void Board::set_trace_color(const std::string& color_)
 {
 	color = color_;
 }
+
 void Board::set_themes(const std::string& themes_)
 {
 	theme = themes_;
-	/** 加载所需要图片进内存*/
 	load_images();
 	queue_draw();
 }
 
-Cairo::RefPtr<Cairo::ImageSurface> Board::get_pic (const std::string &name_)
+cairo_surface_t* Board::get_pic (const std::string &name_)
 {
 	const std::string path = std::string (DATA_DIR) +
 	  "/themes/" + theme + "/" + name_;
-	return Cairo::ImageSurface::create_from_png (path);
+	return cairo_image_surface_create_from_png(path.c_str());
 }
 
-Cairo::RefPtr<Cairo::ImageSurface> Board::get_spic (const std::string &name_)
+cairo_surface_t* Board::get_spic (const std::string &name_)
 {
 	const std::string path = std::string (DATA_DIR) +
 	  "/themes/" + theme + "-small/" + name_;
-	return Cairo::ImageSurface::create_from_png (path);
+	return cairo_image_surface_create_from_png(path.c_str());
 }
 
 void Board::load_images()
 {
+	release_images();
+
 	bg_image = get_pic("bg.png");
 	if(is_small_board){
 		chessman_images[BLACK_ADVISOR] = get_spic("black_advisor.png");
@@ -192,7 +244,6 @@ void Board::load_images()
 		chessman_images[PROPMT] = get_spic("null.png");
 	}
 	else{
-
 		chessman_images[BLACK_ADVISOR] = get_pic("black_advisor.png");
 		chessman_images[BLACK_BISHOP] = get_pic("black_bishop.png");
 		chessman_images[BLACK_CANNON] = get_pic("black_cannon.png");
@@ -219,7 +270,6 @@ void Board::configure_board(int _width)
 	if(is_small_board && _width >=521){
 		is_small_board=false;
 		chessman_width=57;
-
 	}
 	if(!is_small_board && _width<521){
 		is_small_board=true;
@@ -231,23 +281,21 @@ void Board::configure_board(int _width)
 
 void Board::get_grid_size(int& width, int& height)
 {
-	width = (get_width() - border_width * 2) / 8;
-	height = (get_height() - border_width * 2) / 9;
+	width = (gtk_widget_get_allocated_width(area) - border_width * 2) / 8;
+	height = (gtk_widget_get_allocated_height(area) - border_width * 2) / 9;
 }
 
-Gdk::Point Board::get_coordinate(int pos_x, int pos_y)
+BoardPixel Board::get_coordinate(int pos_x, int pos_y)
 {
 	int grid_width;
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 	pos_x = pos_x * grid_width + border_width;
 	pos_y = pos_y * grid_height + border_width;
-
-	return Gdk::Point(pos_x, pos_y);
+	return BoardPixel(pos_x, pos_y);
 }
 
-
-Gdk::Point Board::get_position(int pos_x, int pos_y)
+BoardPixel Board::get_position(int pos_x, int pos_y)
 {
 	int grid_width;
 	int grid_height;
@@ -261,52 +309,44 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	int offset_x = pos_x - x * grid_width;
 	int offset_y = pos_y - y * grid_height;
 	if ((offset_x > chessman_width ) || (offset_y > chessman_width ))
-		return Gdk::Point(-1, -1);
-	return Gdk::Point(x, y);
+		return BoardPixel(-1, -1);
+	return BoardPixel(x, y);
 }
 
-bool Board::on_draw (const ::Cairo::RefPtr<::Cairo::Context> &cr)
+bool Board::on_draw (cairo_t *cr)
 {
+	active_cr = cr;
 	draw_bg();
 	int mv = m_engine.get_last_move_from_snapshot();
 	draw_board();
-	if (mv > 0) {
+	if (mv > 0)
 		draw_trace(mv);
-	}
 	draw_select_frame(true);
 	draw_show_can_move();
+	active_cr = NULL;
 	return true;
 }
 
-/**处理点击事件, handle the click events*/
 bool Board::on_button_press_event(GdkEventButton* ev)
 {
-	/** 对战状态下，电脑走棋时就不响应鼠标事件了*/
-	/** if fight with AI, the compute doesn't handle the events */
 	if(is_fight_to_robot()||is_network_game()){
 		if(!is_human_player())
 			return true;
 	}
-	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
+	if(ev->type == GDK_BUTTON_PRESS && ev->button == 1)
 	{
-		Gdk::Point p = get_position(ev->x, ev->y);
-		selected_x = p.get_x();
-		selected_y = p.get_y();
+		BoardPixel p = get_position(ev->x, ev->y);
+		selected_x = p.x;
+		selected_y = p.y;
 		if(selected_chessman == -1){
-			/** 之前没选中棋子，现在选择 */
-			/** there is not select chessman,now select*/
-
 			CSound::play(SND_CHOOSE);
 			if (selected_x != -1) {
 				selected_chessman = m_engine.get_piece(selected_x, selected_y,is_rev_board);
 				if(selected_chessman==0){
-					/** 仍然没选中, still not select */
 					selected_chessman = -1;
 					printf("still no select chessman\n");
 					return true;
 				}
-				/** 对战状态中，选了对方棋子无效*/
-				/** choose the enemy chessman is useless on war */
 				if(is_fight_to_robot()||is_network_game()){
 					if((m_human_black && (selected_chessman <32))||((!m_human_black)&&(selected_chessman>31))){
 						printf("choose black %d\n",selected_chessman);
@@ -319,138 +359,103 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			}
 		}
 		else{
-			/** 之前已经选中棋子，现在是生成着法或取消*/
-			/** there has a selecter, now buider the moves or canel */
 			int dst_chessman = m_engine.get_piece(selected_x,selected_y,is_rev_board);
 			if( (dst_chessman!=0) && ((selected_chessman &16)==(dst_chessman&16))){
-				/** 之前所选及现在选是同一色棋子, 变更棋子选择 */
-				/** change the select */
 				selected_chessman = dst_chessman;
 				CSound::play(SND_CHOOSE);
 				queue_draw();
-
 			}
-		//else if(dst_chessman == 0){
-		else{
-				/** 目标地点没有棋子可以直接生成着法，当然还需要检测一下从源地点到终点是否是合法的着法，交由下面着法生成函数负责*/
-				/** 目标地点有对方棋子，其实也可以给着法生成函数搞啊*/
+			else{
 				try_move(selected_x,selected_y);
-
 			}
-
-
 		}
 	}
-	else if(ev->type == GDK_BUTTON_PRESS&& ev->button == 3){
-		/** 右键取消选择*/
-		/** the right click canel the choose*/
+	else if(ev->type == GDK_BUTTON_PRESS && ev->button == 3){
 		selected_chessman = -1;
 		queue_draw();
-
 	}
 	return true;
 }
 
 void Board::draw_bg()
 {
-	Gdk::Point p1= get_coordinate(0, 0);
-	Gdk::Point p2= get_coordinate(8, 9);
+	BoardPixel p1= get_coordinate(0, 0);
+	BoardPixel p2= get_coordinate(8, 9);
 
-	int width = p2.get_x() - p1.get_x();
-	int height = p2.get_y() - p1.get_y();
+	int width = p2.x - p1.x;
+	int height = p2.y - p1.y;
 
-	Glib::RefPtr<Gdk::Window> window = get_window ();
-	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+	cairo_pattern_t* pattern = cairo_pattern_create_for_surface(bg_image);
+	cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+	cairo_set_source(active_cr, pattern);
+	cairo_paint(active_cr);
+	cairo_pattern_destroy(pattern);
 
-	Cairo::RefPtr<Cairo::ImageSurface> surface;
-	Cairo::RefPtr<Cairo::Context> bgcr;
+	cairo_save(active_cr);
+	cairo_set_source_rgb(active_cr, 0, 0, 0);
+	cairo_set_line_width(active_cr, 4.0);
+	cairo_rectangle(active_cr, p1.x - 8, p1.y - 8, width + 8 * 2, height + 8 * 2);
+	cairo_stroke(active_cr);
 
-	surface = Cairo::ImageSurface::create(Cairo::Format::FORMAT_ARGB32, width * 9, height * 10);
-	bgcr = Cairo::Context::create(surface);
+	cairo_set_line_width(active_cr, 2.0);
+	cairo_rectangle(active_cr, p1.x, p1.y, width, height);
+	cairo_stroke(active_cr);
 
-	Cairo::RefPtr<Cairo::Pattern> pattern = Cairo::SurfacePattern::create(bg_image);
-	pattern->set_extend(Cairo::Extend::EXTEND_REPEAT);
-	bgcr->set_source(pattern);
-	bgcr->fill();
-	bgcr->paint();
+	cairo_set_line_width(active_cr, 1.0);
 
-	cr->set_source(surface, 0, 0);
-	cr->paint();
-
-	// 画棋盘外框
-	cr->save();
-	cr->set_source_rgb(0, 0, 0);
-	cr->set_line_width(4.0);
-	cr->rectangle(p1.get_x () - 8, p1.get_y () - 8, width + 8 * 2, height + 8 * 2);
-	cr->stroke();
-
-	// 画棋盘内框
-	cr->set_line_width(2.0);
-	cr->rectangle(p1.get_x (), p1.get_y (), width, height);
-	cr->stroke();
-
-	cr->set_line_width(1.0);
-	int grid_width;
-	int grid_height;
-	get_grid_size(grid_width, grid_height);
-
-	// 画棋盘横线
 	for (int i = 0; i < 9; i++)
 	{
 		p1 = get_coordinate (0, i);
 		p2 = get_coordinate (8, i);
-		cr->move_to(p1.get_x(), p1.get_y());
-		cr->line_to(p2.get_x(), p2.get_y());
-		cr->stroke();
+		cairo_move_to(active_cr, p1.x, p1.y);
+		cairo_line_to(active_cr, p2.x, p2.y);
+		cairo_stroke(active_cr);
 	}
 
-	// 画上方棋盘纵线
 	for (int i = 0; i < 8; i++)
 	{
 		p1 = get_coordinate (i, 0);
 		p2 = get_coordinate (i, 4);
-		cr->move_to(p1.get_x(), p1.get_y());
-		cr->line_to(p2.get_x(), p2.get_y());
-		cr->stroke();
+		cairo_move_to(active_cr, p1.x, p1.y);
+		cairo_line_to(active_cr, p2.x, p2.y);
+		cairo_stroke(active_cr);
 	}
 
-	// 画下方棋盘纵线
 	for (int i = 0; i < 8; i++)
 	{
 		p1 = get_coordinate (i, 5);
 		p2 = get_coordinate (i, 9);
-		cr->move_to(p1.get_x(), p1.get_y());
-		cr->line_to(p2.get_x(), p2.get_y());
-		cr->stroke();
+		cairo_move_to(active_cr, p1.x, p1.y);
+		cairo_line_to(active_cr, p2.x, p2.y);
+		cairo_stroke(active_cr);
 	}
 
-	cr->set_line_width(2.0);    // make the line wider
-	draw_localize (cr, 0, 3, PLACE_LEFT);
-	draw_localize (cr, 8, 3, PLACE_RIGHT);
+	cairo_set_line_width(active_cr, 2.0);
+	draw_localize (active_cr, 0, 3, PLACE_LEFT);
+	draw_localize (active_cr, 8, 3, PLACE_RIGHT);
 
-	for (int i = 0; i < 3; i++) {
-		draw_localize(cr, i * 2 + 2, 3, PLACE_ALL);
-	}
+	for (int i = 0; i < 3; i++)
+		draw_localize(active_cr, i * 2 + 2, 3, PLACE_ALL);
 
-	draw_localize(cr, 1, 2, PLACE_ALL);
-	draw_localize(cr, 7, 2, PLACE_ALL);
+	draw_localize(active_cr, 1, 2, PLACE_ALL);
+	draw_localize(active_cr, 7, 2, PLACE_ALL);
 
-	draw_localize(cr, 0, 6, PLACE_LEFT);
-	draw_localize(cr, 8, 6, PLACE_RIGHT);
+	draw_localize(active_cr, 0, 6, PLACE_LEFT);
+	draw_localize(active_cr, 8, 6, PLACE_RIGHT);
 
-	for (int i = 0; i < 3; i++) {
-		draw_localize(cr, i * 2 + 2, 6, PLACE_ALL);
-	}
+	for (int i = 0; i < 3; i++)
+		draw_localize(active_cr, i * 2 + 2, 6, PLACE_ALL);
 
-	draw_localize(cr, 1, 7, PLACE_ALL);
-	draw_localize(cr, 7, 7, PLACE_ALL);
+	draw_localize(active_cr, 1, 7, PLACE_ALL);
+	draw_localize(active_cr, 7, 7, PLACE_ALL);
 
-	cr->set_line_width(1.0);
-	draw_palace (cr, 4, 1);
-	draw_palace (cr, 4, 8);
+	cairo_set_line_width(active_cr, 1.0);
+	draw_palace (active_cr, 4, 1);
+	draw_palace (active_cr, 4, 8);
+	cairo_restore(active_cr);
 }
 
-void Board::draw_localize(Cairo::RefPtr<Cairo::Context> &cr, int x, int y, int place)
+void Board::draw_localize(cairo_t *cr, int x, int y, int place)
 {
 	int width;
 	int height;
@@ -458,64 +463,59 @@ void Board::draw_localize(Cairo::RefPtr<Cairo::Context> &cr, int x, int y, int p
 	width /= 5;
 	height /= 5;
 
-	Gdk::Point p = get_coordinate(x, y);
+	BoardPixel p = get_coordinate(x, y);
 
 	if (place & PLACE_LEFT) {
-		cr->move_to(p.get_x() + 5, p.get_y () - height - 4);
-		cr->line_to(p.get_x () + 5, p.get_y () - 4);
-		cr->line_to(p.get_x () + 5 + width, p.get_y () - 4);
-		cr->stroke();
+		cairo_move_to(cr, p.x + 5, p.y - height - 4);
+		cairo_line_to(cr, p.x + 5, p.y - 4);
+		cairo_line_to(cr, p.x + 5 + width, p.y - 4);
+		cairo_stroke(cr);
 
-		cr->move_to(p.get_x () + 5 + width, p.get_y () + 5);
-		cr->line_to(p.get_x () + 5, p.get_y () + 5);
-		cr->line_to(p.get_x () + 5, p.get_y () + 5 + height);
-		cr->stroke();
+		cairo_move_to(cr, p.x + 5 + width, p.y + 5);
+		cairo_line_to(cr, p.x + 5, p.y + 5);
+		cairo_line_to(cr, p.x + 5, p.y + 5 + height);
+		cairo_stroke(cr);
 	}
 
 	if (place & PLACE_RIGHT) {
-		cr->move_to(p.get_x () - 4 - width, p.get_y () - 4);
-		cr->line_to(p.get_x () - 4, p.get_y () - 4);
-		cr->line_to(p.get_x () - 4, p.get_y () - 4 - height);
-		cr->stroke();
+		cairo_move_to(cr, p.x - 4 - width, p.y - 4);
+		cairo_line_to(cr, p.x - 4, p.y - 4);
+		cairo_line_to(cr, p.x - 4, p.y - 4 - height);
+		cairo_stroke(cr);
 
-		cr->move_to(p.get_x () - 4 - width, p.get_y () + 5);
-		cr->line_to(p.get_x () - 4, p.get_y () + 5);
-		cr->line_to(p.get_x () - 4, p.get_y () + 5 + height);
-		cr->stroke();
+		cairo_move_to(cr, p.x - 4 - width, p.y + 5);
+		cairo_line_to(cr, p.x - 4, p.y + 5);
+		cairo_line_to(cr, p.x - 4, p.y + 5 + height);
+		cairo_stroke(cr);
 	}
 }
 
-void Board::draw_palace(Cairo::RefPtr<Cairo::Context> &cr, int x, int y)
+void Board::draw_palace(cairo_t *cr, int x, int y)
 {
 	int width;
 	int height;
 	get_grid_size(width, height);
-	Gdk::Point p = get_coordinate(x, y);
+	BoardPixel p = get_coordinate(x, y);
 
-	cr->move_to(p.get_x () - width, p.get_y () - height);
-	cr->line_to(p.get_x () + width, p.get_y () + height);
-	cr->move_to(p.get_x () + width, p.get_y () - height);
-	cr->line_to(p.get_x () - width, p.get_y () + height);
-	cr->stroke();
+	cairo_move_to(cr, p.x - width, p.y - height);
+	cairo_line_to(cr, p.x + width, p.y + height);
+	cairo_move_to(cr, p.x + width, p.y - height);
+	cairo_line_to(cr, p.x - width, p.y + height);
+	cairo_stroke(cr);
 }
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-
-
 	int chess_type = m_engine.get_chessman_type(chessman);
 	if(chess_type<0||chess_type>13)
 		return;
 
-	Gdk::Point p = get_coordinate(x, y);
-	int px = p.get_x() - chessman_width / 2;
-	int py = p.get_y() - chessman_width / 2;
+	BoardPixel p = get_coordinate(x, y);
+	int px = p.x - chessman_width / 2;
+	int py = p.y - chessman_width / 2;
 
-	Glib::RefPtr<Gdk::Window> window = get_window ();
-	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
-
-	cr->set_source(chessman_images[chess_type], px, py);
-	cr->paint();
+	cairo_set_source_surface(active_cr, chessman_images[chess_type], px, py);
+	cairo_paint(active_cr);
 }
 
 void Board::draw_show_can_move()
@@ -528,25 +528,18 @@ void Board::draw_show_can_move()
 	std::vector<ChessPoint> points;
 	m_engine.gen_which_can_move(points, selected_chessman, is_rev_board);
 
-	std::vector<ChessPoint>::iterator iter = points.begin();
-
-	for(;iter != points.end(); ++iter){
-		Gdk::Point p = get_coordinate(iter->x, iter->y);
+	for(auto iter = points.begin(); iter != points.end(); ++iter){
+		BoardPixel p = get_coordinate(iter->x, iter->y);
 		draw_phonily_point(p);
 	}
-
 }
 
-void Board::draw_phonily_point(Gdk::Point& p)
+void Board::draw_phonily_point(BoardPixel& p)
 {
-	int px = p.get_x() - 11 / 2;
-	int py = p.get_y() - 11 / 2;
-
-	Glib::RefPtr<Gdk::Window> window = get_window ();
-	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
-
-	cr->set_source(chessman_images[PROPMT], px, py);
-	cr->paint();
+	int px = p.x - 11 / 2;
+	int py = p.y - 11 / 2;
+	cairo_set_source_surface(active_cr, chessman_images[PROPMT], px, py);
+	cairo_paint(active_cr);
 }
 
 void Board::draw_select_frame(bool selected)
@@ -554,23 +547,17 @@ void Board::draw_select_frame(bool selected)
 	if (selected_chessman < 0 || selected_x == -1 || selected_y == -1)
 		return;
 
-	/** 目前要做的是根据棋子代号，获取它所在的棋盘9x10坐标*/
 	int sx,sy;
 	m_engine.get_xy_from_chess(selected_chessman,sx,sy,is_rev_board);
-	Gdk::Point p = get_coordinate(sx, sy);
+	BoardPixel p = get_coordinate(sx, sy);
 
-
-	int px = p.get_x() - chessman_width / 2;
-	int py = p.get_y() - chessman_width / 2;
-
-	Glib::RefPtr<Gdk::Window> window = get_window ();
-	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+	int px = p.x - chessman_width / 2;
+	int py = p.y - chessman_width / 2;
 	if (selected) {
-		cr->set_source(chessman_images[SELECTED_CHESSMAN], px, py);
-		cr->paint();
+		cairo_set_source_surface(active_cr, chessman_images[SELECTED_CHESSMAN], px, py);
+		cairo_paint(active_cr);
 	}
 }
-
 
 void Board::draw_board()
 {
@@ -599,50 +586,40 @@ void Board::draw_trace(int mv)
 	int src = m_engine.get_move_src(mv);
 	int dst = m_engine.get_move_dst(mv);
 
-	Glib::RefPtr<Gdk::Window> window = get_window ();
-	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+	GdkRGBA rgba;
+	if(!gdk_rgba_parse(&rgba, color.c_str()))
+		gdk_rgba_parse(&rgba, "#198964");
 
-	Gdk::RGBA rgba = Gdk::RGBA(color);
+	cairo_set_source_rgba(active_cr, rgba.red, rgba.green, rgba.blue, rgba.alpha);
 
-	cr->set_source_rgba (rgba.get_red(), rgba.get_green(), rgba.get_blue(), rgba.get_alpha());
+	BoardPixel s1 = get_coordinate (m_engine.RANK_X (src) - 3, m_engine.RANK_Y (src) - 3);
+	BoardPixel s2 = get_coordinate (m_engine.RANK_X (dst) - 3, m_engine.RANK_Y (dst) - 3);
 
-	Gdk::Point s1 = get_coordinate (m_engine.RANK_X (src) - 3, m_engine.RANK_Y (src) - 3);
-	Gdk::Point s2 = get_coordinate (m_engine.RANK_X (dst) - 3, m_engine.RANK_Y (dst) - 3);
+	cairo_set_line_width(active_cr, 4.0);
+	cairo_move_to(active_cr, s1.x, s1.y);
+	cairo_line_to(active_cr, s2.x, s2.y);
+	cairo_stroke(active_cr);
 
-	cr->set_line_width (4.0);
-	cr->move_to(s1.get_x (), s1.get_y ());
-	cr->line_to(s2.get_x (), s2.get_y ());
-	cr->stroke();
-
-	// 画箭头
 	double x1;
 	double y1;
 	double x2;
 	double y2;
-	calcVertexes(s1.get_x (), s1.get_y (), s2.get_x (), s2.get_y (), x1, y1, x2, y2);
-	cr->move_to (s2.get_x (), s2.get_y ());
-	cr->line_to (x1, y1);
-	cr->line_to (x2, y2);
-	cr->close_path();
+	calcVertexes(s1.x, s1.y, s2.x, s2.y, x1, y1, x2, y2);
+	cairo_move_to(active_cr, s2.x, s2.y);
+	cairo_line_to(active_cr, x1, y1);
+	cairo_line_to(active_cr, x2, y2);
+	cairo_close_path(active_cr);
 
-	cr->set_source_rgba (rgba.get_red(), rgba.get_green(), rgba.get_blue(), 0.89);
-	cr->fill();
+	cairo_set_source_rgba(active_cr, rgba.red, rgba.green, rgba.blue, 0.89);
+	cairo_fill(active_cr);
 }
 
 void Board::first_move()
 {
 	m_step = 0;
 	m_engine.get_snapshot(m_step);
-
-	/** 设置此步的注释*/
-	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
-	if(str != NULL){
-		parent.set_comment(*str);
-	}
-	else
-		parent.set_comment(" ");
-
+	parent.set_comment(str != NULL ? *str : " ");
 	CSound::play(SND_MOVE);
 	queue_draw();
 }
@@ -651,19 +628,12 @@ void Board::last_move()
 {
 	m_step = m_engine.how_step();
 	m_engine.get_snapshot(m_step);
-
-	/** 设置此步的注释*/
-	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
-	if(str != NULL){
-		parent.set_comment(*str);
-	}
-	else
-		parent.set_comment(" ");
-
+	parent.set_comment(str != NULL ? *str : " ");
 	CSound::play(SND_MOVE);
 	queue_draw();
 }
+
 void Board::next_move()
 {
 	m_step++;
@@ -671,46 +641,27 @@ void Board::next_move()
 	if(m_step> all_step)
 		m_step = all_step;
 	m_engine.get_snapshot(m_step);
-
-	/** 设置此步的注释*/
-	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
-	if(str != NULL){
-		parent.set_comment(*str);
-	}
-	else
-		parent.set_comment(" ");
-
+	parent.set_comment(str != NULL ? *str : " ");
 	CSound::play(SND_MOVE);
 	queue_draw();
 }
+
 void Board::back_move()
 {
-
 	m_step--;
 	if(m_step<0)
 		m_step =0;
 	m_engine.get_snapshot(m_step);
 	DLOG("m_step = %d\n",m_step);
-
-
-	/** 设置此步的注释*/
-	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(m_step);
-	if(str != NULL){
-		parent.set_comment(*str);
-	}
-	else
-		parent.set_comment(" ");
-
+	parent.set_comment(str != NULL ? *str : " ");
 	CSound::play(SND_MOVE);
 	queue_draw();
-
 }
 
 void Board::get_board_by_move(int f_step)
 {
-	//m_step = (num+1)*2;
 	int all_step = m_engine.how_step();
 	if(f_step> all_step)
 		f_step = all_step;
@@ -718,38 +669,25 @@ void Board::get_board_by_move(int f_step)
 
 	m_engine.get_snapshot(f_step);
 	m_step = f_step;
-
-	/** 设置此步的注释*/
-	/** set the comment of this  move*/
 	std::string* str=m_engine.get_comment(f_step);
-	if(str != NULL){
-		parent.set_comment(*str);
-	}
-	else
-		parent.set_comment(" ");
+	parent.set_comment(str != NULL ? *str : " ");
 	queue_draw();
 }
 
 int Board::try_move(int dst_x,int dst_y)
 {
-
 	int dst = m_engine.get_dst_xy(dst_x,dst_y,is_rev_board);
 	int src = m_engine.get_chessman_xy(selected_chessman);
 	int mv =  m_engine.get_move(src,dst);
 	return try_move(mv);
 }
+
 int Board::try_move(int mv)
 {
 	int eat = m_engine.get_move_eat(mv);
 	int dst=  m_engine.get_move_dst(mv);
-	/** 对着法进行逻辑检测*/
-	/** check the logic of the move */
 	if(m_engine.make_move(mv)){
-		/** 执行着法*/
-		//m_engine.do_move(mv);
-		/** 将着法中文表示加到treeview中*/
-		/**  and the chinese moves to treeview */
-		Glib::ustring mv_chin(m_engine.get_chinese_last_move());
+		std::string mv_chin = m_engine.get_chinese_last_move();
 		int num = m_engine.how_step();
 		parent.add_step_line(num,mv_chin);
 		if(eat)
@@ -762,7 +700,6 @@ int Board::try_move(int mv)
 		printf("move = %d finish move and redraw now\n",mv);
 		selected_chessman=-1;
 		std::string iccs_str=m_engine.move_to_iccs_str(mv);
-		/** 对战时的处理*/
 		if(is_fight_to_robot()){
 			if(eat){
 				moves_lines.clear();
@@ -770,52 +707,36 @@ int Board::try_move(int mv)
 			}
 			else{
 				size_t pos = moves_lines.find("moves");
-				if(pos == std::string::npos){
+				if(pos == std::string::npos)
 					moves_lines=moves_lines + " -- 0 1  moves "+iccs_str;
-				}else{
+				else
 					moves_lines=moves_lines + " "+iccs_str;
-				}
-
 			}
-			/** then send the moves_lines to ucci engine(robot)*/
 			std::cout<<"moves_lines = "<<moves_lines<<std::endl;
 			m_robot.send_ctrl_command(moves_lines.c_str());
 			m_robot.send_ctrl_command("\n");
-			//user_player = 1-user_player;
 			if(!is_human_player()){
-				//Glib::ustring str_cmd="go time "+to_msec_ustring(black_time)+" increment 0\n";
-				//Glib::ustring str_cmd=Glib::ustring("go depth ")+search_depth+"\n";
 				char str_cmd[256];
 				sprintf(str_cmd,"go depth %d \n",m_search_depth);
 				m_robot.send_ctrl_command(str_cmd);
-				//m_robot.send_ctrl_command("go time 295000 increment 0\n");
 			}
-
 
 			parent.change_play(is_human_player());
 			count_time=0;
 		}
 		else if(is_network_game()){
-
 			if(!is_human_player()){
-			/** 我走的棋，则将iccs_str走法传给网络*/
 				printf("my go\n");
 				std::string mv_str = "moves:"+iccs_str;
 				send_to_socket(mv_str);
-
-
 			}
 			parent.change_play(is_human_player());
 			count_time=0;
-
 		}
 		parent.set_comment("");
 
-		/**被将死了*/
-		/** is it  mate */
 		if(m_engine.mate() && is_human_player() ){
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			CSound::play(SND_CHECK);
 			parent.on_end_game(ROBOT_WIN);
 			parent.set_comment("不要气馁，再接再大励吧!");
@@ -830,33 +751,25 @@ int Board::try_move(int mv)
 			else
 				parent.set_comment("将军，干得好，看好你噢!");
 		}
-
 	}
 	return 0;
-
 }
 
-// 和棋
 void Board::draw_move()
 {
-
 	if(is_fight_to_robot()){
-
 		if(is_human_player())
 			m_robot.send_ctrl_command("go draw\n");
 		else
 			m_robot.send_ctrl_command("ponderhit draw\n");
-
 	}
 	else if(is_network_game()){
 		parent.on_end_game(ROBOT_DRAW);
 	}
-
 }
 
 void Board::rue_move()
 {
-
 	if(m_engine.how_step()<1)
 		return;
 	DLOG(" how_step %d\n",m_engine.how_step());
@@ -874,15 +787,10 @@ void Board::rue_move()
 	}
 }
 
-
 int Board::open_file(const std::string& filename)
 {
-
-	/** for test pgnfile */
-	if(p_pgnfile->read(filename)<0){
-		/** open fail */
+	if(p_pgnfile->read(filename)<0)
 		return -1;
-	}
 	m_step = m_engine.how_step();
 	m_status = READ_STATUS ;
 
@@ -890,27 +798,23 @@ int Board::open_file(const std::string& filename)
 	return 0;
 }
 
-
-void Board::on_drog_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
-		int, int, const Gtk::SelectionData& selection_data,
-		guint,guint f_time)
+void Board::on_drog_data_received(GtkSelectionData* selection_data, guint)
 {
-	if((selection_data.get_length() >= 0)&&(selection_data.get_format()== 8))
+	if((gtk_selection_data_get_length(selection_data) >= 0)&&(gtk_selection_data_get_format(selection_data)== 8))
 	{
-		context->drag_finish(false,false,f_time);
-		std::string filename = wind_unescape_string(selection_data.get_text().c_str(), NULL);
+		gchar* text = (gchar*)gtk_selection_data_get_text(selection_data);
+		std::string filename = wind_unescape_string(text, NULL);
+		g_free(text);
 		size_t pos = filename.find('\r');
 		if (std::string::npos != pos)
 			filename = filename.substr(7, pos-7);
 		parent.open_file(filename);
-
 	}
 }
 
 void Board::free_game(bool redraw_)
 {
-	if(timer.connected())
-		timer.disconnect();
+	stop_timer();
 
 	m_robot.send_ctrl_command("quit\n");
 	m_robot.stop();
@@ -923,6 +827,7 @@ void Board::free_game(bool redraw_)
 		queue_draw();
 	}
 }
+
 void Board::rev_game()
 {
 	is_rev_board=1-is_rev_board;
@@ -943,11 +848,10 @@ void Board::start_robot(bool new_)
 		chanju_game(m_status);
 }
 
-void Board::set_level_config(int _depth,int _idle,int _style,int _knowledge,int _pruning,int _randomness,bool _usebook)
+void Board::set_level_config(int _depth,int,int,int,int,int,bool _usebook)
 {
 	m_search_depth = _depth;
 	m_usebook = _usebook;
-
 }
 
 void Board::set_time(int _step_time, int _play_time)
@@ -961,13 +865,10 @@ void Board::set_war_time(int _step_time,int _play_time)
 	limit_count_time = _step_time;
 	red_time = _play_time*60;
 	black_time = _play_time* 60;
-
 }
 
 void Board::set_level()
 {
-
-	/** test simple*/
 	m_robot.send_ctrl_command("setoption idle large\n");
 	m_robot.send_ctrl_command("setoption style risky\n");
 	m_robot.send_ctrl_command("setoption knowledge none\n");
@@ -983,7 +884,6 @@ void Board::start_network()
 {
 	set_war_time(300,30);
 	new_game(NETWORK_STATUS);
-
 }
 
 void Board::chanju_game(BOARD_STATUS _status)
@@ -999,7 +899,6 @@ void Board::chanju_game(BOARD_STATUS _status)
 	}
 	DLOG("current fen = %s\n", cur_fen.c_str());
 
-
 	moves_lines.clear();
 	moves_lines = position_str + cur_fen;
 	queue_draw();
@@ -1007,8 +906,7 @@ void Board::chanju_game(BOARD_STATUS _status)
 	parent.textview_engine_log_clear();
 	parent.change_play(is_human_player());
 
-	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
-	/**如果是用户选择黑方，则电脑先走棋 -- if user choose black,the robot go moves first*/
+	start_timer();
 	if(m_human_black){
 		if(m_status == FIGHT_STATUS){
 			moves_lines =moves_lines +std::string(" -- 0 1 ");
@@ -1017,18 +915,12 @@ void Board::chanju_game(BOARD_STATUS _status)
 			char str_cmd[256];
 			sprintf(str_cmd,"go depth %d \n",m_search_depth);
 			m_robot.send_ctrl_command(str_cmd);
-		}else if(m_status == NETWORK_STATUS){
-
 		}
-
 	}
 
-	parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(0));
-	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
-
-
+	parent.set_red_war_time(to_time_string(red_time),to_time_string(0));
+	parent.set_black_war_time(to_time_string(black_time),to_time_string(0));
 }
-
 
 void Board::new_game(BOARD_STATUS _status)
 {
@@ -1042,7 +934,6 @@ void Board::new_game(BOARD_STATUS _status)
 		set_level();
 	}
 
-
 	moves_lines.clear();
 	moves_lines = position_str + std::string(start_fen);
 	queue_draw();
@@ -1050,8 +941,7 @@ void Board::new_game(BOARD_STATUS _status)
 	parent.textview_engine_log_clear();
 	parent.change_play(is_human_player());
 
-	timer=Glib::signal_timeout().connect(sigc::mem_fun(*this,&Board::go_time),1000);
-	/**如果是用户选择黑方，则电脑先走棋 -- if user choose black,the robot go moves first*/
+	start_timer();
 	if(m_human_black){
 		if(m_status == FIGHT_STATUS){
 			moves_lines =moves_lines +std::string(" -- 0 1 ");
@@ -1060,20 +950,15 @@ void Board::new_game(BOARD_STATUS _status)
 			char str_cmd[256];
 			sprintf(str_cmd,"go depth %d \n",m_search_depth);
 			m_robot.send_ctrl_command(str_cmd);
-		}else if(m_status == NETWORK_STATUS){
-
 		}
-
 	}
 
-	parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(0));
-	parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(0));
+	parent.set_red_war_time(to_time_string(red_time),to_time_string(0));
+	parent.set_black_war_time(to_time_string(black_time),to_time_string(0));
 }
-
 
 bool Board::robot_log(GIOCondition)
 {
-	/*for testing,delete me*/
 	char buf[1024] = { 0 };
 	int buf_len = 1024;
 	char* p = buf;
@@ -1093,26 +978,21 @@ bool Board::robot_log(GIOCondition)
 
 		size_t pos_=str_buf.find("draw");
 		if(pos_ != std::string::npos){
-
 			printf("计算机同意和棋\n");
 			if (parent.on_end_game(ROBOT_DRAW)) {
-				if(timer.connected())
-					timer.disconnect();
-				return 1;
+				stop_timer();
+				return true;
 			}
 		}
 		pos_=str_buf.find("resign");
 		if(pos_ != std::string::npos){
-
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
 		pos_=str_buf.find("nobestmove");
 		if(pos_ != std::string::npos){
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}
@@ -1124,23 +1004,21 @@ bool Board::robot_log(GIOCondition)
 			try_move(mv);
 		}
 	}
-
 	return true;
-
 }
 
-Glib::ustring Board::to_time_ustring(int ival)
+std::string Board::to_time_string(int ival)
 {
 	char sp[32];
 	sprintf(sp,"%02d:%02d", ival/60,ival%60);
-	return Glib::ustring(sp);
+	return std::string(sp);
 }
 
-Glib::ustring Board::to_msec_ustring(int ival)
+std::string Board::to_msec_string(int ival)
 {
 	char sp[32];
 	sprintf(sp,"%d000",ival);
-	return Glib::ustring(sp);
+	return std::string(sp);
 }
 
 bool Board::go_time()
@@ -1148,44 +1026,37 @@ bool Board::go_time()
 	if(is_human_player()){
 		count_time++;
 		red_time--;
-		parent.set_red_war_time(to_time_ustring(red_time),to_time_ustring(count_time));
-		/** when the user 's step time over the limit time,we must warn it,and when over time the has not go,it will be losed */
+		parent.set_red_war_time(to_time_string(red_time),to_time_string(count_time));
 		if(count_time>limit_count_time-10 && count_time<= limit_count_time){
 			printf("time out,you less time: %d\n",limit_count_time-count_time);
 			reckon_time_sound(limit_count_time-count_time);
 		}
 		else if(count_time > limit_count_time || red_time<0 ){
 			printf(" time limit ,you lose\n");
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(HUMAN_OVER_TIME);
 			count_time =0;
 			if(is_network_game())
 				send_to_socket("timeout");
-
 		}
 	}
 	else{
 		black_time--;
 		count_time++;
-		parent.set_black_war_time(to_time_ustring(black_time),to_time_ustring(count_time));
-		//printf("black_time: %d\n",black_time);
+		parent.set_black_war_time(to_time_string(black_time),to_time_string(count_time));
 		if(count_time>limit_count_time-10 && count_time<=limit_count_time){
 			printf("time out,bot waster much time\n");
 			m_robot.send_ctrl_command("stop\n");
 		}
 		else if(count_time >limit_count_time || black_time<0 ){
 			printf(" time limit ,robot lose\n");
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_OVER_TIME);
 			count_time =0;
 			if(is_network_game())
 				send_to_socket("timeout");
 		}
 	}
-
-
 	return true;
 }
 
@@ -1194,11 +1065,11 @@ void Board::set_board_size(BOARDSIZE sizemode)
 	switch(sizemode){
 		case BIG_BOARD:
 			is_small_board=false;
-			this->set_size_request(521,577);
+			gtk_widget_set_size_request(area, 521, 577);
 			break;
 		case SMALL_BOARD:
 			is_small_board=true;
-			this->set_size_request(221,277);
+			gtk_widget_set_size_request(area, 221, 277);
 			break;
 		default:
 			g_warn_if_reached();
@@ -1209,75 +1080,46 @@ void Board::set_board_size(BOARDSIZE sizemode)
 void Board::reckon_time_sound(int time_)
 {
 	switch(time_){
-		case 0:
-			CSound::play(SND_0);
-			break;
-		case 1:
-			CSound::play(SND_1);
-			break;
-		case 2:
-			CSound::play(SND_2);
-			break;
-		case 3:
-			CSound::play(SND_3);
-			break;
-		case 4:
-			CSound::play(SND_4);
-			break;
-		case 5:
-			CSound::play(SND_5);
-			break;
-		case 6:
-			CSound::play(SND_6);
-			break;
-		case 7:
-			CSound::play(SND_7);
-			break;
-		case 8:
-			CSound::play(SND_8);
-			break;
-		case 9:
-			CSound::play(SND_9);
-			break;
-		case 10:
-			CSound::play(SND_10);
-			break;
-		default:
-			break;
-
+		case 0: CSound::play(SND_0); break;
+		case 1: CSound::play(SND_1); break;
+		case 2: CSound::play(SND_2); break;
+		case 3: CSound::play(SND_3); break;
+		case 4: CSound::play(SND_4); break;
+		case 5: CSound::play(SND_5); break;
+		case 6: CSound::play(SND_6); break;
+		case 7: CSound::play(SND_7); break;
+		case 8: CSound::play(SND_8); break;
+		case 9: CSound::play(SND_9); break;
+		case 10: CSound::play(SND_10); break;
+		default: break;
 	}
-
 }
 
 void Board::watch_socket(int fd)
 {
 	fd_recv_skt=fd;
-	Glib::signal_io().connect(sigc::mem_fun(*this,&Board::on_network_io),
-			fd_recv_skt, Glib::IO_IN);
-
+	GIOChannel* channel = g_io_channel_unix_new(fd_recv_skt);
+	network_io_id = g_io_add_watch(channel, G_IO_IN, network_io_cb, this);
+	g_io_channel_unref(channel);
 }
-bool Board::on_network_io(const Glib::IOCondition& )
+
+bool Board::on_network_io(GIOCondition)
 {
-
 	int fd_cli = -1;
-       EC_THROW(-1 == (fd_cli = accept(fd_recv_skt, NULL, 0)));
-       char buf[1024];
-       size_t len = read(fd_cli, &buf[0], 1023);
-       buf[len]=0;
-       if (len > 0) {
-
+	EC_THROW(-1 == (fd_cli = accept(fd_recv_skt, NULL, 0)));
+	char buf[1024];
+	size_t len = read(fd_cli, &buf[0], 1023);
+	buf[len]=0;
+	if (len > 0) {
 		std::string str_buf(buf);
 		size_t pos;
-		//size_t pos_=str_buf.find("network-game-red");
 
 		if((pos = str_buf.find("moves:")) != std::string::npos){
 			std::string t_mv=str_buf.substr(pos+6,4);
 			std::cout<<"get robot mv = "<<t_mv<<std::endl;
 			int mv = m_engine.iccs_str_to_move(t_mv);
 			try_move(mv);
-
 		}else if((pos = str_buf.find("network-game-red,"))!= std::string::npos){
-			//start network game with red player
 			std::string enemy_name,my_name;
 			size_t pos_s,pos_e,pos_m;
 			pos_s= str_buf.find("enemy_name:");
@@ -1286,11 +1128,8 @@ bool Board::on_network_io(const Glib::IOCondition& )
 			enemy_name = str_buf.substr(pos_s+11,pos_m-pos_s-11);
 			pos_m = str_buf.find_last_of("@");
 			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
-
-			//parent.on_network_game(my_name,enemy_name,true);
 			parent.on_network_game(enemy_name,my_name,true);
 		}else if((pos = str_buf.find("network-game-black,")) != std::string::npos){
-			//start network game with black player
 			std::string enemy_name,my_name;
 			size_t pos_s,pos_e,pos_m;
 			pos_s= str_buf.find("enemy_name:");
@@ -1301,13 +1140,11 @@ bool Board::on_network_io(const Glib::IOCondition& )
 			my_name = str_buf.substr(pos_e+9,pos_m-pos_e-9);
 			parent.on_network_game(my_name,enemy_name,false);
 		}else if(str_buf.find("network-game-win") != std::string::npos){
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_LOSE);
 			return true;
 		}else if(str_buf.find("resign") != std::string::npos){
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_WIN);
 			return true;
 		}else if(str_buf.find("network-game-rue") != std::string::npos){
@@ -1318,21 +1155,13 @@ bool Board::on_network_io(const Glib::IOCondition& )
 		}else if(str_buf.find("network-game-nodraw") != std::string::npos){
 			parent.info_window(("The against doesn't agree draw!"));
 		}else if(str_buf.find("network-game-draw") != std::string::npos){
-			if(timer.connected())
-				timer.disconnect();
+			stop_timer();
 			parent.on_end_game(ROBOT_DRAW);
-		}else if(str_buf.find("enemy_name:") != std::string::npos){
-
-		}else if(str_buf.find("my_name:") !=std::string::npos){
-
 		}
-
-
 	}
 	close(fd_cli);
 	return true;
 }
-
 
 int Board::init_send_socket()
 {
@@ -1350,9 +1179,9 @@ int Board::init_send_socket()
 
 	return sockfd;
 }
+
 void Board::send_to_socket(const std::string& cmd_)
 {
-
 	int sockfd;
 	struct sockaddr_in srvaddr;
 
@@ -1366,10 +1195,12 @@ void Board::send_to_socket(const std::string& cmd_)
 	EC_THROW( -1 == (setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) )));
 
 	if( 0 == connect(sockfd,(struct sockaddr*)&srvaddr,sizeof(srvaddr))){
-		write(sockfd,cmd_.c_str(),cmd_.size());
+		ssize_t written = write(sockfd,cmd_.c_str(),cmd_.size());
+		(void)written;
 		close(sockfd);
 	}
 }
+
 void Board::close_send_socket()
 {
 	if(fd_send_skt>0){
@@ -1380,21 +1211,20 @@ void Board::close_send_socket()
 
 void Board::save_board_to_file(const std::string& filename)
 {
-	Glib::RefPtr<Gdk::Window> window;
-	Cairo::RefPtr<Cairo::Context> src_cr;
-	Cairo::RefPtr<Cairo::Context> dst_cr;
-	Cairo::RefPtr<Cairo::Surface> src_surface;
-	Cairo::RefPtr<Cairo::ImageSurface> dst_surface;
-
-	window = get_window ();
-	src_cr = window->create_cairo_context ();
-	src_surface = src_cr->get_target();
-
-	dst_surface = Cairo::ImageSurface::create(Cairo::Format::FORMAT_ARGB32,
-						  get_allocated_width(),
-						  get_allocated_height());
-	dst_cr = Cairo::Context::create(dst_surface);
-	dst_cr->set_source(src_surface, 0, 0);
-	dst_cr->paint();
-	dst_surface->write_to_png (filename);
+	const int width = gtk_widget_get_allocated_width(area);
+	const int height = gtk_widget_get_allocated_height(area);
+	cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+	cairo_t* cr = cairo_create(surface);
+	active_cr = cr;
+	draw_bg();
+	draw_board();
+	int mv = m_engine.get_last_move_from_snapshot();
+	if (mv > 0)
+		draw_trace(mv);
+	draw_select_frame(true);
+	draw_show_can_move();
+	active_cr = NULL;
+	cairo_destroy(cr);
+	cairo_surface_write_to_png(surface, filename.c_str());
+	cairo_surface_destroy(surface);
 }

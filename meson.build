@@ -99,9 +99,9 @@ localdir = join_paths(datadir, 'local')
 vapidir = join_paths(datadir, 'vala', 'vapi')
 
 # Dependencies
-gtkmm_req = '>= 3.24.0'
+gtk_req = '>= 3.24.0'
 
-gtkmm_dep = dependency('gtkmm-3.0', version: gtkmm_req, required: false)
+gtk_dep = dependency('gtk+-3.0', version: gtk_req, required: false)
 
 libdl_dep = cpp.find_library('dl', required: true)
 if not libdl_dep.found()

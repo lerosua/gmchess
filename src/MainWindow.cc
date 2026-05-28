@@ -5,235 +5,360 @@
  *
  *    Description:
  *
- *        Version:  1.0
- *        Created:  2009年02月14日 07时52分14秒 CST
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  lerosua (), lerosua@gmail.com
- *        Company:  Cyclone
- *
  * =====================================================================================
  */
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
+
 #include "MainWindow.h"
+#include "BookView.h"
+#include "ConfWindow.h"
+#include "Sound.h"
+#include "gmchess.h"
+
 #include <glib/gi18n.h>
-#include <gtkmm/button.h>
-#include <gtkmm/treeselection.h>
-#include <gtkmm/aboutdialog.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fstream>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "BookView.h"
-#include "ConfWindow.h"
-#include "gmchess.h"
-#include "Sound.h"
 
-Glib::ustring ui_info =
-"<ui>"
-"	<menubar name='MenuBar'>"
-"		<menu action='FileMenu'>"
-"			<menuitem action='OpenFile'/>"
-"			<menuitem action='SaveAs'/>"
-"			<menuitem action='SaveBoard'/>"
-"			<separator/>"
-"			<menuitem action='FileQuit'/>"
-"        	</menu>"
-"		<menu action='ViewMenu'>"
-"			<menuitem action='RevPlay'/>"
-"			<menuitem action='ViewPreferences'/>"
-"		</menu>"
-"		<menu action='GameMenu'>"
-"			<menuitem action='WarAI'/>"
-"			<menuitem action='FreePlay'/>"
-"		</menu>"
-"		<menu action='HelpMenu'>"
-"			<menuitem action='Help'/>"
-"			<menuitem action='About'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
+enum {
+	COL_STEP_NUM,
+	COL_STEP_BOUT,
+	COL_PLAYER,
+	COL_STEP_LINE,
+	N_STEP_COLUMNS
+};
 
-
-
-
-
-MainWindow::MainWindow():menubar(NULL)
-			 ,confwindow(NULL)
+static GtkWidget* create_message_dialog(GtkWindow* parent, const char* title,
+		GtkMessageType type, GtkButtonsType buttons, const std::string& secondary)
 {
-	ui_xml = Gtk::Builder::create_from_file(main_ui,"main_window");
+	GtkWidget* dialog = gtk_message_dialog_new(parent, GTK_DIALOG_MODAL,
+			type, buttons, "%s", title);
+	if(!secondary.empty())
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
+				"%s", secondary.c_str());
+	return dialog;
+}
+
+static gint run_message_dialog(GtkWindow* parent, const char* title,
+		GtkMessageType type, GtkButtonsType buttons, const std::string& secondary)
+{
+	GtkWidget* dialog = create_message_dialog(parent, title, type, buttons, secondary);
+	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+	return result;
+}
+
+static GtkFileFilter* add_file_filter(GtkFileChooser* chooser, const char* name,
+		const char* lower, const char* upper)
+{
+	GtkFileFilter* filter = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, name);
+	gtk_file_filter_add_pattern(filter, lower);
+	gtk_file_filter_add_pattern(filter, upper);
+	gtk_file_chooser_add_filter(chooser, filter);
+	return filter;
+}
+
+MainWindow::MainWindow()
+	: board(NULL)
+	, ui_xml(NULL)
+	, window(NULL)
+	, menubar(NULL)
+	, m_treeview(NULL)
+	, m_refTreeModel(NULL)
+	, m_bookview(NULL)
+	, buttonbox_war(NULL)
+	, text_comment(NULL)
+	, text_engine_log(NULL)
+	, m_notebook(NULL)
+	, confwindow(NULL)
+	, ui_logo(NULL)
+{
+	ui_xml = gtk_builder_new_from_file(main_ui);
 	if(!ui_xml)
 		exit(271);
-	Gtk::Box* main_window =0;
-	Gtk::Box* box_board=0;
 
-	ui_xml->get_widget("main_window",main_window);
-	ui_xml->get_widget("vbox_board",box_board);
-	ui_xml->get_widget("hbuttonbox_war",buttonbox_war);
-	ui_xml->get_widget("textview_comment",text_comment);
-	ui_xml->get_widget("textview_engine_log",text_engine_log);
-	ui_xml->get_widget("notebook",m_notebook);
-	ui_xml->get_widget("button_start",btn_start);
-	ui_xml->get_widget("button_end",btn_end);
-	ui_xml->get_widget("button_prev",btn_prev);
-	ui_xml->get_widget("button_next",btn_next);
-	ui_xml->get_widget("button_chanju", btn_chanjue);
-	ui_xml->get_widget("button_begin",btn_begin);
-	ui_xml->get_widget("button_lose",btn_lose);
-	ui_xml->get_widget("button_draw",btn_draw);
-	ui_xml->get_widget("button_rue",btn_rue);
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(window, "delete-event", G_CALLBACK(delete_event_cb), this);
+	g_signal_connect(window, "destroy", G_CALLBACK(window_destroy_cb), this);
 
-	btn_start->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_first_move));
-	btn_end->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_last_move));
-	btn_prev->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_back_move));
-	btn_next->signal_clicked().connect(
-			sigc::mem_fun(*this,&MainWindow::on_next_move));
+	GtkWidget* main_box = builder_widget("main_window");
+	GtkWidget* box_board = builder_widget("vbox_board");
+	buttonbox_war = builder_widget("hbuttonbox_war");
+	text_comment = GTK_TEXT_VIEW(builder_widget("textview_comment"));
+	text_engine_log = GTK_TEXT_VIEW(builder_widget("textview_engine_log"));
+	m_notebook = GTK_NOTEBOOK(builder_widget("notebook"));
+	btn_start = GTK_BUTTON(builder_widget("button_start"));
+	btn_end = GTK_BUTTON(builder_widget("button_end"));
+	btn_prev = GTK_BUTTON(builder_widget("button_prev"));
+	btn_next = GTK_BUTTON(builder_widget("button_next"));
+	btn_chanjue = GTK_BUTTON(builder_widget("button_chanju"));
+	btn_begin = GTK_BUTTON(builder_widget("button_begin"));
+	btn_lose = GTK_BUTTON(builder_widget("button_lose"));
+	btn_draw = GTK_BUTTON(builder_widget("button_draw"));
+	btn_rue = GTK_BUTTON(builder_widget("button_rue"));
 
-	btn_begin->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_begin_game));
-	btn_lose->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_lose_game));
-	btn_draw->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_draw_game));
-	btn_rue->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_rue_game));
-	btn_chanjue->signal_clicked().connect(
-			sigc::mem_fun(*this, &MainWindow::on_chanju_game));
+	g_signal_connect(btn_start, "clicked", G_CALLBACK(button_first_cb), this);
+	g_signal_connect(btn_end, "clicked", G_CALLBACK(button_last_cb), this);
+	g_signal_connect(btn_prev, "clicked", G_CALLBACK(button_back_cb), this);
+	g_signal_connect(btn_next, "clicked", G_CALLBACK(button_next_cb), this);
+	g_signal_connect(btn_begin, "clicked", G_CALLBACK(button_begin_cb), this);
+	g_signal_connect(btn_lose, "clicked", G_CALLBACK(button_lose_cb), this);
+	g_signal_connect(btn_draw, "clicked", G_CALLBACK(button_draw_cb), this);
+	g_signal_connect(btn_rue, "clicked", G_CALLBACK(button_rue_cb), this);
+	g_signal_connect(btn_chanjue, "clicked", G_CALLBACK(button_chanju_cb), this);
 
-	board = Gtk::manage(new Board(*this));
-	box_board->pack_start(*board);
+	board = new Board(*this);
+	gtk_box_pack_start(GTK_BOX(box_board), board->widget(), TRUE, TRUE, 0);
 
-	this->add(*main_window);
-	this->set_title(_("GMChess"));
+	gtk_container_add(GTK_CONTAINER(window), main_box);
+	gtk_window_set_title(GTK_WINDOW(window), _("GMChess"));
 
-	ui_logo  = Gdk::Pixbuf::create_from_file(DATA_DIR"/gmchess.png");
-	this->set_icon(ui_logo);
-	/** 设置菜单, set the menu*/
+	GError* error = NULL;
+	ui_logo = gdk_pixbuf_new_from_file(DATA_DIR"/gmchess.png", &error);
+	if(ui_logo)
+		gtk_window_set_icon(GTK_WINDOW(window), ui_logo);
+	if(error)
+		g_error_free(error);
+
 	init_ui_manager();
-	menubar = ui_manager->get_widget("/MenuBar");
-	Gtk::Box* menu_tool_box=0;
-	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
-	menu_tool_box->pack_start(*menubar,true,true);
+	GtkWidget* menu_tool_box = builder_widget("box_menu_toolbar");
+	gtk_box_pack_start(GTK_BOX(menu_tool_box), menubar, FALSE, FALSE, 0);
 
-	/** 设置Treeview区, set the treeview*/
-	Gtk::ScrolledWindow* scrolwin= 0;
-	ui_xml->get_widget("scrolledwindow",scrolwin);
-	m_refTreeModel = Gtk::ListStore::create(m_columns);
-	m_treeview.set_model( m_refTreeModel);
-	scrolwin->add(m_treeview);
-	m_treeview.append_column(_("Turn"),m_columns.step_bout);
-	m_treeview.append_column("  ",m_columns.player);
-	m_treeview.append_column(_("Move"),m_columns.step_line);
-	m_treeview.set_events(Gdk::BUTTON_PRESS_MASK);
-	m_treeview.signal_button_press_event().connect(sigc::mem_fun(*this,
-				&MainWindow::on_treeview_click),false);
+	init_move_treeview();
 
-	set_status();
+	GtkWidget* scroll_book = builder_widget("scrolledwin_book");
+	m_bookview = new BookView(this);
+	gtk_container_add(GTK_CONTAINER(scroll_book), m_bookview->widget());
 
-	Gtk::ScrolledWindow* scroll_book=0;
-	ui_xml->get_widget("scrolledwin_book",scroll_book);
-	m_bookview= new BookView(this);
-	scroll_book->add(*m_bookview);
-
-	ui_xml->get_widget("image_p1",p1_image);
-	ui_xml->get_widget("image_p2",p2_image);
-	ui_xml->get_widget("P1_war_time",p1_war_time);
-	ui_xml->get_widget("P2_war_time",p2_war_time);
-	ui_xml->get_widget("P1_step_time",p1_step_time);
-	ui_xml->get_widget("P2_step_time",p2_step_time);
-	ui_xml->get_widget("P1_name",p1_name);
-	ui_xml->get_widget("P2_name",p2_name);
+	p1_image = GTK_IMAGE(builder_widget("image_p1"));
+	p2_image = GTK_IMAGE(builder_widget("image_p2"));
+	p1_war_time = GTK_LABEL(builder_widget("P1_war_time"));
+	p2_war_time = GTK_LABEL(builder_widget("P2_war_time"));
+	p1_step_time = GTK_LABEL(builder_widget("P1_step_time"));
+	p2_step_time = GTK_LABEL(builder_widget("P2_step_time"));
+	p1_name = GTK_LABEL(builder_widget("P1_name"));
+	p2_name = GTK_LABEL(builder_widget("P2_name"));
 
 	init_conf();
-	this->signal_check_resize().connect(
-			sigc::mem_fun(*this,&MainWindow::on_size_change));
+	g_signal_connect(board->widget(), "size-allocate", G_CALLBACK(size_allocate_cb), this);
 
-//#ifdef __linux__
-//	/** test for rgba , it not work in mac osx*/
-//	Glib::RefPtr<const Gdk::Colormap> colormap_ = this->get_screen()->get_rgba_colormap();
-//	this->set_default_colormap(colormap_);
-//#endif
-
-	show_all();
-	p1_image->hide();
-	p2_image->hide();
+	gtk_widget_show_all(window);
+	gtk_widget_hide(GTK_WIDGET(p1_image));
+	gtk_widget_hide(GTK_WIDGET(p2_image));
 
 	if(atoi(GMConf["desktop_size"].c_str()) == 1)
 		board->set_board_size(BIG_BOARD);
 	else
 		board->set_board_size(SMALL_BOARD);
-	int _depth = atoi(GMConf["engine_depth"].c_str());
-	g_log("Mainwindow",G_LOG_LEVEL_INFO,"depth %d",_depth);
-	board->set_level_config(_depth,0,0,0,0,0,atoi(GMConf["usebook"].c_str()));
+
+	int depth = atoi(GMConf["engine_depth"].c_str());
+	g_log("Mainwindow", G_LOG_LEVEL_INFO, "depth %d", depth);
+	board->set_level_config(depth, 0, 0, 0, 0, 0, atoi(GMConf["usebook"].c_str()));
+
 	std::string tmp = GMConf["step_time"];
 	if(tmp.empty())
 		tmp = "240";
-	//int _step_time= atoi(GMConf["step_time"].c_str());
-	int _step_time= atoi(tmp.c_str());
+	int step_time = atoi(tmp.c_str());
 	tmp = GMConf["play_time"];
 	if(tmp.empty())
-		tmp="60";
-	//int _play_time= atoi(GMConf["play_time"].c_str());
-	int _play_time= atoi(tmp.c_str());
-	if(_step_time>0&&_step_time<600 && _play_time>0)
-		board->set_time(_step_time,_play_time);
-	std::string theme_ = GMConf["themes"];
+		tmp = "60";
+	int play_time = atoi(tmp.c_str());
+	if(step_time > 0 && step_time < 600 && play_time > 0)
+		board->set_time(step_time, play_time);
+
+	std::string theme = GMConf["themes"];
 	std::string engine_name = GMConf["engine_name"];
-	std::string color_ = GMConf["line_color"];
+	std::string color = GMConf["line_color"];
 	if(engine_name.empty())
 		engine_name = "eleeye_engine";
-	if(theme_.empty())
-		theme_ = "wood";
-	board->set_themes(theme_);
+	if(theme.empty())
+		theme = "wood";
+	board->set_themes(theme);
 	board->set_engine(engine_name);
-	board->set_trace_color(color_.c_str());
+	board->set_trace_color(color);
 }
 
-//MainWindow::~MainWindow()
-//{
-//	this->pop_colormap();
-//}
+MainWindow::~MainWindow()
+{
+	if(window)
+		gtk_widget_destroy(window);
+	delete confwindow;
+	delete m_bookview;
+	delete board;
+	if(m_refTreeModel)
+		g_object_unref(m_refTreeModel);
+	if(ui_logo)
+		g_object_unref(ui_logo);
+	if(ui_xml)
+		g_object_unref(ui_xml);
+}
+
+GtkWidget* MainWindow::builder_widget(const char* name)
+{
+	GObject* object = gtk_builder_get_object(ui_xml, name);
+	if(!object)
+		g_error("Unable to find widget '%s' in %s", name, main_ui);
+	return GTK_WIDGET(object);
+}
+
+GtkWidget* MainWindow::create_menu_item(const char* label, GCallback callback)
+{
+	GtkWidget* item = gtk_menu_item_new_with_mnemonic(label);
+	g_signal_connect(item, "activate", callback, this);
+	return item;
+}
+
+void MainWindow::button_first_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_first_move();
+}
+
+void MainWindow::button_last_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_last_move();
+}
+
+void MainWindow::button_back_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_back_move();
+}
+
+void MainWindow::button_next_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_next_move();
+}
+
+void MainWindow::button_begin_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_begin_game();
+}
+
+void MainWindow::button_lose_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_lose_game();
+}
+
+void MainWindow::button_draw_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_draw_game();
+}
+
+void MainWindow::button_rue_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_rue_game();
+}
+
+void MainWindow::button_chanju_cb(GtkButton*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_chanju_game();
+}
+
+gboolean MainWindow::tree_button_cb(GtkWidget*, GdkEventButton* event, gpointer data)
+{
+	return static_cast<MainWindow*>(data)->on_treeview_click(event);
+}
+
+gboolean MainWindow::delete_event_cb(GtkWidget*, GdkEvent* event, gpointer data)
+{
+	return static_cast<MainWindow*>(data)->on_delete_event((GdkEventAny*)event);
+}
+
+void MainWindow::window_destroy_cb(GtkWidget*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->window = NULL;
+	gtk_main_quit();
+}
+
+void MainWindow::size_allocate_cb(GtkWidget*, GtkAllocation*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_size_change();
+}
+
+void MainWindow::menu_open_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_open_file();
+}
+
+void MainWindow::menu_save_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_save_file();
+}
+
+void MainWindow::menu_save_board_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_save_board_to_png();
+}
+
+void MainWindow::menu_quit_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_file_quit();
+}
+
+void MainWindow::menu_preferences_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_view_preferences();
+}
+
+void MainWindow::menu_war_ai_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_war_to_ai();
+}
+
+void MainWindow::menu_free_play_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_free_play();
+}
+
+void MainWindow::menu_rev_play_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_rev_play();
+}
+
+void MainWindow::menu_help_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_help();
+}
+
+void MainWindow::menu_about_cb(GtkMenuItem*, gpointer data)
+{
+	static_cast<MainWindow*>(data)->on_menu_about();
+}
 
 void MainWindow::on_size_change()
 {
-	int _wid = board->get_width();
-	board->configure_board(_wid);
+	board->configure_board(gtk_widget_get_allocated_width(board->widget()));
 }
 
 void MainWindow::change_play(bool player)
 {
-	if(player){
-		p1_image->hide();
-		p2_image->show();
+	if(player) {
+		gtk_widget_hide(GTK_WIDGET(p1_image));
+		gtk_widget_show(GTK_WIDGET(p2_image));
 	}
-	else{
-		p2_image->hide();
-		p1_image->show();
+	else {
+		gtk_widget_hide(GTK_WIDGET(p2_image));
+		gtk_widget_show(GTK_WIDGET(p1_image));
 	}
-
 }
 
 void MainWindow::save_conf()
 {
-
-	char buf[512]; // FIXME: Do not use char buffer array
-	std::string homedir = Glib::get_user_config_dir();
-	snprintf(buf, 512,"%s/gmchess/config",homedir.c_str());
+	char buf[512];
+	const char* homedir = g_get_user_config_dir();
+	snprintf(buf, sizeof(buf), "%s/gmchess/config", homedir);
 	std::ofstream file(buf);
-	std::string line;
-	std::map<std::string,std::string>::iterator iter=GMConf.begin();
-	for(;iter != GMConf.end(); ++iter)
-	{
-		line = iter->first + "\t=\t" + iter->second;
-		file << line << std::endl;
+	for(std::map<std::string, std::string>::iterator iter = GMConf.begin();
+			iter != GMConf.end(); ++iter) {
+		file << iter->first << "\t=\t" << iter->second << std::endl;
 	}
 	file.close();
-
 }
 
 void MainWindow::init_conf()
@@ -241,205 +366,166 @@ void MainWindow::init_conf()
 	char buf[512];
 	char book_dir[512];
 	char file_dir[512];
-	std::string homedir=Glib::get_user_config_dir();
-	snprintf(book_dir, 512,"%s/gmchess/book",homedir.c_str());
+	const char* homedir = g_get_user_config_dir();
+
+	snprintf(book_dir, sizeof(book_dir), "%s/gmchess/book", homedir);
 	m_bookview->load_book_dir(book_dir);
-	snprintf(buf,512,"%s/gmchess/config",homedir.c_str());
+	snprintf(buf, sizeof(buf), "%s/gmchess/config", homedir);
 
 	std::ifstream file(buf);
-	if(!file){
+	if(!file) {
 #ifdef __APPLE__
-		mkdir(homedir.c_str(),S_IRUSR|S_IWUSR|S_IXUSR);
+		mkdir(homedir, S_IRUSR | S_IWUSR | S_IXUSR);
 #endif
 		char homepath[512];
-		snprintf(homepath,512,"%s/gmchess/",homedir.c_str());
-		mkdir(homepath,S_IRUSR|S_IWUSR|S_IXUSR);
-		GMConf["usebook"]="1";
-		GMConf["desktop_size"] = "1"; //0--small,1--big
-		GMConf["engine_depth"] ="5";
-		GMConf["themes"]="wood";
+		snprintf(homepath, sizeof(homepath), "%s/gmchess/", homedir);
+		mkdir(homepath, S_IRUSR | S_IWUSR | S_IXUSR);
+		GMConf["usebook"] = "1";
+		GMConf["desktop_size"] = "1";
+		GMConf["engine_depth"] = "5";
+		GMConf["themes"] = "wood";
 		GMConf["engine_name"] = "eleeye_engine";
 		GMConf["line_color"] = "#198964";
 		save_conf();
 
-		snprintf(file_dir,512,"%s/gmchess/files",homedir.c_str());
-		mkdir(file_dir,S_IRUSR|S_IWUSR|S_IXUSR);
+		snprintf(file_dir, sizeof(file_dir), "%s/gmchess/files", homedir);
+		mkdir(file_dir, S_IRUSR | S_IWUSR | S_IXUSR);
 		return;
 	}
 
 	std::string line;
 	std::string name;
 	std::string key;
+	while(std::getline(file, line)) {
+		size_t pos = line.find_first_of("=");
+		if(pos == std::string::npos)
+			continue;
+		name = line.substr(0, pos);
+		key = line.substr(pos + 1, std::string::npos);
 
-	if(file){
-		while(std::getline(file,line)){
-			size_t pos= line.find_first_of("=");
-			if(pos==std::string::npos)
-				continue;
-			name = line.substr(0,pos);
-			key = line.substr(pos+1,std::string::npos);
-			// 下面这2个把所有的空格都去掉了
-			//key.erase(std::remove_if(key.begin(), key.end(), IsBlank()), key.end());
-			//name.erase(std::remove_if(name.begin(), name.end(), IsBlank()), name.end());
-			size_t pos1 = 0;
-			size_t pos2 = 0;
-			size_t len = 0;
-			pos1 = name.find_first_not_of(" \t");
-			pos2 = name.find_last_not_of(" \t");
-			if (pos1 == std::string::npos || pos2 == std::string::npos)
-				continue;
-			len = pos2 - pos1 + 1;
-			name = name.substr(pos1, len);
+		size_t pos1 = name.find_first_not_of(" \t");
+		size_t pos2 = name.find_last_not_of(" \t");
+		if(pos1 == std::string::npos || pos2 == std::string::npos)
+			continue;
+		name = name.substr(pos1, pos2 - pos1 + 1);
 
-			pos1 = key.find_first_not_of(" \t");
-			pos2 = key.find_last_not_of(" \t");
-			if (pos1 == std::string::npos || pos2 == std::string::npos)
-				continue;
-			len = pos2 - pos1 + 1;
-			key = key.substr(pos1, len);
+		pos1 = key.find_first_not_of(" \t");
+		pos2 = key.find_last_not_of(" \t");
+		if(pos1 == std::string::npos || pos2 == std::string::npos)
+			continue;
+		key = key.substr(pos1, pos2 - pos1 + 1);
 
-			GMConf.insert(std::pair<std::string,std::string>(name,key));
-		}
+		GMConf.insert(std::pair<std::string, std::string>(name, key));
 	}
 	file.close();
 }
 
 void MainWindow::set_comment(const std::string& f_comment)
 {
-	text_comment->set_wrap_mode(Gtk::WRAP_WORD);
-	Glib::RefPtr<Gtk::TextBuffer> buffer = text_comment->get_buffer();
-	buffer->set_text(f_comment);
-
+	gtk_text_view_set_wrap_mode(text_comment, GTK_WRAP_WORD);
+	GtkTextBuffer* buffer = gtk_text_view_get_buffer(text_comment);
+	gtk_text_buffer_set_text(buffer, f_comment.c_str(), -1);
 }
 
 void MainWindow::show_textview_engine_log(const std::string& f_text)
 {
-
-	text_engine_log->set_wrap_mode(Gtk::WRAP_WORD);
-	Glib::RefPtr<Gtk::TextBuffer> buffer_ = text_engine_log->get_buffer();
-	Gtk::TextBuffer::iterator end_ = buffer_->end();
-
-	Gdk::Rectangle rect_;
-	text_engine_log->get_visible_rect(rect_);
-
-	int y=-1;
-	int height = -1;
-	text_engine_log->get_line_yrange(end_,y,height);
-
-	buffer_->place_cursor(buffer_->insert(end_,f_text));
-
-	if(y<rect_.get_y() + rect_.get_height()+16)
-		text_engine_log->scroll_to(buffer_->get_insert(),0);
+	gtk_text_view_set_wrap_mode(text_engine_log, GTK_WRAP_WORD);
+	GtkTextBuffer* buffer = gtk_text_view_get_buffer(text_engine_log);
+	GtkTextIter end;
+	gtk_text_buffer_get_end_iter(buffer, &end);
+	gtk_text_buffer_insert(buffer, &end, f_text.c_str(), -1);
+	gtk_text_buffer_get_end_iter(buffer, &end);
+	gtk_text_buffer_place_cursor(buffer, &end);
+	GtkTextMark* mark = gtk_text_buffer_get_insert(buffer);
+	gtk_text_view_scroll_mark_onscreen(text_engine_log, mark);
 }
+
 void MainWindow::textview_engine_log_clear()
 {
-	Glib::RefPtr<Gtk::TextBuffer> buffer_ = text_engine_log->get_buffer();
-	Gtk::TextBuffer::iterator end_ , start_ ;
-	buffer_->get_bounds(start_,end_);
-	buffer_->erase(start_,end_);
+	GtkTextBuffer* buffer = gtk_text_view_get_buffer(text_engine_log);
+	gtk_text_buffer_set_text(buffer, "", -1);
 }
 
 void MainWindow::show_treeview_step()
 {
-	Glib::RefPtr<Gtk::TreeModel> model= m_treeview.get_model();
-	model->foreach_iter(sigc::mem_fun(*this, &MainWindow::on_foreach_iter));
+	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
+	GtkTreeIter iter;
+	if(!gtk_tree_model_get_iter_first(model, &iter))
+		return;
 
-}
-
-bool MainWindow::on_foreach_iter(const Gtk::TreeModel::iterator iter)
-{
-	int n_step = (*iter)[m_columns.step_num];
-	int m_step = board->get_step();
-	if(n_step == m_step){
-		Glib::RefPtr<Gtk::TreeSelection> sel = m_treeview.get_selection();
-		Gtk::TreeModel::Path path(iter);
-		m_treeview.scroll_to_row(path);
-		sel->select(iter);
-
-		return true;
-	}
-	return false;
-
-
+	int current_step = board->get_step();
+	do {
+		gint row_step = 0;
+		gtk_tree_model_get(model, &iter, COL_STEP_NUM, &row_step, -1);
+		if(row_step == current_step) {
+			GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+			gtk_tree_view_scroll_to_cell(m_treeview, path, NULL, FALSE, 0, 0);
+			GtkTreeSelection* sel = gtk_tree_view_get_selection(m_treeview);
+			gtk_tree_selection_select_iter(sel, &iter);
+			gtk_tree_path_free(path);
+			return;
+		}
+	} while(gtk_tree_model_iter_next(model, &iter));
 }
 
 void MainWindow::on_next_move()
 {
 	board->next_move();
 	show_treeview_step();
-
 }
+
 void MainWindow::on_back_move()
 {
 	board->back_move();
 	show_treeview_step();
 }
+
 void MainWindow::on_first_move()
 {
 	board->first_move();
-	m_treeview.scroll_to_point(1,1);
+	gtk_tree_view_scroll_to_point(m_treeview, 1, 1);
 }
+
 void MainWindow::on_last_move()
 {
 	board->last_move();
 	show_treeview_step();
 }
 
-
-
 void MainWindow::init_ui_manager()
 {
-	if (!action_group)
-		action_group = Gtk::ActionGroup::create();
-	Glib::RefPtr<Gtk::Action> action ;
-	//File menu:
-	action_group->add(Gtk::Action::create("FileMenu", _("_File")));
+	menubar = gtk_menu_bar_new();
 
-	action = Gtk::Action::create("OpenFile", Gtk::Stock::OPEN,_("Open file"));
-	action->set_tooltip(_("Open chessman File"));
-	action_group->add(action,
-			sigc::mem_fun(*this, &MainWindow::on_menu_open_file));
-	action = Gtk::Action::create("SaveAs",Gtk::Stock::SAVE,_("Save as"));
-	action->set_tooltip(_("Save as a chess pgn file"));
-	action_group->add(action,
-			sigc::mem_fun(*this,&MainWindow::on_menu_save_file));
-	action = Gtk::Action::create("SaveBoard", Gtk::Stock::SAVE, _("Save Board"));
-	action->set_tooltip(_("Save board to a png file"));
-	action_group->add(action,
-			sigc::mem_fun(*this, &MainWindow::on_menu_save_board_to_png));
+	GtkWidget* file_menu = gtk_menu_new();
+	GtkWidget* file_root = gtk_menu_item_new_with_mnemonic(_("_File"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_root), file_menu);
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Open file"), G_CALLBACK(menu_open_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Save as"), G_CALLBACK(menu_save_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Save Board"), G_CALLBACK(menu_save_board_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), gtk_separator_menu_item_new());
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("_Quit"), G_CALLBACK(menu_quit_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file_root);
 
-	action_group->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
-			sigc::mem_fun(*this, &MainWindow::on_menu_file_quit));
+	GtkWidget* view_menu = gtk_menu_new();
+	GtkWidget* view_root = gtk_menu_item_new_with_mnemonic(_("_View"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_root), view_menu);
+	gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), create_menu_item(_("_Switch colour"), G_CALLBACK(menu_rev_play_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), create_menu_item(_("_Preferences"), G_CALLBACK(menu_preferences_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), view_root);
 
-	//View menu:
-	action_group->add(Gtk::Action::create("ViewMenu", _("_View")));
+	GtkWidget* game_menu = gtk_menu_new();
+	GtkWidget* game_root = gtk_menu_item_new_with_mnemonic(_("_Game"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(game_root), game_menu);
+	gtk_menu_shell_append(GTK_MENU_SHELL(game_menu), create_menu_item(_("_Fight to AI"), G_CALLBACK(menu_war_ai_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(game_menu), create_menu_item(_("Free Play"), G_CALLBACK(menu_free_play_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), game_root);
 
-
-	action_group->add(Gtk::Action::create("ViewPreferences", Gtk::Stock::PREFERENCES),
-			sigc::mem_fun(*this, &MainWindow::on_menu_view_preferences));
-
-	//Game menu:
-	action_group->add(Gtk::Action::create("GameMenu",_("_Game")));
-	action_group->add(Gtk::Action::create("WarAI",Gtk::Stock::MEDIA_PLAY,_("_Fight to AI")),
-			sigc::mem_fun(*this, &MainWindow::on_menu_war_to_ai));
-	action_group->add(Gtk::Action::create("FreePlay",Gtk::Stock::MEDIA_PLAY,_("Free Play")),
-			sigc::mem_fun(*this, &MainWindow::on_menu_free_play));
-	action_group->add(Gtk::Action::create("RevPlay",Gtk::Stock::MEDIA_PLAY,_("_Switch colour")),
-			sigc::mem_fun(*this, &MainWindow::on_menu_rev_play));
-	//Help menu:
-	action_group->add(Gtk::Action::create("HelpMenu", _("_Help")));
-	action_group->add(Gtk::Action::create("Help", Gtk::Stock::HELP),
-			sigc::mem_fun(*this, &MainWindow::on_menu_help));
-	action_group->add(Gtk::Action::create("About", Gtk::Stock::ABOUT),
-			sigc::mem_fun(*this, &MainWindow::on_menu_about));
-
-	if (!ui_manager)
-		ui_manager = Gtk::UIManager::create();
-
-	ui_manager->insert_action_group(action_group);
-	add_accel_group(ui_manager->get_accel_group());
-	ui_manager->add_ui_from_string(ui_info);
-
+	GtkWidget* help_menu = gtk_menu_new();
+	GtkWidget* help_root = gtk_menu_item_new_with_mnemonic(_("_Help"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(help_root), help_menu);
+	gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), create_menu_item(_("_Help"), G_CALLBACK(menu_help_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), create_menu_item(_("_About"), G_CALLBACK(menu_about_cb)));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), help_root);
 }
 
 void MainWindow::on_menu_save_board_to_png()
@@ -449,288 +535,235 @@ void MainWindow::on_menu_save_board_to_png()
 
 void MainWindow::on_menu_save_file()
 {
+	GtkWidget* dlg = gtk_file_chooser_dialog_new(_("Save File"), gobj(),
+			GTK_FILE_CHOOSER_ACTION_SAVE,
+			_("_Cancel"), GTK_RESPONSE_CANCEL,
+			_("_Save"), GTK_RESPONSE_OK,
+			NULL);
 
-	Gtk::FileChooserDialog dlg(*this,
-			_("Save File"),
-			Gtk::FILE_CHOOSER_ACTION_SAVE);
-	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	dlg.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
-
-	std::string filename ;
-	if (Gtk::RESPONSE_OK == dlg.run()) {
-		filename = dlg.get_filename();
-	}
-	if (filename.empty())
-		return;
-
-
-	std::ofstream  file;
-	file.open(filename.c_str());
-	if(!file){
-		DLOG("open %s file error\n",filename.c_str());
-		return ;
-	}
-
-	Gtk::TreeModel::Children children =  m_refTreeModel->children();
-	Gtk::TreeModel::iterator iter ;
-	for(iter = children.begin();iter!= children.end();iter++){
-
-		file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] ;
-		iter++;
-		if(iter!=children.end())
-			file<<"  "<<(*iter)[m_columns.step_line]<<std::endl;
-		else{
-			file<<std::endl;
-			break;
+	std::string filename;
+	if(gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_OK) {
+		char* chosen = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+		if(chosen) {
+			filename = chosen;
+			g_free(chosen);
 		}
 	}
+	gtk_widget_destroy(dlg);
+	if(filename.empty())
+		return;
 
+	std::ofstream file(filename.c_str());
+	if(!file) {
+		DLOG("open %s file error\n", filename.c_str());
+		return;
+	}
+
+	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
+	GtkTreeIter iter;
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
+	while(valid) {
+		gint bout = 0;
+		gchar* line = NULL;
+		gtk_tree_model_get(model, &iter, COL_STEP_BOUT, &bout, COL_STEP_LINE, &line, -1);
+		file << bout << ". " << (line ? line : "");
+		g_free(line);
+
+		valid = gtk_tree_model_iter_next(model, &iter);
+		if(valid) {
+			gtk_tree_model_get(model, &iter, COL_STEP_LINE, &line, -1);
+			file << "  " << (line ? line : "") << std::endl;
+			g_free(line);
+			valid = gtk_tree_model_iter_next(model, &iter);
+		}
+		else {
+			file << std::endl;
+		}
+	}
 	file.close();
-
 }
 
 void MainWindow::auto_save_chess_file()
 {
-	std::string homedir=Glib::get_user_config_dir();
+	std::string homedir = g_get_user_config_dir();
 	homedir += "/gmchess/files/";
 
 	char time1[200];
 	char time2[200];
-	time_t now;
-	struct tm *tmp;
-
-	now = time(NULL);
-	tmp = localtime(&now);
+	time_t now = time(NULL);
+	struct tm* tmp = localtime(&now);
 	strftime(time1, sizeof(time1), "%Y-%m-%d-%H-%M-", tmp);
 	strftime(time2, sizeof(time2), "%Y.%m.%d", tmp);
-	std::string name = p1_name->get_text()+"-"+p2_name->get_text()+".pgn";
+
+	const char* p1 = gtk_label_get_text(p1_name);
+	const char* p2 = gtk_label_get_text(p2_name);
+	std::string name = std::string(p1) + "-" + p2 + ".pgn";
 	std::string filename = homedir + std::string(time1) + name;
 
-	std::ofstream  file;
-	file.open(filename.c_str());
-	if(!file){
-		DLOG("open %s file error\n",filename.c_str());
-		return ;
+	std::ofstream file(filename.c_str());
+	if(!file) {
+		DLOG("open %s file error\n", filename.c_str());
+		return;
 	}
 
-	file<<"[Game \"Chese chess Play by GMChess\"]"<<std::endl;
-	file<<"[Date \""<<std::string(time2)<<"\"]"<<std::endl;
-	file<<"[Red \""<<p1_name->get_text()<<"\"]"<<std::endl;
-	file<<"[Black \""<<p2_name->get_text()<<"\"]"<<std::endl;
+	file << "[Game \"Chese chess Play by GMChess\"]" << std::endl;
+	file << "[Date \"" << std::string(time2) << "\"]" << std::endl;
+	file << "[Red \"" << p1 << "\"]" << std::endl;
+	file << "[Black \"" << p2 << "\"]" << std::endl;
 
-	Gtk::TreeModel::Children children =  m_refTreeModel->children();
-	Gtk::TreeModel::iterator iter ;
-	for(iter = children.begin();iter!= children.end();iter++){
+	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
+	GtkTreeIter iter;
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
+	while(valid) {
+		gint bout = 0;
+		gchar* line = NULL;
+		gtk_tree_model_get(model, &iter, COL_STEP_BOUT, &bout, COL_STEP_LINE, &line, -1);
+		file << bout << ". " << (line ? line : "");
+		g_free(line);
 
-		file<<(*iter)[m_columns.step_bout] <<". "<<(*iter)[m_columns.step_line] ;
-		iter++;
-		if(iter!=children.end())
-			file<<"  "<<(*iter)[m_columns.step_line]<<std::endl;
-		else{
-			file<<std::endl;
-			break;
+		valid = gtk_tree_model_iter_next(model, &iter);
+		if(valid) {
+			gtk_tree_model_get(model, &iter, COL_STEP_LINE, &line, -1);
+			file << "  " << (line ? line : "") << std::endl;
+			g_free(line);
+			valid = gtk_tree_model_iter_next(model, &iter);
+		}
+		else {
+			file << std::endl;
 		}
 	}
-
 	file.close();
-
-
 }
 
-
-void MainWindow:: on_menu_open_file()
+void MainWindow::on_menu_open_file()
 {
-	Gtk::FileChooserDialog dlg(*this,
-			_("Choose File"),
-			Gtk::FILE_CHOOSER_ACTION_OPEN);
-	dlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	dlg.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+	GtkWidget* dlg = gtk_file_chooser_dialog_new(_("Choose File"), gobj(),
+			GTK_FILE_CHOOSER_ACTION_OPEN,
+			_("_Cancel"), GTK_RESPONSE_CANCEL,
+			_("_Open"), GTK_RESPONSE_OK,
+			NULL);
+	GtkFileChooser* chooser = GTK_FILE_CHOOSER(dlg);
+	add_file_filter(chooser, "PGN", "*.pgn", "*.PGN");
+	add_file_filter(chooser, "CCM", "*.ccm", "*.CCM");
+	add_file_filter(chooser, "CHE", "*.che", "*.CHE");
+	add_file_filter(chooser, "CHN", "*.chn", "*.CHN");
+	add_file_filter(chooser, "MXQ", "*.mxq", "*.MXQ");
+	add_file_filter(chooser, "XQF", "*.xqf", "*.XQF");
+	GtkFileFilter* filter_any = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter_any, _("All Files"));
+	gtk_file_filter_add_pattern(filter_any, "*");
+	gtk_file_chooser_add_filter(chooser, filter_any);
 
-	Glib::RefPtr<Gtk::FileFilter> filter_pgn = Gtk::FileFilter::create ();
-	filter_pgn->set_name("PGN");
-	filter_pgn->add_pattern("*.pgn");
-	filter_pgn->add_pattern("*.PGN");
-	dlg.add_filter(filter_pgn);
-	/** 中游象棋*/
-	Glib::RefPtr<Gtk::FileFilter> filter_ccm = Gtk::FileFilter::create ();
-	filter_ccm->set_name("CCM");
-	filter_ccm->add_pattern("*.ccm");
-	filter_ccm->add_pattern("*.CCM");
-	dlg.add_filter(filter_ccm);
-	/** QQ象棋*/
-	Glib::RefPtr<Gtk::FileFilter> filter_che = Gtk::FileFilter::create ();
-	filter_che->set_name("CHE");
-	filter_che->add_pattern("*.che");
-	filter_che->add_pattern("*.CHE");
-	dlg.add_filter(filter_che);
-	/** 联众象棋*/
-	Glib::RefPtr<Gtk::FileFilter> filter_chn = Gtk::FileFilter::create ();
-	filter_chn->set_name("CHN");
-	filter_chn->add_pattern("*.chn");
-	filter_chn->add_pattern("*.CHN");
-	dlg.add_filter(filter_chn);
-
-	/** 弈天象棋*/
-	Glib::RefPtr<Gtk::FileFilter> filter_mxq = Gtk::FileFilter::create ();
-	filter_mxq->set_name("MXQ");
-	filter_mxq->add_pattern("*.mxq");
-	filter_mxq->add_pattern("*.MXQ");
-	dlg.add_filter(filter_mxq);
-	/** 象棋演播室*/
-  Glib::RefPtr<Gtk::FileFilter> filter_xqf = Gtk::FileFilter::create ();
-	filter_xqf->set_name("XQF");
-	filter_xqf->add_pattern("*.xqf");
-	filter_xqf->add_pattern("*.XQF");
-	dlg.add_filter(filter_xqf);
-	/** 所有文件*/
-	//Gtk::FileFilter filter_any;
-	Glib::RefPtr<Gtk::FileFilter> filter_any = Gtk::FileFilter::create ();
-	filter_any->set_name(_("All Files"));
-	filter_any->add_pattern("*");
-	dlg.add_filter(filter_any);
-
-	std::string filename ;
-	if (Gtk::RESPONSE_OK == dlg.run()) {
-		filename = dlg.get_filename();
+	std::string filename;
+	if(gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_OK) {
+		char* chosen = gtk_file_chooser_get_filename(chooser);
+		if(chosen) {
+			filename = chosen;
+			g_free(chosen);
+		}
 	}
-	if (filename.empty())
-		return;
-	open_file(filename);
+	gtk_widget_destroy(dlg);
+	if(!filename.empty())
+		open_file(filename);
 }
 
 void MainWindow::open_file(const std::string& filename)
 {
-    if (board->is_fight_to_robot()) {
-        Gtk::MessageDialog dialog(*this, _("AI Warn"), false,
-                Gtk::MESSAGE_QUESTION,
-                Gtk::BUTTONS_OK_CANCEL);
-        Glib::ustring msg =_("Open book view will close the AI game. Are you sure?");
-        dialog.set_secondary_text(msg);
+	if(board->is_fight_to_robot()) {
+		gint result = run_message_dialog(gobj(), _("AI Warn"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL,
+				_("Open book view will close the AI game. Are you sure?"));
+		if(result == GTK_RESPONSE_OK)
+			board->free_game();
+		else
+			return;
+	}
 
-        int result = dialog.run();
-        switch (result) {
-            case (Gtk::RESPONSE_OK): {
-                board->free_game();
-                break;
-            }
-            case (Gtk::RESPONSE_CANCEL): {
-                return;
-                break;
-            }
-            default: {
-                return;
-                break;
-            }
-        } /* switch */
-    } /* if */
+	int out;
+	std::string::size_type const pos = filename.find(".pgn");
+	if(pos == std::string::npos) {
+		std::string const convert_cmdline = "convert_pgn \"" + filename + "\"";
+		if(system(convert_cmdline.c_str()) < 0) {
+			DLOG("convert pgn file error\n");
+			return;
+		}
+		out = board->open_file("/tmp/gmchess.pgn");
+	}
+	else {
+		out = board->open_file(filename);
+	}
 
-    /** 获取文件后先它将它转换成pgn文件才能打开*/
-    /** get the file, convert it to pgn file */
-    int out;
-    std::string::size_type const pos = filename.find(".pgn");
-
-    if (pos == std::string::npos) {
-        /* Not a pgn file, we should convert it */
-        std::string const convert_cmdline = \
-                "convert_pgn \"" + \
-                filename + \
-                "\"";
-        if (system(convert_cmdline.c_str()) < 0) {
-            DLOG("convert pgn file error\n");
-            return; // XXX: study this
-        }
-
-        out = board->open_file("/tmp/gmchess.pgn");
-    } else {
-        out = board->open_file( filename);
-    }
-
-    if (out < 0) {
-        DLOG("open file: %s error\n",filename.c_str());
-        Gtk::MessageDialog dialog("Error", false, Gtk::MESSAGE_INFO);
-        dialog.set_secondary_text(_("the file maybe not right format for chess"));
-        dialog.run();
-    } else {
-        init_move_treeview();
-        set_information();
-        m_notebook->set_current_page(0);
-    }
+	if(out < 0) {
+		DLOG("open file: %s error\n", filename.c_str());
+		run_message_dialog(gobj(), "Error", GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+				_("the file maybe not right format for chess"));
+	}
+	else {
+		init_move_treeview();
+		set_information();
+		gtk_notebook_set_current_page(m_notebook, 0);
+	}
 }
-
 
 void MainWindow::info_window(const std::string& info)
 {
-    Gtk::MessageDialog dialog("Info",false,
-            Gtk::MESSAGE_INFO);
-    dialog.set_secondary_text(info);
-    dialog.run();
+	run_message_dialog(gobj(), "Info", GTK_MESSAGE_INFO, GTK_BUTTONS_OK, info);
 }
-
 
 void MainWindow::on_menu_war_to_ai()
 {
-    on_begin_game();
+	on_begin_game();
 }
 
 void MainWindow::on_menu_free_play()
 {
 	board->free_game();
-	m_refTreeModel->clear();
+	gtk_list_store_clear(m_refTreeModel);
 	set_status();
 }
+
 void MainWindow::on_menu_rev_play()
 {
 	board->rev_game();
-
 }
 
 void MainWindow::on_menu_file_quit()
 {
-	if(board->get_status() == NETWORK_STATUS){
+	if(board->get_status() == NETWORK_STATUS)
 		board->send_to_socket("close");
-	}
-	Gtk::Main::quit();
-
+	if(window)
+		gtk_widget_destroy(window);
 }
-bool MainWindow::on_delete_event(GdkEventAny* event)
+
+gboolean MainWindow::on_delete_event(GdkEventAny*)
 {
-	if(board->get_status() == NETWORK_STATUS){
-		Gtk::MessageDialog dialog(*this, _("Warning"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-		Glib::ustring msg =_("Are you  sure to close the network game?");
-		dialog.set_secondary_text(msg);
-		int result = dialog.run();
-		switch (result) {
-			case (Gtk::RESPONSE_OK): {
-				board->send_to_socket("close");
-                	        break;
-                	}
-
-			case (Gtk::RESPONSE_CANCEL): {
-			     return true;
-                	        break;
-                	}
-
-			default: {
-			     return true;
-                	        break;
-                	}
-		}
+	if(board->get_status() == NETWORK_STATUS) {
+		gint result = run_message_dialog(gobj(), _("Warning"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL,
+				_("Are you  sure to close the network game?"));
+		if(result == GTK_RESPONSE_OK)
+			board->send_to_socket("close");
+		else
+			return TRUE;
 	}
-
-	return Gtk::Window::on_delete_event(event);
-
+	return FALSE;
 }
 
 void MainWindow::on_menu_view_preferences()
 {
-	if(NULL == confwindow){
-		confwindow = new ConfWindow(this);
-		confwindow->signal_quit().connect(sigc::mem_fun(*this, &MainWindow::on_conf_window_quit));
+	if(confwindow == NULL) {
+		confwindow = new ConfWindow(gobj());
+		confwindow->set_quit_callback([this]() {
+				on_conf_window_quit();
+				});
+		confwindow->set_close_callback([this]() {
+				on_conf_window_close();
+				});
 		confwindow->raise();
-	}else
+	}
+	else {
 		confwindow->raise();
+	}
 }
 
 void MainWindow::on_conf_window_quit()
@@ -743,490 +776,403 @@ void MainWindow::on_conf_window_quit()
 		board->set_board_size(SMALL_BOARD);
 	board->set_themes(GMConf["themes"]);
 }
+
 void MainWindow::on_conf_window_close()
 {
-	if(NULL !=confwindow){
+	if(confwindow != NULL) {
 		delete confwindow;
-		confwindow=NULL;
+		confwindow = NULL;
 	}
-
 }
+
 void MainWindow::on_menu_help()
 {
-    Gtk::MessageDialog dialog(*this, _("Function not implemented yet"));
-    dialog.run();
+	run_message_dialog(gobj(), _("Function not implemented yet"), GTK_MESSAGE_INFO,
+			GTK_BUTTONS_OK, "");
 }
-
 
 void MainWindow::on_menu_about()
 {
-	static Gtk::AboutDialog*  about(0);
-	if(about == 0){
-		std::vector<Glib::ustring> authors;
-		authors.push_back("lerosua@gmail.com ");
-		authors.push_back("wind(xihels@gmail.com)");
-		about = new Gtk::AboutDialog ;
-		about->set_logo(ui_logo);
-		if(GTKMM_MAJOR_VERSION==2 && GTKMM_MINOR_VERSION>=12)
-			about->set_program_name("GMChess");
-		about->set_version(PACKAGE_VERSION);
-		about->set_website("https://lerosua.github.io");
-		about->set_copyright("Copyright (c) 2009 - 2011 lerosua");
-		about->set_comments(_("GMChess is a Chinese chess game written in gtkmm."));
-		about->set_authors(authors);
-		about->set_license (_("This program is licensed under GNU General Public Licence (GPL) version 2."));
-		Glib::ustring transer = "zh_CN lerosua@gmail.com\nru Sadovnikov Dmitry <xbadcode@mail.ru>";
-		about->set_translator_credits(transer);
-
-
-	}
-	about->run();
-	delete about;
-	about=0;
-
+	const gchar* authors[] = {
+		"lerosua@gmail.com ",
+		"wind(xihels@gmail.com)",
+		NULL
+	};
+	GtkWidget* about = gtk_about_dialog_new();
+	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(about), ui_logo);
+	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(about), "GMChess");
+	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about), PACKAGE_VERSION);
+	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about), "https://lerosua.github.io");
+	gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(about),
+			"Copyright (c) 2009 - 2011 lerosua");
+	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(about),
+			_("GMChess is a Chinese chess game written with GTK."));
+	gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(about), authors);
+	gtk_about_dialog_set_license(GTK_ABOUT_DIALOG(about),
+			_("This program is licensed under GNU General Public Licence (GPL) version 2."));
+	gtk_about_dialog_set_translator_credits(GTK_ABOUT_DIALOG(about),
+			"zh_CN lerosua@gmail.com\nru Sadovnikov Dmitry <xbadcode@mail.ru>");
+	gtk_window_set_transient_for(GTK_WINDOW(about), gobj());
+	gtk_dialog_run(GTK_DIALOG(about));
+	gtk_widget_destroy(about);
 }
 
-void MainWindow::add_step_line(int num,const Glib::ustring& f_line)
+void MainWindow::add_step_line(int num, const std::string& f_line)
 {
-	Gtk::TreeModel::iterator iter = m_refTreeModel->append();
-	(*iter)[m_columns.step_line] = f_line;
-	(*iter)[m_columns.step_num] = num;
-	(*iter)[m_columns.step_bout] = (int)((num+1)/2);
-	if((num%2) ==0){
-		(*iter)[m_columns.player] = _("Black");
-	}
-	else{
-		(*iter)[m_columns.player] = _("Red");
-	}
+	GtkTreeIter iter;
+	gtk_list_store_append(m_refTreeModel, &iter);
+	gtk_list_store_set(m_refTreeModel, &iter,
+			COL_STEP_LINE, f_line.c_str(),
+			COL_STEP_NUM, num,
+			COL_STEP_BOUT, (int)((num + 1) / 2),
+			COL_PLAYER, (num % 2) == 0 ? _("Black") : _("Red"),
+			-1);
 
-	Gtk::TreeModel::Path path(iter);
-	m_treeview.scroll_to_row(path);
+	GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(m_refTreeModel), &iter);
+	gtk_tree_view_scroll_to_cell(m_treeview, path, NULL, FALSE, 0, 0);
+	gtk_tree_path_free(path);
 }
 
 void MainWindow::del_step_last_line()
 {
-	Gtk::TreeModel::iterator iter = m_refTreeModel->children().end();
-	iter--;
-	m_refTreeModel->erase(*iter);
+	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
+	GtkTreeIter iter;
+	if(!gtk_tree_model_get_iter_first(model, &iter))
+		return;
 
+	GtkTreeIter last = iter;
+	while(gtk_tree_model_iter_next(model, &iter))
+		last = iter;
+	gtk_list_store_remove(m_refTreeModel, &last);
 }
 
 void MainWindow::init_move_treeview()
 {
-	m_refTreeModel->clear();
-
-	const std::vector<std::string>&  move_chinese = board->get_move_chinese_snapshot();
-	std::vector<std::string>::const_iterator iter;
-	iter = move_chinese.begin();
-	for(int i=1;iter != move_chinese.end(); iter++,i++)
-		add_step_line(i,Glib::ustring(*iter));
-
-}
-
-bool MainWindow::on_treeview_click(GdkEventButton* ev)
-{
-
-	if(board->is_fight_to_robot())
-		return true;
-
-	Glib::RefPtr<Gtk::TreeSelection> selection = m_treeview.get_selection();
-	Gtk::TreeModel::iterator iter  = selection->get_selected();
-	if(!selection->count_selected_rows())
-		return false;
-	Gtk::TreeModel::Path path(iter);
-	Gtk::TreeViewColumn* tvc;
-	int cx, cy;
-
-	if(!m_treeview.get_path_at_pos((int) ev->x, (int) ev->y, path, tvc, cx, cy))
-		return false;;
-
-	if(ev->type == GDK_2BUTTON_PRESS){ // TODO: alias to GDK_DOUBLE_BUTTON_PRESS
-		int num = (*iter)[m_columns.step_num];
-		board->get_board_by_move(num);
-
-		return true;
+	if(m_treeview == NULL) {
+		GtkWidget* scrolwin = builder_widget("scrolledwindow");
+		m_refTreeModel = gtk_list_store_new(N_STEP_COLUMNS,
+				G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING);
+		m_treeview = GTK_TREE_VIEW(gtk_tree_view_new());
+		gtk_tree_view_set_model(m_treeview, GTK_TREE_MODEL(m_refTreeModel));
+		gtk_container_add(GTK_CONTAINER(scrolwin), GTK_WIDGET(m_treeview));
+		gtk_tree_view_insert_column_with_attributes(m_treeview,
+				-1, _("Turn"), gtk_cell_renderer_text_new(), "text", COL_STEP_BOUT, NULL);
+		gtk_tree_view_insert_column_with_attributes(m_treeview,
+				-1, "  ", gtk_cell_renderer_text_new(), "text", COL_PLAYER, NULL);
+		gtk_tree_view_insert_column_with_attributes(m_treeview,
+				-1, _("Move"), gtk_cell_renderer_text_new(), "text", COL_STEP_LINE, NULL);
+		gtk_widget_add_events(GTK_WIDGET(m_treeview), GDK_BUTTON_PRESS_MASK);
+		g_signal_connect(m_treeview, "button-press-event", G_CALLBACK(tree_button_cb), this);
+		gtk_widget_show(GTK_WIDGET(m_treeview));
+		set_status();
+		return;
 	}
 
-	return false;
+	gtk_list_store_clear(m_refTreeModel);
+	const std::vector<std::string>& move_chinese = board->get_move_chinese_snapshot();
+	for(std::vector<std::string>::const_iterator iter = move_chinese.begin();
+			iter != move_chinese.end(); ++iter) {
+		add_step_line((int)(iter - move_chinese.begin()) + 1, *iter);
+	}
 }
 
+gboolean MainWindow::on_treeview_click(GdkEventButton* ev)
+{
+	if(board->is_fight_to_robot())
+		return TRUE;
 
+	GtkTreePath* path = NULL;
+	GtkTreeViewColumn* tvc = NULL;
+	int cx, cy;
+	if(!gtk_tree_view_get_path_at_pos(m_treeview, (int)ev->x, (int)ev->y,
+				&path, &tvc, &cx, &cy))
+		return FALSE;
+
+	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
+	GtkTreeIter iter;
+	if(!gtk_tree_model_get_iter(model, &iter, path)) {
+		gtk_tree_path_free(path);
+		return FALSE;
+	}
+
+	GtkTreeSelection* selection = gtk_tree_view_get_selection(m_treeview);
+	gtk_tree_selection_select_iter(selection, &iter);
+
+	if(ev->type == GDK_2BUTTON_PRESS) {
+		gint num = 0;
+		gtk_tree_model_get(model, &iter, COL_STEP_NUM, &num, -1);
+		board->get_board_by_move(num);
+		gtk_tree_path_free(path);
+		return TRUE;
+	}
+
+	gtk_tree_path_free(path);
+	return FALSE;
+}
 
 void MainWindow::set_information()
 {
-	Gtk::Label* info   = 0;ui_xml->get_widget("info_label",info);
+	GtkLabel* info = GTK_LABEL(builder_widget("info_label"));
 
 	const Board_info& board_info = board->get_board_info();
-	p1_name->set_label(board_info.black);
-	p2_name->set_label(board_info.red);
-	Glib::ustring text = Glib::ustring(_("Game: ")) +board_info.event+"\n";
-	text = text + _("Time: ")+board_info.date+"\n";
-	text = text + _("Site: ")+board_info.site+"\n";
-	text = text + _("Result: ")+board_info.result+"\n";
-	text = text + _("Opening: ")+board_info.opening+"\n";
-	text = text + _("Variation:  ")+board_info.variation+"\n";
-	info->set_label(text);
-	info->set_ellipsize(Pango::ELLIPSIZE_END);
+	gtk_label_set_text(p1_name, board_info.black.c_str());
+	gtk_label_set_text(p2_name, board_info.red.c_str());
+	std::string text = std::string(_("Game: ")) + board_info.event + "\n";
+	text += std::string(_("Time: ")) + board_info.date + "\n";
+	text += std::string(_("Site: ")) + board_info.site + "\n";
+	text += std::string(_("Result: ")) + board_info.result + "\n";
+	text += std::string(_("Opening: ")) + board_info.opening + "\n";
+	text += std::string(_("Variation:  ")) + board_info.variation + "\n";
+	gtk_label_set_text(info, text.c_str());
+	gtk_label_set_ellipsize(info, PANGO_ELLIPSIZE_END);
 	set_status();
-
 }
-
 
 void MainWindow::set_status()
 {
 	int f_status = board->get_status();
-	bool f_use=1;
+	bool f_use = true;
 
-	switch(f_status){
+	switch(f_status) {
 		case READ_STATUS:
-			btn_next->set_sensitive(f_use);
-			btn_prev->set_sensitive(f_use);
-			btn_start->set_sensitive(f_use);
-			btn_end->set_sensitive(f_use);
-
-			btn_begin->set_sensitive(f_use);
-			btn_lose->set_sensitive(1-f_use);
-			btn_draw->set_sensitive(1-f_use);
-			btn_rue->set_sensitive(1-f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_next), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_prev), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_start), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_end), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_lose), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_draw), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_rue), !f_use);
 			break;
 		case FIGHT_STATUS:
 		case NETWORK_STATUS:
-			btn_next->set_sensitive(1-f_use);
-			btn_prev->set_sensitive(1-f_use);
-			btn_start->set_sensitive(1-f_use);
-			btn_end->set_sensitive(1-f_use);
-
-			btn_begin->set_sensitive(1-f_use);
-			btn_lose->set_sensitive(f_use);
-			btn_draw->set_sensitive(f_use);
-			btn_rue->set_sensitive(f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_next), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_prev), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_start), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_end), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_lose), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_draw), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_rue), f_use);
 			break;
 		case FREE_STATUS:
-			btn_next->set_sensitive(f_use);
-			btn_prev->set_sensitive(f_use);
-			btn_start->set_sensitive(f_use);
-			btn_end->set_sensitive(f_use);
-
-			btn_begin->set_sensitive(f_use);
-			btn_lose->set_sensitive(1-f_use);
-			btn_draw->set_sensitive(1-f_use);
-			btn_rue->set_sensitive(1-f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_next), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_prev), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_start), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_end), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_lose), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_draw), !f_use);
+			gtk_widget_set_sensitive(GTK_WIDGET(btn_rue), !f_use);
 			break;
 		default:
 			break;
 	};
-
 }
 
-void MainWindow::on_network_game(const std::string& me_name,const std::string& enemy_name,bool role_red_)
+void MainWindow::on_network_game(const std::string& me_name, const std::string& enemy_name,
+		bool role_red_)
 {
-		p1_name->set_text(enemy_name);
-		p2_name->set_text(me_name);
-	if(!role_red_){
+	gtk_label_set_text(p1_name, enemy_name.c_str());
+	gtk_label_set_text(p2_name, me_name.c_str());
+	if(!role_red_)
 		board->rev_game();
-	}
 
-	m_refTreeModel->clear();
+	gtk_list_store_clear(m_refTreeModel);
 	board->start_network();
 	set_status();
-	btn_begin->set_sensitive(false);
-
-
+	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);
 }
 
 void MainWindow::on_chanju_game()
 {
-	/** 已经在对战中，则询问是否开始新游戏*/
-	/** ask if start new game */
-	if(board->is_fight_to_robot()){
-
-		Gtk::MessageDialog dialog(*this, _("new game"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-		Glib::ustring msg =_("Will you start a new game?");
-		dialog.set_secondary_text(msg);
-		int result = dialog.run();
-		switch (result) {
-			case (Gtk::RESPONSE_OK): {
-				m_refTreeModel->clear();
-				board->chanju_game();
-                	        break;
-                	}
-
-			case (Gtk::RESPONSE_CANCEL): {
-                	        break;
-                	}
-
-			default: {
-                	        break;
-                	}
+	if(board->is_fight_to_robot()) {
+		gint result = run_message_dialog(gobj(), _("new game"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL, _("Will you start a new game?"));
+		if(result == GTK_RESPONSE_OK) {
+			gtk_list_store_clear(m_refTreeModel);
+			board->chanju_game();
 		}
 		return;
-
 	}
-	else if(board->is_network_game()){
-		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
-		Glib::ustring msg =_("You are play online, Please end this game first!");
-		dialog_info.set_secondary_text(msg);
-		dialog_info.run();
-		return ;
-
+	else if(board->is_network_game()) {
+		run_message_dialog(gobj(), _("Information"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+				_("You are play online, Please end this game first!"));
+		return;
 	}
-	m_refTreeModel->clear();
+	gtk_list_store_clear(m_refTreeModel);
 	board->start_robot(false);
 	set_status();
-	btn_begin->set_sensitive(false);
-	//btn_chanjue->set_sensitive(false);
-
-
+	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);
 }
 
 void MainWindow::on_begin_game()
 {
-	/** 已经在对战中，则询问是否开始新游戏*/
-	/** ask if start new game */
-	if(board->is_fight_to_robot()){
-
-		Gtk::MessageDialog dialog(*this, _("new game"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-		Glib::ustring msg =_("Will you start a new game?");
-		dialog.set_secondary_text(msg);
-		int result = dialog.run();
-		switch (result) {
-			case (Gtk::RESPONSE_OK): {
-				m_refTreeModel->clear();
-				board->new_game();
-                	        break;
-                	}
-
-			case (Gtk::RESPONSE_CANCEL): {
-                	        break;
-                	}
-
-			default: {
-                	        break;
-                	}
+	if(board->is_fight_to_robot()) {
+		gint result = run_message_dialog(gobj(), _("new game"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL, _("Will you start a new game?"));
+		if(result == GTK_RESPONSE_OK) {
+			gtk_list_store_clear(m_refTreeModel);
+			board->new_game();
 		}
 		return;
-
 	}
-	else if(board->is_network_game()){
-		Gtk::MessageDialog dialog_info(*this, _("Information"), false);
-		Glib::ustring msg =_("You are playing online, Please end this game first!");
-		dialog_info.set_secondary_text(msg);
-		dialog_info.run();
-		return ;
-
+	else if(board->is_network_game()) {
+		run_message_dialog(gobj(), _("Information"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+				_("You are playing online, Please end this game first!"));
+		return;
 	}
-	m_refTreeModel->clear();
+	gtk_list_store_clear(m_refTreeModel);
 	board->start_robot();
 	set_status();
-	btn_begin->set_sensitive(false);
+	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);
 }
 
 void MainWindow::on_lose_game()
 {
-
-    if(board->is_fight_to_robot()){
-        Gtk::MessageDialog dialog(*this, _("be lose"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-        Glib::ustring msg =_("Will you resign in this game?");
-        dialog.set_secondary_text(msg);
-        int result =dialog.run();
-        switch (result) {
-            case (Gtk::RESPONSE_OK): {
-                //m_refTreeModel->clear();
-                board->free_game();
-                set_status();
-                            break;
-                    }
-
-            case (Gtk::RESPONSE_CANCEL): {
-                //board->free_game(false);
-                //set_status();
-                            break;
-                    }
-
-            default: {
-                            break;
-                    }
-        }
-        return;
-    }
-    else if(board->is_network_game()){
-
-        Gtk::MessageDialog dialog(*this, _("be lose"), false,
-                                  Gtk::MESSAGE_QUESTION,
-                                  Gtk::BUTTONS_OK_CANCEL);
-        dialog.set_secondary_text(_("Will you resign in this game?"));
-        int result =dialog.run();
-        switch (result) {
-            case (Gtk::RESPONSE_OK): {
-				board->send_to_socket("resign");
-				Gtk::MessageDialog dialog_info(*this, _("Information"), false);
-				Glib::ustring msg =_("You lose the game!");
-				dialog_info.set_secondary_text(msg);
-				dialog_info.run();
-				board->free_game();
-				set_status();
-                            break;
-				}
-
-            case (Gtk::RESPONSE_CANCEL): {
-                //board->free_game(false);
-                //set_status();
-                            break;
-                    }
-
-            default: {
-                            break;
-                    }
-        }
-    }
-}
-
-/** draw 是打平局面的意思*/
-void MainWindow::on_draw_game()
-{
-    if(board->is_fight_to_robot()){
-		board->draw_move();
-    }
-	else if(board->is_network_game()){
-		if(board->is_human_player()){
-			board->send_to_socket("draw");
-		}else{
-			Gtk::MessageDialog dialog(*this, _("Warning"), false);
-			Glib::ustring msg =_("You may only take a back move when it's your turn. Please wait a minute!");
-			dialog.set_secondary_text(msg);
-			dialog.run();
+	if(board->is_fight_to_robot()) {
+		gint result = run_message_dialog(gobj(), _("be lose"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL, _("Will you resign in this game?"));
+		if(result == GTK_RESPONSE_OK) {
+			board->free_game();
+			set_status();
+		}
+		return;
+	}
+	else if(board->is_network_game()) {
+		gint result = run_message_dialog(gobj(), _("be lose"), GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_OK_CANCEL, _("Will you resign in this game?"));
+		if(result == GTK_RESPONSE_OK) {
+			board->send_to_socket("resign");
+			run_message_dialog(gobj(), _("Information"), GTK_MESSAGE_INFO,
+					GTK_BUTTONS_OK, _("You lose the game!"));
+			board->free_game();
+			set_status();
 		}
 	}
+}
 
+void MainWindow::on_draw_game()
+{
+	if(board->is_fight_to_robot()) {
+		board->draw_move();
+	}
+	else if(board->is_network_game()) {
+		if(board->is_human_player()) {
+			board->send_to_socket("draw");
+		}
+		else {
+			run_message_dialog(gobj(), _("Warning"), GTK_MESSAGE_WARNING,
+					GTK_BUTTONS_OK,
+					_("You may only take a back move when it's your turn. Please wait a minute!"));
+		}
+	}
 }
 
 void MainWindow::on_rue_game()
 {
-	/** 如果是网络对战，则需要确认信息*/
-	/** 设置成只有用户走时才能悔棋，一次撤销两步，即ai的一步，用户的一步，再次轮到用户走
-	 * 这么做是为了防止ai在思考中撤销着法会产生冲突*/
-
-	if(board->is_fight_to_robot()){
-		if(board->is_human_player()){
+	if(board->is_fight_to_robot()) {
+		if(board->is_human_player()) {
 			board->rue_move();
 			board->rue_move();
-		}else{
-			Gtk::MessageDialog dialog(*this, _("Warning"), false);
-			Glib::ustring msg =_("You can only take a back move when it's your turn. Please wait a minute!");
-			dialog.set_secondary_text(msg);
-			dialog.run();
 		}
-
+		else {
+			run_message_dialog(gobj(), _("Warning"), GTK_MESSAGE_WARNING,
+					GTK_BUTTONS_OK,
+					_("You can only take a back move when it's your turn. Please wait a minute!"));
+		}
 	}
-	else if(board->is_network_game()){
-		if(board->is_human_player()){
-			/** 发送了悔棋指令，此时界面不应该能操作，直到对方返回应答，yes/no */
+	else if(board->is_network_game()) {
+		if(board->is_human_player()) {
 			board->send_to_socket("rue");
-		}else{
-			Gtk::MessageDialog dialog(*this, _("Warning"), false);
-			Glib::ustring msg =_("You can only take a back move when it's your turn. Please wait a minute!");
-			dialog.set_secondary_text(msg);
-			dialog.run();
 		}
-
-
+		else {
+			run_message_dialog(gobj(), _("Warning"), GTK_MESSAGE_WARNING,
+					GTK_BUTTONS_OK,
+					_("You can only take a back move when it's your turn. Please wait a minute!"));
+		}
 	}
-
 }
-bool MainWindow::on_end_game(OVERSTATUS _over)
+
+bool MainWindow::on_end_game(OVERSTATUS over)
 {
-	Glib::ustring msg ;
-	switch(_over){
+	std::string msg;
+	switch(over) {
 		case ROBOT_WIN:
-			//robot win
-			msg=_("You Lose!\nDo you want to start a new game?");
+			msg = _("You Lose!\nDo you want to start a new game?");
 			CSound::play(SND_LOSS);
 			break;
 		case ROBOT_LOSE:
-			//robot lose
-			msg=_("Congratuations, YOU WIN!\nTo start a new game, click OK");
+			msg = _("Congratuations, YOU WIN!\nTo start a new game, click OK");
 			CSound::play(SND_WIN);
 			break;
 		case ROBOT_DRAW:
-			//robot want to draw
-			msg=_("Draw Game!");
+			msg = _("Draw Game!");
 			break;
 		case ROBOT_OVER_TIME:
-			// robot overload time,lose
 			msg = _("The opponent used up their time. You Win!");
 			CSound::play(SND_WIN);
 			break;
 		case HUMAN_OVER_TIME:
 			msg = _("You used up your time. You Lose!");
 			CSound::play(SND_LOSS);
+			break;
 		default:
 			break;
-
 	}
-		Gtk::MessageDialog dialog_info(*this, _("Game Over"), false);
-		dialog_info.set_secondary_text(msg);
-		dialog_info.run();
 
-		if(board->is_network_game())
-			auto_save_chess_file();
-		board->free_game(false);
-		set_status();
-		return true;
+	run_message_dialog(gobj(), _("Game Over"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK, msg);
+
+	if(board->is_network_game())
+		auto_save_chess_file();
+	board->free_game(false);
+	set_status();
+	return true;
 }
 
-void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
+void MainWindow::set_red_war_time(const std::string& f_time, const std::string& c_time)
 {
-
-		p2_war_time->set_text(f_time);
-		p2_step_time->set_text(c_time);
-
-
+	gtk_label_set_text(p2_war_time, f_time.c_str());
+	gtk_label_set_text(p2_step_time, c_time.c_str());
 }
-void MainWindow::set_black_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
+
+void MainWindow::set_black_war_time(const std::string& f_time, const std::string& c_time)
 {
-
-		p1_war_time->set_text(f_time);
-		p1_step_time->set_text(c_time);
+	gtk_label_set_text(p1_war_time, f_time.c_str());
+	gtk_label_set_text(p1_step_time, c_time.c_str());
 }
+
 void MainWindow::watch_socket(int fd)
 {
 	board->watch_socket(fd);
-
 }
+
 void MainWindow::start_with(const std::string& param)
 {
-		if((param.find("network-game-red,"))!= std::string::npos){
-			//start network game with red player
-			std::string enemy_name,my_name;
-			size_t pos_s,pos_e,pos_m;
-			pos_s= param.find("enemy_name:");
-			pos_e= param.find(",my_name:");
-			pos_m= param.find_first_of("@");
-			enemy_name = param.substr(pos_s+11,pos_m-pos_s-11);
-			pos_m = param.find_last_of("@");
-			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
-
-			on_network_game(enemy_name,my_name,true);
-		}else if((param.find("network-game-black,")) != std::string::npos){
-			//start network game with black player
-			std::string enemy_name,my_name;
-			size_t pos_s,pos_e,pos_m;
-			pos_s= param.find("enemy_name:");
-			pos_e= param.find(",my_name:");
-			pos_m= param.find_first_of("@");
-			enemy_name = param.substr(pos_s+11,pos_m-pos_s-11);
-			pos_m = param.find_last_of("@");
-			my_name = param.substr(pos_e+9,pos_m-pos_e-9);
-			on_network_game(my_name,enemy_name,false);
-		}
-		else{
-			if(!param.empty())
-				open_file(param);
-		}
+	if((param.find("network-game-red,")) != std::string::npos) {
+		std::string enemy_name;
+		std::string my_name;
+		size_t pos_s = param.find("enemy_name:");
+		size_t pos_e = param.find(",my_name:");
+		size_t pos_m = param.find_first_of("@");
+		enemy_name = param.substr(pos_s + 11, pos_m - pos_s - 11);
+		pos_m = param.find_last_of("@");
+		my_name = param.substr(pos_e + 9, pos_m - pos_e - 9);
+		on_network_game(enemy_name, my_name, true);
+	}
+	else if((param.find("network-game-black,")) != std::string::npos) {
+		std::string enemy_name;
+		std::string my_name;
+		size_t pos_s = param.find("enemy_name:");
+		size_t pos_e = param.find(",my_name:");
+		size_t pos_m = param.find_first_of("@");
+		enemy_name = param.substr(pos_s + 11, pos_m - pos_s - 11);
+		pos_m = param.find_last_of("@");
+		my_name = param.substr(pos_e + 9, pos_m - pos_e - 9);
+		on_network_game(my_name, enemy_name, false);
+	}
+	else {
+		if(!param.empty())
+			open_file(param);
+	}
 }
