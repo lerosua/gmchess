@@ -1,0 +1,6 @@
+gmchess (0.29.6.4) unstable; urgency=medium
+
+  * Add Debian packaging for Ubuntu deb builds.
+  * Build against GTK4 with Meson.
+
+ -- lerosua <lerosua@gmail.com>  Thu, 28 May 2026 19:20:00 +0800

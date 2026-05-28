@@ -1,0 +1,24 @@
+Source: gmchess
+Section: games
+Priority: optional
+Maintainer: lerosua <lerosua@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ gettext,
+ meson,
+ ninja-build,
+ pkg-config,
+ libgtk-4-dev (>= 4.10)
+Standards-Version: 4.7.0
+Homepage: https://github.com/lerosua/gmchess
+Rules-Requires-Root: no
+
+Package: gmchess
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ alsa-utils
+Description: Chinese chess game for GTK
+ GMChess is a Chinese chess game that supports human-versus-engine play,
+ free play, PGN-style game records, and bundled board themes.
