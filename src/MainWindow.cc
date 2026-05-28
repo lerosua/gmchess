@@ -45,13 +45,36 @@ static GtkWidget* create_message_dialog(GtkWindow* parent, const char* title,
 	return dialog;
 }
 
+struct DialogRunData {
+	GMainLoop* loop;
+	gint response;
+};
+
+static void dialog_response_cb(GtkDialog*, gint response, gpointer data)
+{
+	DialogRunData* run_data = static_cast<DialogRunData*>(data);
+	run_data->response = response;
+	g_main_loop_quit(run_data->loop);
+}
+
+static void native_dialog_response_cb(GtkNativeDialog*, gint response, gpointer data)
+{
+	DialogRunData* run_data = static_cast<DialogRunData*>(data);
+	run_data->response = response;
+	g_main_loop_quit(run_data->loop);
+}
+
 static gint run_message_dialog(GtkWindow* parent, const char* title,
 		GtkMessageType type, GtkButtonsType buttons, const std::string& secondary)
 {
 	GtkWidget* dialog = create_message_dialog(parent, title, type, buttons, secondary);
-	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-	return result;
+	DialogRunData run_data = { g_main_loop_new(NULL, FALSE), GTK_RESPONSE_NONE };
+	g_signal_connect(dialog, "response", G_CALLBACK(dialog_response_cb), &run_data);
+	gtk_window_present(GTK_WINDOW(dialog));
+	g_main_loop_run(run_data.loop);
+	g_main_loop_unref(run_data.loop);
+	gtk_window_destroy(GTK_WINDOW(dialog));
+	return run_data.response;
 }
 
 static GtkFileFilter* add_file_filter(GtkFileChooser* chooser, const char* name,
@@ -65,11 +88,53 @@ static GtkFileFilter* add_file_filter(GtkFileChooser* chooser, const char* name,
 	return filter;
 }
 
-MainWindow::MainWindow()
+static std::string run_file_chooser(GtkWindow* parent, const char* title,
+		GtkFileChooserAction action, const char* accept_label, bool add_filters)
+{
+	GtkFileChooserNative* dlg = gtk_file_chooser_native_new(title, parent, action,
+			accept_label, _("_Cancel"));
+	GtkFileChooser* chooser = GTK_FILE_CHOOSER(dlg);
+	if(add_filters) {
+		add_file_filter(chooser, "PGN", "*.pgn", "*.PGN");
+		add_file_filter(chooser, "CCM", "*.ccm", "*.CCM");
+		add_file_filter(chooser, "CHE", "*.che", "*.CHE");
+		add_file_filter(chooser, "CHN", "*.chn", "*.CHN");
+		add_file_filter(chooser, "MXQ", "*.mxq", "*.MXQ");
+		add_file_filter(chooser, "XQF", "*.xqf", "*.XQF");
+		GtkFileFilter* filter_any = gtk_file_filter_new();
+		gtk_file_filter_set_name(filter_any, _("All Files"));
+		gtk_file_filter_add_pattern(filter_any, "*");
+		gtk_file_chooser_add_filter(chooser, filter_any);
+	}
+
+	DialogRunData run_data = { g_main_loop_new(NULL, FALSE), GTK_RESPONSE_NONE };
+	g_signal_connect(dlg, "response", G_CALLBACK(native_dialog_response_cb), &run_data);
+	gtk_native_dialog_show(GTK_NATIVE_DIALOG(dlg));
+	g_main_loop_run(run_data.loop);
+	g_main_loop_unref(run_data.loop);
+
+	std::string filename;
+	if(run_data.response == GTK_RESPONSE_ACCEPT) {
+		GFile* file = gtk_file_chooser_get_file(chooser);
+		if(file) {
+			char* path = g_file_get_path(file);
+			if(path) {
+				filename = path;
+				g_free(path);
+			}
+			g_object_unref(file);
+		}
+	}
+	g_object_unref(dlg);
+	return filename;
+}
+
+MainWindow::MainWindow(GtkApplication* app)
 	: board(NULL)
 	, ui_xml(NULL)
 	, window(NULL)
 	, menubar(NULL)
+	, action_group(NULL)
 	, m_treeview(NULL)
 	, m_refTreeModel(NULL)
 	, m_bookview(NULL)
@@ -80,12 +145,8 @@ MainWindow::MainWindow()
 	, confwindow(NULL)
 	, ui_logo(NULL)
 {
-	ui_xml = gtk_builder_new_from_file(main_ui);
-	if(!ui_xml)
-		exit(271);
-
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(window, "delete-event", G_CALLBACK(delete_event_cb), this);
+	build_main_ui(app);
+	g_signal_connect(window, "close-request", G_CALLBACK(delete_event_cb), this);
 	g_signal_connect(window, "destroy", G_CALLBACK(window_destroy_cb), this);
 
 	GtkWidget* main_box = builder_widget("main_window");
@@ -115,27 +176,23 @@ MainWindow::MainWindow()
 	g_signal_connect(btn_chanjue, "clicked", G_CALLBACK(button_chanju_cb), this);
 
 	board = new Board(*this);
-	gtk_box_pack_start(GTK_BOX(box_board), board->widget(), TRUE, TRUE, 0);
-
-	gtk_container_add(GTK_CONTAINER(window), main_box);
+	gtk_box_append(GTK_BOX(box_board), board->widget());
 	gtk_window_set_title(GTK_WINDOW(window), _("GMChess"));
 
 	GError* error = NULL;
-	ui_logo = gdk_pixbuf_new_from_file(DATA_DIR"/gmchess.png", &error);
-	if(ui_logo)
-		gtk_window_set_icon(GTK_WINDOW(window), ui_logo);
+	ui_logo = GDK_PAINTABLE(gdk_texture_new_from_filename(DATA_DIR"/gmchess.png", &error));
 	if(error)
 		g_error_free(error);
 
 	init_ui_manager();
 	GtkWidget* menu_tool_box = builder_widget("box_menu_toolbar");
-	gtk_box_pack_start(GTK_BOX(menu_tool_box), menubar, FALSE, FALSE, 0);
+	gtk_box_append(GTK_BOX(menu_tool_box), menubar);
 
 	init_move_treeview();
 
 	GtkWidget* scroll_book = builder_widget("scrolledwin_book");
 	m_bookview = new BookView(this);
-	gtk_container_add(GTK_CONTAINER(scroll_book), m_bookview->widget());
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll_book), m_bookview->widget());
 
 	p1_image = GTK_IMAGE(builder_widget("image_p1"));
 	p2_image = GTK_IMAGE(builder_widget("image_p2"));
@@ -147,9 +204,9 @@ MainWindow::MainWindow()
 	p2_name = GTK_LABEL(builder_widget("P2_name"));
 
 	init_conf();
-	g_signal_connect(board->widget(), "size-allocate", G_CALLBACK(size_allocate_cb), this);
+	g_signal_connect(board->widget(), "resize", G_CALLBACK(board_resize_cb), this);
 
-	gtk_widget_show_all(window);
+	gtk_widget_show(window);
 	gtk_widget_hide(GTK_WIDGET(p1_image));
 	gtk_widget_hide(GTK_WIDGET(p2_image));
 
@@ -188,7 +245,7 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
 	if(window)
-		gtk_widget_destroy(window);
+		gtk_window_destroy(GTK_WINDOW(window));
 	delete confwindow;
 	delete m_bookview;
 	delete board;
@@ -196,23 +253,126 @@ MainWindow::~MainWindow()
 		g_object_unref(m_refTreeModel);
 	if(ui_logo)
 		g_object_unref(ui_logo);
+	if(action_group)
+		g_object_unref(action_group);
 	if(ui_xml)
 		g_object_unref(ui_xml);
 }
 
-GtkWidget* MainWindow::builder_widget(const char* name)
+GtkWidget* MainWindow::remember_widget(const char* name, GtkWidget* widget)
 {
-	GObject* object = gtk_builder_get_object(ui_xml, name);
-	if(!object)
-		g_error("Unable to find widget '%s' in %s", name, main_ui);
-	return GTK_WIDGET(object);
+	ui_widgets[name] = widget;
+	return widget;
 }
 
-GtkWidget* MainWindow::create_menu_item(const char* label, GCallback callback)
+GtkWidget* MainWindow::builder_widget(const char* name)
 {
-	GtkWidget* item = gtk_menu_item_new_with_mnemonic(label);
-	g_signal_connect(item, "activate", callback, this);
-	return item;
+	std::map<std::string, GtkWidget*>::iterator found = ui_widgets.find(name);
+	if(found == ui_widgets.end())
+		g_error("Unable to find widget '%s' in %s", name, main_ui);
+	return found->second;
+}
+
+void MainWindow::build_main_ui(GtkApplication* app)
+{
+	window = gtk_window_new();
+	if(app)
+		gtk_window_set_application(GTK_WINDOW(window), app);
+	gtk_window_set_default_size(GTK_WINDOW(window), 900, 620);
+
+	GtkWidget* main_box = remember_widget("main_window", gtk_box_new(GTK_ORIENTATION_VERTICAL, 4));
+	gtk_window_set_child(GTK_WINDOW(window), main_box);
+
+	GtkWidget* menu_box = remember_widget("box_menu_toolbar", gtk_box_new(GTK_ORIENTATION_VERTICAL, 0));
+	gtk_box_append(GTK_BOX(main_box), menu_box);
+
+	GtkWidget* content = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+	gtk_widget_set_vexpand(content, TRUE);
+	gtk_box_append(GTK_BOX(main_box), content);
+
+	GtkWidget* players = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+	gtk_box_append(GTK_BOX(content), players);
+
+	p1_image = GTK_IMAGE(remember_widget("image_p1", gtk_image_new_from_file(DATA_DIR"/play.png")));
+	p2_image = GTK_IMAGE(remember_widget("image_p2", gtk_image_new_from_file(DATA_DIR"/play.png")));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_image));
+	p1_name = GTK_LABEL(remember_widget("P1_name", gtk_label_new("Computer")));
+	p1_step_time = GTK_LABEL(remember_widget("P1_step_time", gtk_label_new("")));
+	p1_war_time = GTK_LABEL(remember_widget("P1_war_time", gtk_label_new("")));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_name));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_step_time));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_war_time));
+	gtk_box_append(GTK_BOX(players), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
+	p2_name = GTK_LABEL(remember_widget("P2_name", gtk_label_new("Human")));
+	p2_step_time = GTK_LABEL(remember_widget("P2_step_time", gtk_label_new("")));
+	p2_war_time = GTK_LABEL(remember_widget("P2_war_time", gtk_label_new("")));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_name));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_step_time));
+	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_war_time));
+
+	GtkWidget* board_box = remember_widget("vbox_board", gtk_box_new(GTK_ORIENTATION_VERTICAL, 4));
+	gtk_widget_set_hexpand(board_box, TRUE);
+	gtk_widget_set_vexpand(board_box, TRUE);
+	gtk_box_append(GTK_BOX(content), board_box);
+
+	buttonbox_war = remember_widget("hbuttonbox_war", gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4));
+	btn_begin = GTK_BUTTON(remember_widget("button_begin", gtk_button_new_with_mnemonic(_("Start"))));
+	btn_lose = GTK_BUTTON(remember_widget("button_lose", gtk_button_new_with_mnemonic(_("Lost"))));
+	btn_draw = GTK_BUTTON(remember_widget("button_draw", gtk_button_new_with_mnemonic(_("Draw"))));
+	btn_rue = GTK_BUTTON(remember_widget("button_rue", gtk_button_new_with_mnemonic(_("Rue"))));
+	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_begin));
+	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_lose));
+	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_draw));
+	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_rue));
+	gtk_box_append(GTK_BOX(board_box), buttonbox_war);
+
+	m_notebook = GTK_NOTEBOOK(remember_widget("notebook", gtk_notebook_new()));
+	gtk_widget_set_hexpand(GTK_WIDGET(m_notebook), TRUE);
+	gtk_widget_set_vexpand(GTK_WIDGET(m_notebook), TRUE);
+	gtk_box_append(GTK_BOX(content), GTK_WIDGET(m_notebook));
+
+	GtkWidget* info_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+	GtkWidget* info_label = remember_widget("info_label", gtk_label_new(_("Information")));
+	gtk_label_set_wrap(GTK_LABEL(info_label), TRUE);
+	gtk_box_append(GTK_BOX(info_page), info_label);
+	GtkWidget* scrolled = remember_widget("scrolledwindow", gtk_scrolled_window_new());
+	gtk_widget_set_vexpand(scrolled, TRUE);
+	gtk_box_append(GTK_BOX(info_page), scrolled);
+
+	GtkWidget* move_buttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+	btn_chanjue = GTK_BUTTON(remember_widget("button_chanju", gtk_button_new_from_icon_name("go-jump")));
+	btn_start = GTK_BUTTON(remember_widget("button_start", gtk_button_new_from_icon_name("go-first")));
+	btn_prev = GTK_BUTTON(remember_widget("button_prev", gtk_button_new_from_icon_name("go-previous")));
+	btn_next = GTK_BUTTON(remember_widget("button_next", gtk_button_new_from_icon_name("go-next")));
+	btn_end = GTK_BUTTON(remember_widget("button_end", gtk_button_new_from_icon_name("go-last")));
+	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_chanjue));
+	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_start));
+	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_prev));
+	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_next));
+	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_end));
+	gtk_box_append(GTK_BOX(info_page), move_buttons);
+
+	text_comment = GTK_TEXT_VIEW(remember_widget("textview_comment", gtk_text_view_new()));
+	GtkWidget* comment_scroll = gtk_scrolled_window_new();
+	gtk_widget_set_vexpand(comment_scroll, TRUE);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(comment_scroll), GTK_WIDGET(text_comment));
+	gtk_box_append(GTK_BOX(info_page), comment_scroll);
+	gtk_notebook_append_page(m_notebook, info_page, gtk_label_new(_("Board Information")));
+
+	GtkWidget* book_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+	GtkWidget* book_scroll = remember_widget("scrolledwin_book", gtk_scrolled_window_new());
+	gtk_widget_set_vexpand(book_scroll, TRUE);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(book_scroll), NULL);
+	gtk_box_append(GTK_BOX(book_page), book_scroll);
+	gtk_notebook_append_page(m_notebook, book_page, gtk_label_new(_("Book")));
+
+	GtkWidget* engine_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+	text_engine_log = GTK_TEXT_VIEW(remember_widget("textview_engine_log", gtk_text_view_new()));
+	GtkWidget* engine_scroll = gtk_scrolled_window_new();
+	gtk_widget_set_vexpand(engine_scroll, TRUE);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(engine_scroll), GTK_WIDGET(text_engine_log));
+	gtk_box_append(GTK_BOX(engine_page), engine_scroll);
+	gtk_notebook_append_page(m_notebook, engine_page, gtk_label_new(_("Engine")));
 }
 
 void MainWindow::button_first_cb(GtkButton*, gpointer data)
@@ -260,73 +420,73 @@ void MainWindow::button_chanju_cb(GtkButton*, gpointer data)
 	static_cast<MainWindow*>(data)->on_chanju_game();
 }
 
-gboolean MainWindow::tree_button_cb(GtkWidget*, GdkEventButton* event, gpointer data)
+void MainWindow::tree_button_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data)
 {
-	return static_cast<MainWindow*>(data)->on_treeview_click(event);
+	guint button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
+	static_cast<MainWindow*>(data)->on_treeview_click(x, y, button, n_press);
 }
 
-gboolean MainWindow::delete_event_cb(GtkWidget*, GdkEvent* event, gpointer data)
+gboolean MainWindow::delete_event_cb(GtkWindow*, gpointer data)
 {
-	return static_cast<MainWindow*>(data)->on_delete_event((GdkEventAny*)event);
+	return static_cast<MainWindow*>(data)->on_delete_event();
 }
 
 void MainWindow::window_destroy_cb(GtkWidget*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->window = NULL;
-	gtk_main_quit();
 }
 
-void MainWindow::size_allocate_cb(GtkWidget*, GtkAllocation*, gpointer data)
+void MainWindow::board_resize_cb(GtkDrawingArea*, int, int, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_size_change();
 }
 
-void MainWindow::menu_open_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_open_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_open_file();
 }
 
-void MainWindow::menu_save_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_save_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_save_file();
 }
 
-void MainWindow::menu_save_board_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_save_board_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_save_board_to_png();
 }
 
-void MainWindow::menu_quit_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_quit_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_file_quit();
 }
 
-void MainWindow::menu_preferences_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_preferences_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_view_preferences();
 }
 
-void MainWindow::menu_war_ai_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_war_ai_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_war_to_ai();
 }
 
-void MainWindow::menu_free_play_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_free_play_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_free_play();
 }
 
-void MainWindow::menu_rev_play_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_rev_play_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_rev_play();
 }
 
-void MainWindow::menu_help_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_help_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_help();
 }
 
-void MainWindow::menu_about_cb(GtkMenuItem*, gpointer data)
+void MainWindow::menu_about_cb(GSimpleAction*, GVariant*, gpointer data)
 {
 	static_cast<MainWindow*>(data)->on_menu_about();
 }
@@ -494,38 +654,52 @@ void MainWindow::on_last_move()
 
 void MainWindow::init_ui_manager()
 {
-	menubar = gtk_menu_bar_new();
+	static const GActionEntry entries[] = {
+		{ "open", menu_open_cb, NULL, NULL, NULL },
+		{ "save", menu_save_cb, NULL, NULL, NULL },
+		{ "save-board", menu_save_board_cb, NULL, NULL, NULL },
+		{ "quit", menu_quit_cb, NULL, NULL, NULL },
+		{ "preferences", menu_preferences_cb, NULL, NULL, NULL },
+		{ "fight-ai", menu_war_ai_cb, NULL, NULL, NULL },
+		{ "free-play", menu_free_play_cb, NULL, NULL, NULL },
+		{ "switch-colour", menu_rev_play_cb, NULL, NULL, NULL },
+		{ "help", menu_help_cb, NULL, NULL, NULL },
+		{ "about", menu_about_cb, NULL, NULL, NULL },
+	};
 
-	GtkWidget* file_menu = gtk_menu_new();
-	GtkWidget* file_root = gtk_menu_item_new_with_mnemonic(_("_File"));
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_root), file_menu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Open file"), G_CALLBACK(menu_open_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Save as"), G_CALLBACK(menu_save_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("Save Board"), G_CALLBACK(menu_save_board_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), gtk_separator_menu_item_new());
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), create_menu_item(_("_Quit"), G_CALLBACK(menu_quit_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file_root);
+	action_group = g_simple_action_group_new();
+	g_action_map_add_action_entries(G_ACTION_MAP(action_group), entries, G_N_ELEMENTS(entries), this);
+	gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
 
-	GtkWidget* view_menu = gtk_menu_new();
-	GtkWidget* view_root = gtk_menu_item_new_with_mnemonic(_("_View"));
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_root), view_menu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), create_menu_item(_("_Switch colour"), G_CALLBACK(menu_rev_play_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), create_menu_item(_("_Preferences"), G_CALLBACK(menu_preferences_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), view_root);
+	GMenu* root = g_menu_new();
+	GMenu* file_menu = g_menu_new();
+	g_menu_append(file_menu, _("Open file"), "win.open");
+	g_menu_append(file_menu, _("Save as"), "win.save");
+	g_menu_append(file_menu, _("Save Board"), "win.save-board");
+	g_menu_append(file_menu, _("_Quit"), "win.quit");
+	g_menu_append_submenu(root, _("_File"), G_MENU_MODEL(file_menu));
+	g_object_unref(file_menu);
 
-	GtkWidget* game_menu = gtk_menu_new();
-	GtkWidget* game_root = gtk_menu_item_new_with_mnemonic(_("_Game"));
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(game_root), game_menu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(game_menu), create_menu_item(_("_Fight to AI"), G_CALLBACK(menu_war_ai_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(game_menu), create_menu_item(_("Free Play"), G_CALLBACK(menu_free_play_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), game_root);
+	GMenu* view_menu = g_menu_new();
+	g_menu_append(view_menu, _("_Switch colour"), "win.switch-colour");
+	g_menu_append(view_menu, _("_Preferences"), "win.preferences");
+	g_menu_append_submenu(root, _("_View"), G_MENU_MODEL(view_menu));
+	g_object_unref(view_menu);
 
-	GtkWidget* help_menu = gtk_menu_new();
-	GtkWidget* help_root = gtk_menu_item_new_with_mnemonic(_("_Help"));
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(help_root), help_menu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), create_menu_item(_("_Help"), G_CALLBACK(menu_help_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), create_menu_item(_("_About"), G_CALLBACK(menu_about_cb)));
-	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), help_root);
+	GMenu* game_menu = g_menu_new();
+	g_menu_append(game_menu, _("_Fight to AI"), "win.fight-ai");
+	g_menu_append(game_menu, _("Free Play"), "win.free-play");
+	g_menu_append_submenu(root, _("_Game"), G_MENU_MODEL(game_menu));
+	g_object_unref(game_menu);
+
+	GMenu* help_menu = g_menu_new();
+	g_menu_append(help_menu, _("_Help"), "win.help");
+	g_menu_append(help_menu, _("_About"), "win.about");
+	g_menu_append_submenu(root, _("_Help"), G_MENU_MODEL(help_menu));
+	g_object_unref(help_menu);
+
+	menubar = gtk_popover_menu_bar_new_from_model(G_MENU_MODEL(root));
+	g_object_unref(root);
 }
 
 void MainWindow::on_menu_save_board_to_png()
@@ -535,21 +709,8 @@ void MainWindow::on_menu_save_board_to_png()
 
 void MainWindow::on_menu_save_file()
 {
-	GtkWidget* dlg = gtk_file_chooser_dialog_new(_("Save File"), gobj(),
-			GTK_FILE_CHOOSER_ACTION_SAVE,
-			_("_Cancel"), GTK_RESPONSE_CANCEL,
-			_("_Save"), GTK_RESPONSE_OK,
-			NULL);
-
-	std::string filename;
-	if(gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_OK) {
-		char* chosen = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
-		if(chosen) {
-			filename = chosen;
-			g_free(chosen);
-		}
-	}
-	gtk_widget_destroy(dlg);
+	std::string filename = run_file_chooser(gobj(), _("Save File"),
+			GTK_FILE_CHOOSER_ACTION_SAVE, _("_Save"), false);
 	if(filename.empty())
 		return;
 
@@ -637,32 +798,8 @@ void MainWindow::auto_save_chess_file()
 
 void MainWindow::on_menu_open_file()
 {
-	GtkWidget* dlg = gtk_file_chooser_dialog_new(_("Choose File"), gobj(),
-			GTK_FILE_CHOOSER_ACTION_OPEN,
-			_("_Cancel"), GTK_RESPONSE_CANCEL,
-			_("_Open"), GTK_RESPONSE_OK,
-			NULL);
-	GtkFileChooser* chooser = GTK_FILE_CHOOSER(dlg);
-	add_file_filter(chooser, "PGN", "*.pgn", "*.PGN");
-	add_file_filter(chooser, "CCM", "*.ccm", "*.CCM");
-	add_file_filter(chooser, "CHE", "*.che", "*.CHE");
-	add_file_filter(chooser, "CHN", "*.chn", "*.CHN");
-	add_file_filter(chooser, "MXQ", "*.mxq", "*.MXQ");
-	add_file_filter(chooser, "XQF", "*.xqf", "*.XQF");
-	GtkFileFilter* filter_any = gtk_file_filter_new();
-	gtk_file_filter_set_name(filter_any, _("All Files"));
-	gtk_file_filter_add_pattern(filter_any, "*");
-	gtk_file_chooser_add_filter(chooser, filter_any);
-
-	std::string filename;
-	if(gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_OK) {
-		char* chosen = gtk_file_chooser_get_filename(chooser);
-		if(chosen) {
-			filename = chosen;
-			g_free(chosen);
-		}
-	}
-	gtk_widget_destroy(dlg);
+	std::string filename = run_file_chooser(gobj(), _("Choose File"),
+			GTK_FILE_CHOOSER_ACTION_OPEN, _("_Open"), true);
 	if(!filename.empty())
 		open_file(filename);
 }
@@ -732,10 +869,10 @@ void MainWindow::on_menu_file_quit()
 	if(board->get_status() == NETWORK_STATUS)
 		board->send_to_socket("close");
 	if(window)
-		gtk_widget_destroy(window);
+		gtk_window_destroy(GTK_WINDOW(window));
 }
 
-gboolean MainWindow::on_delete_event(GdkEventAny*)
+gboolean MainWindow::on_delete_event()
 {
 	if(board->get_status() == NETWORK_STATUS) {
 		gint result = run_message_dialog(gobj(), _("Warning"), GTK_MESSAGE_QUESTION,
@@ -799,7 +936,8 @@ void MainWindow::on_menu_about()
 		NULL
 	};
 	GtkWidget* about = gtk_about_dialog_new();
-	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(about), ui_logo);
+	if(ui_logo)
+		gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(about), ui_logo);
 	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(about), "GMChess");
 	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about), PACKAGE_VERSION);
 	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about), "https://lerosua.github.io");
@@ -813,8 +951,7 @@ void MainWindow::on_menu_about()
 	gtk_about_dialog_set_translator_credits(GTK_ABOUT_DIALOG(about),
 			"zh_CN lerosua@gmail.com\nru Sadovnikov Dmitry <xbadcode@mail.ru>");
 	gtk_window_set_transient_for(GTK_WINDOW(about), gobj());
-	gtk_dialog_run(GTK_DIALOG(about));
-	gtk_widget_destroy(about);
+	gtk_window_present(GTK_WINDOW(about));
 }
 
 void MainWindow::add_step_line(int num, const std::string& f_line)
@@ -854,15 +991,17 @@ void MainWindow::init_move_treeview()
 				G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING);
 		m_treeview = GTK_TREE_VIEW(gtk_tree_view_new());
 		gtk_tree_view_set_model(m_treeview, GTK_TREE_MODEL(m_refTreeModel));
-		gtk_container_add(GTK_CONTAINER(scrolwin), GTK_WIDGET(m_treeview));
+		gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolwin), GTK_WIDGET(m_treeview));
 		gtk_tree_view_insert_column_with_attributes(m_treeview,
 				-1, _("Turn"), gtk_cell_renderer_text_new(), "text", COL_STEP_BOUT, NULL);
 		gtk_tree_view_insert_column_with_attributes(m_treeview,
 				-1, "  ", gtk_cell_renderer_text_new(), "text", COL_PLAYER, NULL);
 		gtk_tree_view_insert_column_with_attributes(m_treeview,
 				-1, _("Move"), gtk_cell_renderer_text_new(), "text", COL_STEP_LINE, NULL);
-		gtk_widget_add_events(GTK_WIDGET(m_treeview), GDK_BUTTON_PRESS_MASK);
-		g_signal_connect(m_treeview, "button-press-event", G_CALLBACK(tree_button_cb), this);
+		GtkGesture* click = gtk_gesture_click_new();
+		gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
+		g_signal_connect(click, "pressed", G_CALLBACK(tree_button_cb), this);
+		gtk_widget_add_controller(GTK_WIDGET(m_treeview), GTK_EVENT_CONTROLLER(click));
 		gtk_widget_show(GTK_WIDGET(m_treeview));
 		set_status();
 		return;
@@ -876,7 +1015,7 @@ void MainWindow::init_move_treeview()
 	}
 }
 
-gboolean MainWindow::on_treeview_click(GdkEventButton* ev)
+gboolean MainWindow::on_treeview_click(double x, double y, guint, int n_press)
 {
 	if(board->is_fight_to_robot())
 		return TRUE;
@@ -884,7 +1023,7 @@ gboolean MainWindow::on_treeview_click(GdkEventButton* ev)
 	GtkTreePath* path = NULL;
 	GtkTreeViewColumn* tvc = NULL;
 	int cx, cy;
-	if(!gtk_tree_view_get_path_at_pos(m_treeview, (int)ev->x, (int)ev->y,
+	if(!gtk_tree_view_get_path_at_pos(m_treeview, (int)x, (int)y,
 				&path, &tvc, &cx, &cy))
 		return FALSE;
 
@@ -898,7 +1037,7 @@ gboolean MainWindow::on_treeview_click(GdkEventButton* ev)
 	GtkTreeSelection* selection = gtk_tree_view_get_selection(m_treeview);
 	gtk_tree_selection_select_iter(selection, &iter);
 
-	if(ev->type == GDK_2BUTTON_PRESS) {
+	if(n_press >= 2) {
 		gint num = 0;
 		gtk_tree_model_get(model, &iter, COL_STEP_NUM, &num, -1);
 		board->get_board_by_move(num);

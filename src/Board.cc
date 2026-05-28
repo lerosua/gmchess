@@ -90,21 +90,24 @@ std::string  wind_unescape_string (const char *escaped_string,
 	return std::string(result);
 }
 
-gboolean Board::draw_cb(GtkWidget*, cairo_t* cr, gpointer data)
+void Board::draw_cb(GtkDrawingArea*, cairo_t* cr, int, int, gpointer data)
 {
-	return static_cast<Board*>(data)->on_draw(cr);
+	static_cast<Board*>(data)->on_draw(cr);
 }
 
-gboolean Board::button_press_cb(GtkWidget*, GdkEventButton* event, gpointer data)
+void Board::button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data)
 {
-	return static_cast<Board*>(data)->on_button_press_event(event);
+	guint button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
+	static_cast<Board*>(data)->on_button_press_event(x, y, button, n_press);
 }
 
-void Board::drag_data_received_cb(GtkWidget*, GdkDragContext* context, gint, gint,
-		GtkSelectionData* selection_data, guint, guint time, gpointer data)
+gboolean Board::drop_cb(GtkDropTarget*, const GValue* value, double, double, gpointer data)
 {
-	static_cast<Board*>(data)->on_drog_data_received(selection_data, time);
-	gtk_drag_finish(context, FALSE, FALSE, time);
+	if(G_VALUE_HOLDS_STRING(value)) {
+		static_cast<Board*>(data)->on_drop_text(g_value_get_string(value));
+		return TRUE;
+	}
+	return FALSE;
 }
 
 gboolean Board::timer_cb(gpointer data)
@@ -126,16 +129,17 @@ Board::Board(MainWindow& win)
 	for(int i = 0; i < 18; ++i)
 		chessman_images[i] = NULL;
 
-	GtkTargetEntry listTargets[] = {
-		{ (gchar*)"STRING", 0, 0 },
-		{ (gchar*)"text/plain", 0, 0 }
-	};
-
 	gtk_widget_set_size_request(area, 221, 277);
-	gtk_drag_dest_set(area, GTK_DEST_DEFAULT_ALL, listTargets, 2, GDK_ACTION_COPY);
-	g_signal_connect(area, "drag-data-received", G_CALLBACK(drag_data_received_cb), this);
-	g_signal_connect(area, "draw", G_CALLBACK(draw_cb), this);
-	g_signal_connect(area, "button-press-event", G_CALLBACK(button_press_cb), this);
+	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(area), draw_cb, this, NULL);
+
+	GtkGesture* click = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
+	g_signal_connect(click, "pressed", G_CALLBACK(button_press_cb), this);
+	gtk_widget_add_controller(area, GTK_EVENT_CONTROLLER(click));
+
+	GtkDropTarget* drop_target = gtk_drop_target_new(G_TYPE_STRING, GDK_ACTION_COPY);
+	g_signal_connect(drop_target, "drop", G_CALLBACK(drop_cb), this);
+	gtk_widget_add_controller(area, GTK_EVENT_CONTROLLER(drop_target));
 
 	load_images();
 
@@ -144,8 +148,7 @@ Board::Board(MainWindow& win)
 	m_robot.set_out_callback([this](GIOCondition condition) {
 			return robot_log(condition);
 			});
-	gtk_widget_add_events(area, GDK_BUTTON_PRESS_MASK | GDK_EXPOSURE_MASK);
-	gtk_widget_show_all(area);
+	gtk_widget_show(area);
 }
 
 Board::~Board()
@@ -327,15 +330,15 @@ bool Board::on_draw (cairo_t *cr)
 	return true;
 }
 
-bool Board::on_button_press_event(GdkEventButton* ev)
+bool Board::on_button_press_event(double x, double y, guint button, int)
 {
 	if(is_fight_to_robot()||is_network_game()){
 		if(!is_human_player())
 			return true;
 	}
-	if(ev->type == GDK_BUTTON_PRESS && ev->button == 1)
+	if(button == 1)
 	{
-		BoardPixel p = get_position(ev->x, ev->y);
+		BoardPixel p = get_position((int)x, (int)y);
 		selected_x = p.x;
 		selected_y = p.y;
 		if(selected_chessman == -1){
@@ -370,7 +373,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 			}
 		}
 	}
-	else if(ev->type == GDK_BUTTON_PRESS && ev->button == 3){
+	else if(button == 3){
 		selected_chessman = -1;
 		queue_draw();
 	}
@@ -798,18 +801,16 @@ int Board::open_file(const std::string& filename)
 	return 0;
 }
 
-void Board::on_drog_data_received(GtkSelectionData* selection_data, guint)
+void Board::on_drop_text(const char* text)
 {
-	if((gtk_selection_data_get_length(selection_data) >= 0)&&(gtk_selection_data_get_format(selection_data)== 8))
-	{
-		gchar* text = (gchar*)gtk_selection_data_get_text(selection_data);
-		std::string filename = wind_unescape_string(text, NULL);
-		g_free(text);
-		size_t pos = filename.find('\r');
-		if (std::string::npos != pos)
-			filename = filename.substr(7, pos-7);
+	if(!text)
+		return;
+	std::string filename = wind_unescape_string(text, NULL);
+	size_t pos = filename.find('\r');
+	if (std::string::npos != pos)
+		filename = filename.substr(7, pos-7);
+	if(!filename.empty())
 		parent.open_file(filename);
-	}
 }
 
 void Board::free_game(bool redraw_)

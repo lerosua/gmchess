@@ -38,5 +38,5 @@ if gtk_dep.found()
     install: true,
   )
 else
-  message('gtk+-3.0 not found; building core and engine targets only')
+  message('gtk4 not found; building core and engine targets only')
 endif

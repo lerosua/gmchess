@@ -12,6 +12,7 @@
 #define  GMCHESS_MAINWINDOW_FILE_HEADER_INC
 
 #include <gtk/gtk.h>
+#include <map>
 #include <string>
 #include "Board.h"
 
@@ -24,7 +25,7 @@ class ConfWindow;
 class MainWindow
 {
 	public:
-		MainWindow();
+		MainWindow(GtkApplication* app = NULL);
 		~MainWindow();
 		GtkWidget* widget() { return window; }
 		GtkWindow* gobj() { return GTK_WINDOW(window); }
@@ -41,7 +42,7 @@ class MainWindow
 		void on_draw_game();
 		void on_rue_game();
 		bool on_end_game(OVERSTATUS _over);
-		gboolean on_treeview_click(GdkEventButton* ev);
+		gboolean on_treeview_click(double x, double y, guint button, int n_press);
 		void set_comment(const std::string& f_comment);
 		void show_textview_engine_log(const std::string& f_text);
 		void textview_engine_log_clear();
@@ -57,7 +58,7 @@ class MainWindow
 		void on_size_change();
 		void save_conf();
 		void watch_socket(int fd);
-		gboolean on_delete_event(GdkEventAny* event);
+		gboolean on_delete_event();
 		void info_window(const std::string& info);
 		void auto_save_chess_file();
 
@@ -88,28 +89,31 @@ class MainWindow
 		static void button_draw_cb(GtkButton* button, gpointer data);
 		static void button_rue_cb(GtkButton* button, gpointer data);
 		static void button_chanju_cb(GtkButton* button, gpointer data);
-		static gboolean tree_button_cb(GtkWidget* widget, GdkEventButton* event, gpointer data);
-		static gboolean delete_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data);
+		static void tree_button_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
+		static gboolean delete_event_cb(GtkWindow* window, gpointer data);
 		static void window_destroy_cb(GtkWidget* widget, gpointer data);
-		static void size_allocate_cb(GtkWidget* widget, GtkAllocation* allocation, gpointer data);
-		static void menu_open_cb(GtkMenuItem* item, gpointer data);
-		static void menu_save_cb(GtkMenuItem* item, gpointer data);
-		static void menu_save_board_cb(GtkMenuItem* item, gpointer data);
-		static void menu_quit_cb(GtkMenuItem* item, gpointer data);
-		static void menu_preferences_cb(GtkMenuItem* item, gpointer data);
-		static void menu_war_ai_cb(GtkMenuItem* item, gpointer data);
-		static void menu_free_play_cb(GtkMenuItem* item, gpointer data);
-		static void menu_rev_play_cb(GtkMenuItem* item, gpointer data);
-		static void menu_help_cb(GtkMenuItem* item, gpointer data);
-		static void menu_about_cb(GtkMenuItem* item, gpointer data);
+		static void board_resize_cb(GtkDrawingArea* area, int width, int height, gpointer data);
+		static void menu_open_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_save_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_save_board_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_quit_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_preferences_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_war_ai_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_free_play_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_rev_play_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_help_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
+		static void menu_about_cb(GSimpleAction* action, GVariant* parameter, gpointer data);
 
 		GtkWidget* builder_widget(const char* name);
-		GtkWidget* create_menu_item(const char* label, GCallback callback);
+		GtkWidget* remember_widget(const char* name, GtkWidget* widget);
+		void build_main_ui(GtkApplication* app);
 
 		Board*				board;
 		GtkBuilder*			ui_xml;
 		GtkWidget*			window;
 		GtkWidget*			menubar;
+		GSimpleActionGroup*	action_group;
+		std::map<std::string, GtkWidget*> ui_widgets;
 		GtkTreeView*		m_treeview;
 		GtkListStore*		m_refTreeModel;
 		BookView*			m_bookview;
@@ -118,7 +122,7 @@ class MainWindow
 		GtkTextView*		text_engine_log;
 		GtkNotebook*		m_notebook;
 		ConfWindow*			confwindow;
-		GdkPixbuf*			ui_logo ;
+		GdkPaintable*		ui_logo ;
 		GtkImage*			p1_image;
 		GtkImage*			p2_image;
 		GtkLabel*			p1_step_time;

@@ -50,12 +50,18 @@ class ConfWindow
 		static void button_save_cb(GtkButton* button, gpointer data);
 		static void button_cancel_cb(GtkButton* button, gpointer data);
 		static void color_set_cb(GtkColorButton* button, gpointer data);
-		static gboolean delete_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data);
+		static gboolean delete_event_cb(GtkWindow* window, gpointer data);
 
 		GtkBuilder*		builder;
 		GtkWidget*		window;
 		GtkComboBoxText*	cbtheme;
 		GtkColorButton*	colorBt;
+		GtkCheckButton*	size_big_button;
+		GtkCheckButton*	usebook_button;
+		GtkSpinButton*	depth_button;
+		GtkEntry*		step_time_entry;
+		GtkEntry*		play_time_entry;
+		GtkEntry*		engine_name_entry;
 		Callback		quit_callback;
 		Callback		close_callback;
 		std::string		m_depth = "10";

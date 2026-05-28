@@ -42,7 +42,7 @@ class Board
 
 	protected:
 		bool on_draw(cairo_t *cr);
-		bool on_button_press_event (GdkEventButton *ev);
+		bool on_button_press_event (double x, double y, guint button, int n_press);
 
 		cairo_surface_t* get_pic (const std::string &name_);
 		cairo_surface_t* get_spic (const std::string &name_);
@@ -58,7 +58,7 @@ class Board
 		void draw_localize(cairo_t *cr, int x, int y, int place);
 		void draw_palace(cairo_t *cr, int x, int y);
 		void calcVertexes(double start_x, double start_y, double end_x, double end_y, double& x1, double& y1, double& x2, double& y2);
-		void on_drog_data_received(GtkSelectionData* selection_data, guint time);
+		void on_drop_text(const char* text);
 
 	public:
 		void set_engine (const std::string &name) { engine_name = name; }
@@ -100,10 +100,9 @@ class Board
 		void draw_trace (int mv);
 
 	private:
-		static gboolean draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data);
-		static gboolean button_press_cb(GtkWidget* widget, GdkEventButton* event, gpointer data);
-		static void drag_data_received_cb(GtkWidget* widget, GdkDragContext* context, gint x, gint y,
-				GtkSelectionData* selection_data, guint info, guint time, gpointer data);
+		static void draw_cb(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer data);
+		static void button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
+		static gboolean drop_cb(GtkDropTarget* target, const GValue* value, double x, double y, gpointer data);
 		static gboolean timer_cb(gpointer data);
 		static gboolean network_io_cb(GIOChannel* source, GIOCondition condition, gpointer data);
 

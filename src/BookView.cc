@@ -24,9 +24,10 @@ enum {
 	N_COLUMNS
 };
 
-gboolean BookView::button_press_cb(GtkWidget*, GdkEventButton* event, gpointer data)
+void BookView::button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data)
 {
-	return static_cast<BookView*>(data)->on_button_press_event(event);
+	guint button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
+	static_cast<BookView*>(data)->on_button_press_event(x, y, button, n_press);
 }
 
 BookView::BookView(MainWindow* parent)
@@ -38,8 +39,10 @@ BookView::BookView(MainWindow* parent)
 	gtk_tree_view_set_model(GTK_TREE_VIEW(treeview), GTK_TREE_MODEL(tree_model));
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview),
 			-1, _("Book"), gtk_cell_renderer_text_new(), "text", COL_TITLE, NULL);
-	gtk_widget_add_events(treeview, GDK_BUTTON_PRESS_MASK);
-	g_signal_connect(treeview, "button-press-event", G_CALLBACK(button_press_cb), this);
+	GtkGesture* click = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
+	g_signal_connect(click, "pressed", G_CALLBACK(button_press_cb), this);
+	gtk_widget_add_controller(treeview, GTK_EVENT_CONTROLLER(click));
 	gtk_widget_show(treeview);
 }
 
@@ -122,12 +125,12 @@ bool BookView::get_list_iter(GtkTreeIter* iter, GtkTreeIter* parent, const std::
 	return false;
 }
 
-gboolean BookView::on_button_press_event(GdkEventButton* ev)
+gboolean BookView::on_button_press_event(double x, double y, guint button, int n_press)
 {
 	GtkTreePath* path = NULL;
 	GtkTreeViewColumn* tvc = NULL;
 	int cx, cy;
-	if(!gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(treeview), (int)ev->x, (int)ev->y,
+	if(!gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(treeview), (int)x, (int)y,
 				&path, &tvc, &cx, &cy))
 		return FALSE;
 
@@ -141,8 +144,7 @@ gboolean BookView::on_button_press_event(GdkEventButton* ev)
 	GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
 	gtk_tree_selection_select_iter(selection, &iter);
 
-	if ((ev->type == GDK_2BUTTON_PRESS ||
-				ev->type == GDK_3BUTTON_PRESS) && ev->button != 3) {
+	if (n_press >= 2 && button != 3) {
 		gint type = GROUP;
 		gchar* file = NULL;
 		gtk_tree_model_get(model, &iter, COL_TYPE, &type, COL_PATH, &file, -1);

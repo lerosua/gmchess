@@ -70,6 +70,15 @@ static int singleon(const std::string& url)
 }
 
 
+static void activate_cb(GtkApplication* app, gpointer user_data)
+{
+    const std::string* url = static_cast<const std::string*>(user_data);
+    int fd_io = singleon(*url);
+    MainWindow* win = new MainWindow(app);
+    win->watch_socket(fd_io);
+    win->start_with(*url);
+}
+
 int main (int argc, char *argv[])
 {
     std::string url;
@@ -80,15 +89,13 @@ int main (int argc, char *argv[])
         url = std::string("");
     }
 
-    int fd_io = singleon(url);
     bindtextdomain (GETTEXT_PACKAGE, GMCHESS_LOCALEDIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    gtk_init(&argc, &argv);
-    MainWindow win;
-    win.watch_socket(fd_io);
-    win.start_with(url);
-    gtk_main();
-    return 0;
+    GtkApplication* app = gtk_application_new("org.gmchess.GMChess", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate_cb), &url);
+    int status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
+    return status;
 }

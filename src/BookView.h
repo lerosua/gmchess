@@ -29,11 +29,11 @@ class BookView
 		bool add_group(GtkTreeIter* iter, const std::string& group);
 		bool add_group(GtkTreeIter* iter, const std::string& g_parent, const std::string& group);
 		void add_line(const std::string& groupname, const std::string& f_line, const std::string& f_path);
-		gboolean on_button_press_event(GdkEventButton* ev);
+		gboolean on_button_press_event(double x, double y, guint button, int n_press);
 		int load_book_dir(const char* path);
 
 	private:
-		static gboolean button_press_cb(GtkWidget* widget, GdkEventButton* event, gpointer data);
+		static void button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
 
 		GtkWidget* treeview;
 		GtkTreeStore* tree_model;
