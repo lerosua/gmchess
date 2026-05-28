@@ -382,37 +382,67 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	gtk_box_append(GTK_BOX(main_box), content);
 
 	GtkWidget* players = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+	gtk_widget_set_size_request(players, 140, -1);
 	gtk_box_append(GTK_BOX(content), players);
+
+	GtkWidget* p1_panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+	gtk_widget_set_vexpand(p1_panel, TRUE);
+	gtk_box_append(GTK_BOX(players), p1_panel);
 
 	p1_image = GTK_IMAGE(remember_widget("image_p1",
 				gtk_image_new_from_file(gmchess_data_path("play.png").c_str())));
 	p2_image = GTK_IMAGE(remember_widget("image_p2",
 				gtk_image_new_from_file(gmchess_data_path("play.png").c_str())));
-	GtkWidget* p1_avatar = gtk_image_new_from_file(gmchess_data_path("p1.png").c_str());
-	gtk_widget_set_vexpand(p1_avatar, TRUE);
-	gtk_box_append(GTK_BOX(players), p1_avatar);
+	gtk_image_set_pixel_size(p1_image, 36);
+	gtk_image_set_pixel_size(p2_image, 36);
+	GtkWidget* p1_avatar = gtk_picture_new_for_filename(gmchess_data_path("p1.png").c_str());
+	gtk_picture_set_content_fit(GTK_PICTURE(p1_avatar), GTK_CONTENT_FIT_CONTAIN);
+	gtk_widget_set_size_request(p1_avatar, 88, 88);
+	gtk_widget_set_halign(p1_avatar, GTK_ALIGN_CENTER);
+	gtk_widget_set_margin_top(p1_avatar, 18);
+	gtk_widget_set_margin_bottom(p1_avatar, 4);
+	gtk_box_append(GTK_BOX(p1_panel), p1_avatar);
 	p1_name = GTK_LABEL(remember_widget("P1_name", gtk_label_new("Computer")));
 	p1_step_time = GTK_LABEL(remember_widget("P1_step_time", gtk_label_new("")));
 	p1_war_time = GTK_LABEL(remember_widget("P1_war_time", gtk_label_new("")));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_name));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_step_time));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_war_time));
-	gtk_widget_set_vexpand(GTK_WIDGET(p1_image), TRUE);
+	gtk_label_set_xalign(p1_name, 0.5);
+	gtk_box_append(GTK_BOX(p1_panel), GTK_WIDGET(p1_name));
+	gtk_box_append(GTK_BOX(p1_panel), GTK_WIDGET(p1_step_time));
+	gtk_box_append(GTK_BOX(p1_panel), GTK_WIDGET(p1_war_time));
+	GtkWidget* p1_spacer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_widget_set_vexpand(p1_spacer, TRUE);
+	gtk_box_append(GTK_BOX(p1_panel), p1_spacer);
 	gtk_widget_set_valign(GTK_WIDGET(p1_image), GTK_ALIGN_END);
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p1_image));
+	gtk_widget_set_halign(GTK_WIDGET(p1_image), GTK_ALIGN_CENTER);
+	gtk_widget_set_margin_bottom(GTK_WIDGET(p1_image), 16);
+	gtk_box_append(GTK_BOX(p1_panel), GTK_WIDGET(p1_image));
 	gtk_box_append(GTK_BOX(players), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
-	GtkWidget* p2_avatar = gtk_image_new_from_file(gmchess_data_path("p2.png").c_str());
-	gtk_widget_set_vexpand(p2_avatar, TRUE);
-	gtk_box_append(GTK_BOX(players), p2_avatar);
+
+	GtkWidget* p2_panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+	gtk_widget_set_vexpand(p2_panel, TRUE);
+	gtk_box_append(GTK_BOX(players), p2_panel);
+
+	GtkWidget* p2_avatar = gtk_picture_new_for_filename(gmchess_data_path("p2.png").c_str());
+	gtk_picture_set_content_fit(GTK_PICTURE(p2_avatar), GTK_CONTENT_FIT_CONTAIN);
+	gtk_widget_set_size_request(p2_avatar, 88, 88);
+	gtk_widget_set_halign(p2_avatar, GTK_ALIGN_CENTER);
+	gtk_widget_set_margin_top(p2_avatar, 18);
+	gtk_widget_set_margin_bottom(p2_avatar, 4);
+	gtk_box_append(GTK_BOX(p2_panel), p2_avatar);
 	p2_name = GTK_LABEL(remember_widget("P2_name", gtk_label_new("Human")));
 	p2_step_time = GTK_LABEL(remember_widget("P2_step_time", gtk_label_new("")));
 	p2_war_time = GTK_LABEL(remember_widget("P2_war_time", gtk_label_new("")));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_name));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_step_time));
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_war_time));
-	gtk_widget_set_vexpand(GTK_WIDGET(p2_image), TRUE);
+	gtk_label_set_xalign(p2_name, 0.5);
+	gtk_box_append(GTK_BOX(p2_panel), GTK_WIDGET(p2_name));
+	gtk_box_append(GTK_BOX(p2_panel), GTK_WIDGET(p2_step_time));
+	gtk_box_append(GTK_BOX(p2_panel), GTK_WIDGET(p2_war_time));
+	GtkWidget* p2_spacer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_widget_set_vexpand(p2_spacer, TRUE);
+	gtk_box_append(GTK_BOX(p2_panel), p2_spacer);
 	gtk_widget_set_valign(GTK_WIDGET(p2_image), GTK_ALIGN_END);
-	gtk_box_append(GTK_BOX(players), GTK_WIDGET(p2_image));
+	gtk_widget_set_halign(GTK_WIDGET(p2_image), GTK_ALIGN_CENTER);
+	gtk_widget_set_margin_bottom(GTK_WIDGET(p2_image), 16);
+	gtk_box_append(GTK_BOX(p2_panel), GTK_WIDGET(p2_image));
 
 	GtkWidget* board_box = remember_widget("vbox_board", gtk_box_new(GTK_ORIENTATION_VERTICAL, 4));
 	gtk_widget_set_hexpand(board_box, TRUE);
