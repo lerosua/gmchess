@@ -32,7 +32,7 @@ void ConfWindow::button_cancel_cb(GtkButton*, gpointer data)
 	static_cast<ConfWindow*>(data)->on_button_cancel();
 }
 
-void ConfWindow::color_set_cb(GtkColorButton*, gpointer data)
+void ConfWindow::color_set_cb(GtkColorDialogButton*, GParamSpec*, gpointer data)
 {
 	static_cast<ConfWindow*>(data)->on_button_color_set();
 }
@@ -71,15 +71,14 @@ ConfWindow::ConfWindow(GtkWindow* parent_window)
 
 	GtkWidget* theme_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_box_append(GTK_BOX(theme_row), gtk_label_new(_("Theme:")));
-	cbtheme = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
-	gtk_combo_box_text_append_text(cbtheme, "wood");
-	gtk_combo_box_text_append_text(cbtheme, "west");
+	const char* themes[] = { "wood", "west", NULL };
+	cbtheme = GTK_DROP_DOWN(gtk_drop_down_new_from_strings(themes));
 	gtk_box_append(GTK_BOX(theme_row), GTK_WIDGET(cbtheme));
 	gtk_box_append(GTK_BOX(vbox), theme_row);
 
 	GtkWidget* color_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_box_append(GTK_BOX(color_row), gtk_label_new(_("Trace color:")));
-	colorBt = GTK_COLOR_BUTTON(gtk_color_button_new());
+	colorBt = GTK_COLOR_DIALOG_BUTTON(gtk_color_dialog_button_new(gtk_color_dialog_new()));
 	gtk_box_append(GTK_BOX(color_row), GTK_WIDGET(colorBt));
 	gtk_box_append(GTK_BOX(vbox), color_row);
 
@@ -126,12 +125,12 @@ ConfWindow::ConfWindow(GtkWindow* parent_window)
 
 	g_signal_connect(ok_bt, "clicked", G_CALLBACK(button_save_cb), this);
 	g_signal_connect(cancel_bt, "clicked", G_CALLBACK(button_cancel_cb), this);
-	g_signal_connect(colorBt, "color-set", G_CALLBACK(color_set_cb), this);
+	g_signal_connect(colorBt, "notify::rgba", G_CALLBACK(color_set_cb), this);
 
 	m_line_color = GMConf["line_color"];
 	GdkRGBA color;
 	if(gdk_rgba_parse(&color, m_line_color.c_str()))
-		gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(colorBt), &color);
+		gtk_color_dialog_button_set_rgba(colorBt, &color);
 
 	std::string& size_big = GMConf["desktop_size"];
 	m_size_big = (!size_big.empty())&&(size_big[0]=='1');
@@ -145,7 +144,7 @@ ConfWindow::ConfWindow(GtkWindow* parent_window)
 	m_theme = GMConf["themes"];
 	m_engine_name = GMConf["engine_name"];
 
-	gtk_combo_box_set_active(GTK_COMBO_BOX(cbtheme), m_theme == "wood" ? 0 : 1);
+	gtk_drop_down_set_selected(cbtheme, m_theme == "wood" ? 0 : 1);
 	gtk_check_button_set_active(size_big_button, m_size_big);
 	gtk_check_button_set_active(usebook_button, m_usebook);
 	gtk_spin_button_set_value(depth_button, atof(m_depth.c_str()));
@@ -160,7 +159,7 @@ ConfWindow::ConfWindow(GtkWindow* parent_window)
 		gtk_window_set_transient_for(GTK_WINDOW(window), parent_window);
 	g_signal_connect(window, "close-request", G_CALLBACK(delete_event_cb), this);
 
-	gtk_widget_show(window);
+	gtk_window_present(GTK_WINDOW(window));
 }
 
 ConfWindow::~ConfWindow()
@@ -192,9 +191,8 @@ void ConfWindow::on_button_cancel()
 
 void ConfWindow::on_button_color_set()
 {
-	GdkRGBA color;
-	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(colorBt), &color);
-	gchar* color_string = gdk_rgba_to_string(&color);
+	const GdkRGBA* color = gtk_color_dialog_button_get_rgba(colorBt);
+	gchar* color_string = gdk_rgba_to_string(color);
 	m_line_color = color_string;
 	g_free(color_string);
 }
@@ -222,10 +220,9 @@ void ConfWindow::write_to_GMConf()
 	GMConf["engine_name"] = m_engine_name;
 	GMConf["line_color"] = m_line_color;
 
-	gchar* active_theme = gtk_combo_box_text_get_active_text(cbtheme);
-	if(active_theme && std::string(active_theme) == "wood")
+	guint active_theme = gtk_drop_down_get_selected(cbtheme);
+	if(active_theme == 0)
 		GMConf["themes"] = "wood";
 	else
 		GMConf["themes"] = "west";
-	g_free(active_theme);
 }

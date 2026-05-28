@@ -25,18 +25,21 @@ class BookView
 		~BookView();
 
 		GtkWidget* widget() { return treeview; }
-		bool get_list_iter(GtkTreeIter* iter, GtkTreeIter* parent, const std::string& groupname);
-		bool add_group(GtkTreeIter* iter, const std::string& group);
-		bool add_group(GtkTreeIter* iter, const std::string& g_parent, const std::string& group);
+		bool add_group(const std::string& group);
+		bool add_group(const std::string& g_parent, const std::string& group);
 		void add_line(const std::string& groupname, const std::string& f_line, const std::string& f_path);
-		gboolean on_button_press_event(double x, double y, guint button, int n_press);
 		int load_book_dir(const char* path);
 
 	private:
-		static void button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
+		static void setup_cb(GtkSignalListItemFactory* factory, GtkListItem* item, gpointer data);
+		static void bind_cb(GtkSignalListItemFactory* factory, GtkListItem* item, gpointer data);
+		static void activate_cb(GtkListView* list, guint position, gpointer data);
+		int load_book_dir(const char* path, int depth);
+		void append_row(const std::string& title, const std::string& path, int type, int depth);
 
 		GtkWidget* treeview;
-		GtkTreeStore* tree_model;
+		GListStore* tree_model;
+		GtkSingleSelection* selection_model;
 		MainWindow* m_parent;
 };
 

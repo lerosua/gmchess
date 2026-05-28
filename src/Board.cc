@@ -148,7 +148,7 @@ Board::Board(MainWindow& win)
 	m_robot.set_out_callback([this](GIOCondition condition) {
 			return robot_log(condition);
 			});
-	gtk_widget_show(area);
+	gtk_widget_set_visible(area, TRUE);
 }
 
 Board::~Board()
@@ -284,8 +284,8 @@ void Board::configure_board(int _width)
 
 void Board::get_grid_size(int& width, int& height)
 {
-	width = (gtk_widget_get_allocated_width(area) - border_width * 2) / 8;
-	height = (gtk_widget_get_allocated_height(area) - border_width * 2) / 9;
+	width = (gtk_widget_get_width(area) - border_width * 2) / 8;
+	height = (gtk_widget_get_height(area) - border_width * 2) / 9;
 }
 
 BoardPixel Board::get_coordinate(int pos_x, int pos_y)
@@ -1212,8 +1212,8 @@ void Board::close_send_socket()
 
 void Board::save_board_to_file(const std::string& filename)
 {
-	const int width = gtk_widget_get_allocated_width(area);
-	const int height = gtk_widget_get_allocated_height(area);
+	const int width = gtk_widget_get_width(area);
+	const int height = gtk_widget_get_height(area);
 	cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
 	cairo_t* cr = cairo_create(surface);
 	active_cr = cr;

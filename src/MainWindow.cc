@@ -34,98 +34,185 @@ enum {
 	N_STEP_COLUMNS
 };
 
-static GtkWidget* create_message_dialog(GtkWindow* parent, const char* title,
-		GtkMessageType type, GtkButtonsType buttons, const std::string& secondary)
+static GObject* move_row_new(int num, const std::string& line)
 {
-	GtkWidget* dialog = gtk_message_dialog_new(parent, GTK_DIALOG_MODAL,
-			type, buttons, "%s", title);
-	if(!secondary.empty())
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
-				"%s", secondary.c_str());
-	return dialog;
+	const int bout = (num + 1) / 2;
+	const char* player = (num % 2) == 0 ? _("Black") : _("Red");
+	char display[1024];
+	snprintf(display, sizeof(display), "%d    %s    %s", bout, player, line.c_str());
+
+	GObject* row = G_OBJECT(g_object_new(G_TYPE_OBJECT, NULL));
+	g_object_set_data(row, "step-num", GINT_TO_POINTER(num));
+	g_object_set_data(row, "step-bout", GINT_TO_POINTER(bout));
+	g_object_set_data_full(row, "player", g_strdup(player), g_free);
+	g_object_set_data_full(row, "step-line", g_strdup(line.c_str()), g_free);
+	g_object_set_data_full(row, "display", g_strdup(display), g_free);
+	return row;
+}
+
+static int row_int(GObject* row, const char* key)
+{
+	return GPOINTER_TO_INT(g_object_get_data(row, key));
+}
+
+static const char* row_string(GObject* row, const char* key)
+{
+	const char* value = static_cast<const char*>(g_object_get_data(row, key));
+	return value ? value : "";
+}
+
+static void move_list_setup_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
+{
+	GtkWidget* label = gtk_label_new("");
+	gtk_label_set_xalign(GTK_LABEL(label), 0.0);
+	gtk_widget_set_margin_start(label, 6);
+	gtk_widget_set_margin_end(label, 6);
+	gtk_list_item_set_child(item, label);
+}
+
+static void move_list_bind_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
+{
+	GObject* row = G_OBJECT(gtk_list_item_get_item(item));
+	GtkWidget* label = gtk_list_item_get_child(item);
+	gtk_label_set_text(GTK_LABEL(label), row_string(row, "display"));
 }
 
 struct DialogRunData {
 	GMainLoop* loop;
 	gint response;
+	GFile* file;
+	bool save;
 };
 
-static void dialog_response_cb(GtkDialog*, gint response, gpointer data)
+static void alert_dialog_done_cb(GObject* source, GAsyncResult* result, gpointer data)
 {
 	DialogRunData* run_data = static_cast<DialogRunData*>(data);
-	run_data->response = response;
+	GError* error = NULL;
+	int button = gtk_alert_dialog_choose_finish(GTK_ALERT_DIALOG(source), result, &error);
+	if(error) {
+		g_error_free(error);
+		run_data->response = GTK_RESPONSE_CANCEL;
+	}
+	else {
+		run_data->response = (button == 0) ? GTK_RESPONSE_CANCEL : GTK_RESPONSE_OK;
+	}
 	g_main_loop_quit(run_data->loop);
 }
 
-static void native_dialog_response_cb(GtkNativeDialog*, gint response, gpointer data)
+static void file_dialog_done_cb(GObject* source, GAsyncResult* result, gpointer data)
 {
 	DialogRunData* run_data = static_cast<DialogRunData*>(data);
-	run_data->response = response;
+	GError* error = NULL;
+	GtkFileDialog* dialog = GTK_FILE_DIALOG(source);
+	run_data->file = run_data->save
+		? gtk_file_dialog_save_finish(dialog, result, &error)
+		: gtk_file_dialog_open_finish(dialog, result, &error);
+	if(error) {
+		g_error_free(error);
+		run_data->response = GTK_RESPONSE_CANCEL;
+	}
+	else {
+		run_data->response = run_data->file ? GTK_RESPONSE_ACCEPT : GTK_RESPONSE_CANCEL;
+	}
 	g_main_loop_quit(run_data->loop);
 }
 
 static gint run_message_dialog(GtkWindow* parent, const char* title,
 		GtkMessageType type, GtkButtonsType buttons, const std::string& secondary)
 {
-	GtkWidget* dialog = create_message_dialog(parent, title, type, buttons, secondary);
-	DialogRunData run_data = { g_main_loop_new(NULL, FALSE), GTK_RESPONSE_NONE };
-	g_signal_connect(dialog, "response", G_CALLBACK(dialog_response_cb), &run_data);
-	gtk_window_present(GTK_WINDOW(dialog));
+	(void)type;
+	GtkAlertDialog* dialog = gtk_alert_dialog_new("%s", title);
+	gtk_alert_dialog_set_modal(dialog, TRUE);
+	if(!secondary.empty())
+		gtk_alert_dialog_set_detail(dialog, secondary.c_str());
+
+	const char* ok_buttons[] = { _("_Cancel"), _("_OK"), NULL };
+	const char* info_buttons[] = { _("_OK"), NULL };
+	if(buttons == GTK_BUTTONS_OK_CANCEL) {
+		gtk_alert_dialog_set_buttons(dialog, ok_buttons);
+		gtk_alert_dialog_set_cancel_button(dialog, 0);
+		gtk_alert_dialog_set_default_button(dialog, 1);
+	}
+	else {
+		gtk_alert_dialog_set_buttons(dialog, info_buttons);
+		gtk_alert_dialog_set_cancel_button(dialog, 0);
+		gtk_alert_dialog_set_default_button(dialog, 0);
+	}
+
+	DialogRunData run_data = { g_main_loop_new(NULL, FALSE), GTK_RESPONSE_NONE, NULL, false };
+	gtk_alert_dialog_choose(dialog, parent, NULL, alert_dialog_done_cb, &run_data);
 	g_main_loop_run(run_data.loop);
 	g_main_loop_unref(run_data.loop);
-	gtk_window_destroy(GTK_WINDOW(dialog));
+	g_object_unref(dialog);
+	if(buttons != GTK_BUTTONS_OK_CANCEL && run_data.response == GTK_RESPONSE_CANCEL)
+		return GTK_RESPONSE_OK;
 	return run_data.response;
 }
 
-static GtkFileFilter* add_file_filter(GtkFileChooser* chooser, const char* name,
-		const char* lower, const char* upper)
+static GtkFileFilter* create_file_filter(const char* name, const char* lower, const char* upper)
 {
 	GtkFileFilter* filter = gtk_file_filter_new();
 	gtk_file_filter_set_name(filter, name);
 	gtk_file_filter_add_pattern(filter, lower);
 	gtk_file_filter_add_pattern(filter, upper);
-	gtk_file_chooser_add_filter(chooser, filter);
 	return filter;
 }
 
 static std::string run_file_chooser(GtkWindow* parent, const char* title,
 		GtkFileChooserAction action, const char* accept_label, bool add_filters)
 {
-	GtkFileChooserNative* dlg = gtk_file_chooser_native_new(title, parent, action,
-			accept_label, _("_Cancel"));
-	GtkFileChooser* chooser = GTK_FILE_CHOOSER(dlg);
+	GtkFileDialog* dialog = gtk_file_dialog_new();
+	gtk_file_dialog_set_title(dialog, title);
+	gtk_file_dialog_set_accept_label(dialog, accept_label);
+	gtk_file_dialog_set_modal(dialog, TRUE);
+
+	GListStore* filters = NULL;
 	if(add_filters) {
-		add_file_filter(chooser, "PGN", "*.pgn", "*.PGN");
-		add_file_filter(chooser, "CCM", "*.ccm", "*.CCM");
-		add_file_filter(chooser, "CHE", "*.che", "*.CHE");
-		add_file_filter(chooser, "CHN", "*.chn", "*.CHN");
-		add_file_filter(chooser, "MXQ", "*.mxq", "*.MXQ");
-		add_file_filter(chooser, "XQF", "*.xqf", "*.XQF");
-		GtkFileFilter* filter_any = gtk_file_filter_new();
-		gtk_file_filter_set_name(filter_any, _("All Files"));
-		gtk_file_filter_add_pattern(filter_any, "*");
-		gtk_file_chooser_add_filter(chooser, filter_any);
+		filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
+		const char* specs[][3] = {
+			{ "PGN", "*.pgn", "*.PGN" },
+			{ "CCM", "*.ccm", "*.CCM" },
+			{ "CHE", "*.che", "*.CHE" },
+			{ "CHN", "*.chn", "*.CHN" },
+			{ "MXQ", "*.mxq", "*.MXQ" },
+			{ "XQF", "*.xqf", "*.XQF" },
+		};
+		for(size_t i = 0; i < G_N_ELEMENTS(specs); ++i) {
+			GtkFileFilter* filter = create_file_filter(specs[i][0], specs[i][1], specs[i][2]);
+			g_list_store_append(filters, filter);
+			g_object_unref(filter);
+		}
+		GtkFileFilter* filter_any = create_file_filter(_("All Files"), "*", "*");
+		g_list_store_append(filters, filter_any);
+		g_object_unref(filter_any);
+		gtk_file_dialog_set_filters(dialog, G_LIST_MODEL(filters));
 	}
 
-	DialogRunData run_data = { g_main_loop_new(NULL, FALSE), GTK_RESPONSE_NONE };
-	g_signal_connect(dlg, "response", G_CALLBACK(native_dialog_response_cb), &run_data);
-	gtk_native_dialog_show(GTK_NATIVE_DIALOG(dlg));
+	DialogRunData run_data = {
+		g_main_loop_new(NULL, FALSE),
+		GTK_RESPONSE_NONE,
+		NULL,
+		action == GTK_FILE_CHOOSER_ACTION_SAVE
+	};
+	if(run_data.save)
+		gtk_file_dialog_save(dialog, parent, NULL, file_dialog_done_cb, &run_data);
+	else
+		gtk_file_dialog_open(dialog, parent, NULL, file_dialog_done_cb, &run_data);
 	g_main_loop_run(run_data.loop);
 	g_main_loop_unref(run_data.loop);
 
 	std::string filename;
-	if(run_data.response == GTK_RESPONSE_ACCEPT) {
-		GFile* file = gtk_file_chooser_get_file(chooser);
-		if(file) {
-			char* path = g_file_get_path(file);
-			if(path) {
-				filename = path;
-				g_free(path);
-			}
-			g_object_unref(file);
+	if(run_data.response == GTK_RESPONSE_ACCEPT && run_data.file) {
+		char* path = g_file_get_path(run_data.file);
+		if(path) {
+			filename = path;
+			g_free(path);
 		}
+		g_object_unref(run_data.file);
 	}
-	g_object_unref(dlg);
+	if(filters)
+		g_object_unref(filters);
+	g_object_unref(dialog);
 	return filename;
 }
 
@@ -137,6 +224,7 @@ MainWindow::MainWindow(GtkApplication* app)
 	, action_group(NULL)
 	, m_treeview(NULL)
 	, m_refTreeModel(NULL)
+	, m_move_selection(NULL)
 	, m_bookview(NULL)
 	, buttonbox_war(NULL)
 	, text_comment(NULL)
@@ -149,7 +237,6 @@ MainWindow::MainWindow(GtkApplication* app)
 	g_signal_connect(window, "close-request", G_CALLBACK(delete_event_cb), this);
 	g_signal_connect(window, "destroy", G_CALLBACK(window_destroy_cb), this);
 
-	GtkWidget* main_box = builder_widget("main_window");
 	GtkWidget* box_board = builder_widget("vbox_board");
 	buttonbox_war = builder_widget("hbuttonbox_war");
 	text_comment = GTK_TEXT_VIEW(builder_widget("textview_comment"));
@@ -206,9 +293,9 @@ MainWindow::MainWindow(GtkApplication* app)
 	init_conf();
 	g_signal_connect(board->widget(), "resize", G_CALLBACK(board_resize_cb), this);
 
-	gtk_widget_show(window);
-	gtk_widget_hide(GTK_WIDGET(p1_image));
-	gtk_widget_hide(GTK_WIDGET(p2_image));
+	gtk_window_present(GTK_WINDOW(window));
+	gtk_widget_set_visible(GTK_WIDGET(p1_image), FALSE);
+	gtk_widget_set_visible(GTK_WIDGET(p2_image), FALSE);
 
 	if(atoi(GMConf["desktop_size"].c_str()) == 1)
 		board->set_board_size(BIG_BOARD);
@@ -251,6 +338,8 @@ MainWindow::~MainWindow()
 	delete board;
 	if(m_refTreeModel)
 		g_object_unref(m_refTreeModel);
+	if(m_move_selection)
+		g_object_unref(m_move_selection);
 	if(ui_logo)
 		g_object_unref(ui_logo);
 	if(action_group)
@@ -420,10 +509,16 @@ void MainWindow::button_chanju_cb(GtkButton*, gpointer data)
 	static_cast<MainWindow*>(data)->on_chanju_game();
 }
 
-void MainWindow::tree_button_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data)
+void MainWindow::move_list_activate_cb(GtkListView*, guint position, gpointer data)
 {
-	guint button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-	static_cast<MainWindow*>(data)->on_treeview_click(x, y, button, n_press);
+	MainWindow* self = static_cast<MainWindow*>(data);
+	if(self->board->is_fight_to_robot())
+		return;
+	GObject* row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(self->m_refTreeModel), position));
+	if(!row)
+		return;
+	self->board->get_board_by_move(row_int(row, "step-num"));
+	g_object_unref(row);
 }
 
 gboolean MainWindow::delete_event_cb(GtkWindow*, gpointer data)
@@ -493,18 +588,18 @@ void MainWindow::menu_about_cb(GSimpleAction*, GVariant*, gpointer data)
 
 void MainWindow::on_size_change()
 {
-	board->configure_board(gtk_widget_get_allocated_width(board->widget()));
+	board->configure_board(gtk_widget_get_width(board->widget()));
 }
 
 void MainWindow::change_play(bool player)
 {
 	if(player) {
-		gtk_widget_hide(GTK_WIDGET(p1_image));
-		gtk_widget_show(GTK_WIDGET(p2_image));
+		gtk_widget_set_visible(GTK_WIDGET(p1_image), FALSE);
+		gtk_widget_set_visible(GTK_WIDGET(p2_image), TRUE);
 	}
 	else {
-		gtk_widget_hide(GTK_WIDGET(p2_image));
-		gtk_widget_show(GTK_WIDGET(p1_image));
+		gtk_widget_set_visible(GTK_WIDGET(p2_image), FALSE);
+		gtk_widget_set_visible(GTK_WIDGET(p1_image), TRUE);
 	}
 }
 
@@ -608,24 +703,21 @@ void MainWindow::textview_engine_log_clear()
 
 void MainWindow::show_treeview_step()
 {
-	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
-	GtkTreeIter iter;
-	if(!gtk_tree_model_get_iter_first(model, &iter))
+	if(!m_refTreeModel || !m_move_selection)
 		return;
 
 	int current_step = board->get_step();
-	do {
-		gint row_step = 0;
-		gtk_tree_model_get(model, &iter, COL_STEP_NUM, &row_step, -1);
-		if(row_step == current_step) {
-			GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
-			gtk_tree_view_scroll_to_cell(m_treeview, path, NULL, FALSE, 0, 0);
-			GtkTreeSelection* sel = gtk_tree_view_get_selection(m_treeview);
-			gtk_tree_selection_select_iter(sel, &iter);
-			gtk_tree_path_free(path);
+	const guint count = g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel));
+	for(guint i = 0; i < count; ++i) {
+		GObject* row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(m_refTreeModel), i));
+		if(row && row_int(row, "step-num") == current_step) {
+			gtk_single_selection_set_selected(m_move_selection, i);
+			g_object_unref(row);
 			return;
 		}
-	} while(gtk_tree_model_iter_next(model, &iter));
+		if(row)
+			g_object_unref(row);
+	}
 }
 
 void MainWindow::on_next_move()
@@ -643,7 +735,8 @@ void MainWindow::on_back_move()
 void MainWindow::on_first_move()
 {
 	board->first_move();
-	gtk_tree_view_scroll_to_point(m_treeview, 1, 1);
+	if(m_move_selection)
+		gtk_single_selection_set_selected(m_move_selection, 0);
 }
 
 void MainWindow::on_last_move()
@@ -720,22 +813,20 @@ void MainWindow::on_menu_save_file()
 		return;
 	}
 
-	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
-	GtkTreeIter iter;
-	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
-	while(valid) {
-		gint bout = 0;
-		gchar* line = NULL;
-		gtk_tree_model_get(model, &iter, COL_STEP_BOUT, &bout, COL_STEP_LINE, &line, -1);
-		file << bout << ". " << (line ? line : "");
-		g_free(line);
+	const guint count = g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel));
+	for(guint i = 0; i < count; ++i) {
+		GObject* row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(m_refTreeModel), i));
+		if(!row)
+			continue;
+		file << row_int(row, "step-bout") << ". " << row_string(row, "step-line");
+		g_object_unref(row);
 
-		valid = gtk_tree_model_iter_next(model, &iter);
-		if(valid) {
-			gtk_tree_model_get(model, &iter, COL_STEP_LINE, &line, -1);
-			file << "  " << (line ? line : "") << std::endl;
-			g_free(line);
-			valid = gtk_tree_model_iter_next(model, &iter);
+		if(i + 1 < count) {
+			row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(m_refTreeModel), ++i));
+			if(row) {
+				file << "  " << row_string(row, "step-line") << std::endl;
+				g_object_unref(row);
+			}
 		}
 		else {
 			file << std::endl;
@@ -772,22 +863,20 @@ void MainWindow::auto_save_chess_file()
 	file << "[Red \"" << p1 << "\"]" << std::endl;
 	file << "[Black \"" << p2 << "\"]" << std::endl;
 
-	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
-	GtkTreeIter iter;
-	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
-	while(valid) {
-		gint bout = 0;
-		gchar* line = NULL;
-		gtk_tree_model_get(model, &iter, COL_STEP_BOUT, &bout, COL_STEP_LINE, &line, -1);
-		file << bout << ". " << (line ? line : "");
-		g_free(line);
+	const guint count = g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel));
+	for(guint i = 0; i < count; ++i) {
+		GObject* row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(m_refTreeModel), i));
+		if(!row)
+			continue;
+		file << row_int(row, "step-bout") << ". " << row_string(row, "step-line");
+		g_object_unref(row);
 
-		valid = gtk_tree_model_iter_next(model, &iter);
-		if(valid) {
-			gtk_tree_model_get(model, &iter, COL_STEP_LINE, &line, -1);
-			file << "  " << (line ? line : "") << std::endl;
-			g_free(line);
-			valid = gtk_tree_model_iter_next(model, &iter);
+		if(i + 1 < count) {
+			row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(m_refTreeModel), ++i));
+			if(row) {
+				file << "  " << row_string(row, "step-line") << std::endl;
+				g_object_unref(row);
+			}
 		}
 		else {
 			file << std::endl;
@@ -855,7 +944,7 @@ void MainWindow::on_menu_war_to_ai()
 void MainWindow::on_menu_free_play()
 {
 	board->free_game();
-	gtk_list_store_clear(m_refTreeModel);
+	g_list_store_remove_all(m_refTreeModel);
 	set_status();
 }
 
@@ -956,97 +1045,46 @@ void MainWindow::on_menu_about()
 
 void MainWindow::add_step_line(int num, const std::string& f_line)
 {
-	GtkTreeIter iter;
-	gtk_list_store_append(m_refTreeModel, &iter);
-	gtk_list_store_set(m_refTreeModel, &iter,
-			COL_STEP_LINE, f_line.c_str(),
-			COL_STEP_NUM, num,
-			COL_STEP_BOUT, (int)((num + 1) / 2),
-			COL_PLAYER, (num % 2) == 0 ? _("Black") : _("Red"),
-			-1);
-
-	GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(m_refTreeModel), &iter);
-	gtk_tree_view_scroll_to_cell(m_treeview, path, NULL, FALSE, 0, 0);
-	gtk_tree_path_free(path);
+	GObject* row = move_row_new(num, f_line);
+	g_list_store_append(m_refTreeModel, row);
+	g_object_unref(row);
+	if(m_move_selection)
+		gtk_single_selection_set_selected(m_move_selection,
+				g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel)) - 1);
 }
 
 void MainWindow::del_step_last_line()
 {
-	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
-	GtkTreeIter iter;
-	if(!gtk_tree_model_get_iter_first(model, &iter))
+	const guint count = g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel));
+	if(count == 0)
 		return;
-
-	GtkTreeIter last = iter;
-	while(gtk_tree_model_iter_next(model, &iter))
-		last = iter;
-	gtk_list_store_remove(m_refTreeModel, &last);
+	g_list_store_remove(m_refTreeModel, count - 1);
 }
 
 void MainWindow::init_move_treeview()
 {
 	if(m_treeview == NULL) {
 		GtkWidget* scrolwin = builder_widget("scrolledwindow");
-		m_refTreeModel = gtk_list_store_new(N_STEP_COLUMNS,
-				G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING);
-		m_treeview = GTK_TREE_VIEW(gtk_tree_view_new());
-		gtk_tree_view_set_model(m_treeview, GTK_TREE_MODEL(m_refTreeModel));
+		GtkListItemFactory* factory = gtk_signal_list_item_factory_new();
+		g_signal_connect(factory, "setup", G_CALLBACK(move_list_setup_cb), this);
+		g_signal_connect(factory, "bind", G_CALLBACK(move_list_bind_cb), this);
+		m_refTreeModel = g_list_store_new(G_TYPE_OBJECT);
+		m_move_selection = gtk_single_selection_new(G_LIST_MODEL(g_object_ref(m_refTreeModel)));
+		m_treeview = GTK_LIST_VIEW(gtk_list_view_new(GTK_SELECTION_MODEL(g_object_ref(m_move_selection)), factory));
+		gtk_list_view_set_show_separators(m_treeview, TRUE);
+		g_signal_connect(m_treeview, "activate", G_CALLBACK(move_list_activate_cb), this);
 		gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolwin), GTK_WIDGET(m_treeview));
-		gtk_tree_view_insert_column_with_attributes(m_treeview,
-				-1, _("Turn"), gtk_cell_renderer_text_new(), "text", COL_STEP_BOUT, NULL);
-		gtk_tree_view_insert_column_with_attributes(m_treeview,
-				-1, "  ", gtk_cell_renderer_text_new(), "text", COL_PLAYER, NULL);
-		gtk_tree_view_insert_column_with_attributes(m_treeview,
-				-1, _("Move"), gtk_cell_renderer_text_new(), "text", COL_STEP_LINE, NULL);
-		GtkGesture* click = gtk_gesture_click_new();
-		gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
-		g_signal_connect(click, "pressed", G_CALLBACK(tree_button_cb), this);
-		gtk_widget_add_controller(GTK_WIDGET(m_treeview), GTK_EVENT_CONTROLLER(click));
-		gtk_widget_show(GTK_WIDGET(m_treeview));
+		gtk_widget_set_visible(GTK_WIDGET(m_treeview), TRUE);
 		set_status();
 		return;
 	}
 
-	gtk_list_store_clear(m_refTreeModel);
+	g_list_store_remove_all(m_refTreeModel);
 	const std::vector<std::string>& move_chinese = board->get_move_chinese_snapshot();
 	for(std::vector<std::string>::const_iterator iter = move_chinese.begin();
 			iter != move_chinese.end(); ++iter) {
 		add_step_line((int)(iter - move_chinese.begin()) + 1, *iter);
 	}
-}
-
-gboolean MainWindow::on_treeview_click(double x, double y, guint, int n_press)
-{
-	if(board->is_fight_to_robot())
-		return TRUE;
-
-	GtkTreePath* path = NULL;
-	GtkTreeViewColumn* tvc = NULL;
-	int cx, cy;
-	if(!gtk_tree_view_get_path_at_pos(m_treeview, (int)x, (int)y,
-				&path, &tvc, &cx, &cy))
-		return FALSE;
-
-	GtkTreeModel* model = GTK_TREE_MODEL(m_refTreeModel);
-	GtkTreeIter iter;
-	if(!gtk_tree_model_get_iter(model, &iter, path)) {
-		gtk_tree_path_free(path);
-		return FALSE;
-	}
-
-	GtkTreeSelection* selection = gtk_tree_view_get_selection(m_treeview);
-	gtk_tree_selection_select_iter(selection, &iter);
-
-	if(n_press >= 2) {
-		gint num = 0;
-		gtk_tree_model_get(model, &iter, COL_STEP_NUM, &num, -1);
-		board->get_board_by_move(num);
-		gtk_tree_path_free(path);
-		return TRUE;
-	}
-
-	gtk_tree_path_free(path);
-	return FALSE;
 }
 
 void MainWindow::set_information()
@@ -1117,7 +1155,7 @@ void MainWindow::on_network_game(const std::string& me_name, const std::string& 
 	if(!role_red_)
 		board->rev_game();
 
-	gtk_list_store_clear(m_refTreeModel);
+	g_list_store_remove_all(m_refTreeModel);
 	board->start_network();
 	set_status();
 	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);
@@ -1129,7 +1167,7 @@ void MainWindow::on_chanju_game()
 		gint result = run_message_dialog(gobj(), _("new game"), GTK_MESSAGE_QUESTION,
 				GTK_BUTTONS_OK_CANCEL, _("Will you start a new game?"));
 		if(result == GTK_RESPONSE_OK) {
-			gtk_list_store_clear(m_refTreeModel);
+			g_list_store_remove_all(m_refTreeModel);
 			board->chanju_game();
 		}
 		return;
@@ -1139,7 +1177,7 @@ void MainWindow::on_chanju_game()
 				_("You are play online, Please end this game first!"));
 		return;
 	}
-	gtk_list_store_clear(m_refTreeModel);
+	g_list_store_remove_all(m_refTreeModel);
 	board->start_robot(false);
 	set_status();
 	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);
@@ -1151,7 +1189,7 @@ void MainWindow::on_begin_game()
 		gint result = run_message_dialog(gobj(), _("new game"), GTK_MESSAGE_QUESTION,
 				GTK_BUTTONS_OK_CANCEL, _("Will you start a new game?"));
 		if(result == GTK_RESPONSE_OK) {
-			gtk_list_store_clear(m_refTreeModel);
+			g_list_store_remove_all(m_refTreeModel);
 			board->new_game();
 		}
 		return;
@@ -1161,7 +1199,7 @@ void MainWindow::on_begin_game()
 				_("You are playing online, Please end this game first!"));
 		return;
 	}
-	gtk_list_store_clear(m_refTreeModel);
+	g_list_store_remove_all(m_refTreeModel);
 	board->start_robot();
 	set_status();
 	gtk_widget_set_sensitive(GTK_WIDGET(btn_begin), FALSE);

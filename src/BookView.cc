@@ -18,157 +18,126 @@
 #include <cstring>
 
 enum {
-	COL_TITLE,
-	COL_PATH,
-	COL_TYPE,
-	N_COLUMNS
+	BOOK_GROUP,
+	BOOK_MEMBER
 };
 
-void BookView::button_press_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data)
+static GObject* book_row_new(const std::string& title, const std::string& path, int type, int depth)
 {
-	guint button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-	static_cast<BookView*>(data)->on_button_press_event(x, y, button, n_press);
+	GObject* row = G_OBJECT(g_object_new(G_TYPE_OBJECT, NULL));
+	g_object_set_data_full(row, "title", g_strdup(title.c_str()), g_free);
+	g_object_set_data_full(row, "path", g_strdup(path.c_str()), g_free);
+	g_object_set_data(row, "type", GINT_TO_POINTER(type));
+	g_object_set_data(row, "depth", GINT_TO_POINTER(depth));
+	return row;
+}
+
+static const char* row_string(GObject* row, const char* key)
+{
+	const char* value = static_cast<const char*>(g_object_get_data(row, key));
+	return value ? value : "";
+}
+
+static int row_int(GObject* row, const char* key)
+{
+	return GPOINTER_TO_INT(g_object_get_data(row, key));
+}
+
+void BookView::setup_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
+{
+	GtkWidget* label = gtk_label_new("");
+	gtk_label_set_xalign(GTK_LABEL(label), 0.0);
+	gtk_list_item_set_child(item, label);
+}
+
+void BookView::bind_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
+{
+	GObject* row = G_OBJECT(gtk_list_item_get_item(item));
+	GtkWidget* label = gtk_list_item_get_child(item);
+	const int depth = row_int(row, "depth");
+	const int type = row_int(row, "type");
+	std::string title(depth * 2, ' ');
+	if(type == BOOK_GROUP)
+		title += "[";
+	title += row_string(row, "title");
+	if(type == BOOK_GROUP)
+		title += "]";
+	gtk_label_set_text(GTK_LABEL(label), title.c_str());
+	gtk_widget_set_margin_start(label, depth * 12);
+}
+
+void BookView::activate_cb(GtkListView*, guint position, gpointer data)
+{
+	BookView* self = static_cast<BookView*>(data);
+	GObject* row = G_OBJECT(g_list_model_get_item(G_LIST_MODEL(self->tree_model), position));
+	if(!row)
+		return;
+	if(row_int(row, "type") == BOOK_MEMBER) {
+		const char* file = row_string(row, "path");
+		DLOG("open file %s \n", file);
+		if(file[0] != '\0')
+			self->m_parent->open_file(file);
+	}
+	g_object_unref(row);
 }
 
 BookView::BookView(MainWindow* parent)
-	: treeview(gtk_tree_view_new())
-	, tree_model(gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT))
+	: treeview(NULL)
+	, tree_model(g_list_store_new(G_TYPE_OBJECT))
+	, selection_model(NULL)
 	, m_parent(parent)
 {
+	GtkListItemFactory* factory = gtk_signal_list_item_factory_new();
+	g_signal_connect(factory, "setup", G_CALLBACK(setup_cb), this);
+	g_signal_connect(factory, "bind", G_CALLBACK(bind_cb), this);
+	selection_model = gtk_single_selection_new(G_LIST_MODEL(g_object_ref(tree_model)));
+	treeview = gtk_list_view_new(GTK_SELECTION_MODEL(g_object_ref(selection_model)), factory);
 	gtk_widget_set_can_focus(treeview, TRUE);
-	gtk_tree_view_set_model(GTK_TREE_VIEW(treeview), GTK_TREE_MODEL(tree_model));
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview),
-			-1, _("Book"), gtk_cell_renderer_text_new(), "text", COL_TITLE, NULL);
-	GtkGesture* click = gtk_gesture_click_new();
-	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
-	g_signal_connect(click, "pressed", G_CALLBACK(button_press_cb), this);
-	gtk_widget_add_controller(treeview, GTK_EVENT_CONTROLLER(click));
-	gtk_widget_show(treeview);
+	g_signal_connect(treeview, "activate", G_CALLBACK(activate_cb), this);
+	gtk_widget_set_visible(treeview, TRUE);
 }
 
 BookView::~BookView()
 {
 	g_object_unref(tree_model);
+	g_object_unref(selection_model);
 }
 
-bool BookView::add_group(GtkTreeIter* iter, const std::string& group)
+void BookView::append_row(const std::string& title, const std::string& path, int type, int depth)
 {
-	gtk_tree_store_append(tree_model, iter, NULL);
-	gtk_tree_store_set(tree_model, iter,
-			COL_TITLE, group.c_str(),
-			COL_PATH, "",
-			COL_TYPE, GROUP,
-			-1);
+	GObject* row = book_row_new(title, path, type, depth);
+	g_list_store_append(tree_model, row);
+	g_object_unref(row);
+}
+
+bool BookView::add_group(const std::string& group)
+{
+	append_row(group, "", BOOK_GROUP, 0);
 	return true;
 }
 
-bool BookView::add_group(GtkTreeIter* iter, const std::string& g_parent, const std::string& group)
+bool BookView::add_group(const std::string&, const std::string& group)
 {
-	if(g_parent == "book")
-		return add_group(iter, group);
-
-	GtkTreeIter parent_iter;
-	if(!get_list_iter(&parent_iter, NULL, g_parent))
-		add_group(&parent_iter, g_parent);
-
-	gtk_tree_store_append(tree_model, iter, &parent_iter);
-	gtk_tree_store_set(tree_model, iter,
-			COL_TITLE, group.c_str(),
-			COL_PATH, "",
-			COL_TYPE, GROUP,
-			-1);
+	append_row(group, "", BOOK_GROUP, 1);
 	return true;
 }
 
 void BookView::add_line(const std::string& groupname, const std::string& f_line, const std::string& f_path)
 {
-	GtkTreeIter group_iter;
-	if(!get_list_iter(&group_iter, NULL, groupname)) {
-		GtkTreeIter root_iter;
-		bool found = false;
-		if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_model), &root_iter)) {
-			do {
-				if(get_list_iter(&group_iter, &root_iter, groupname)) {
-					found = true;
-					break;
-				}
-			} while(gtk_tree_model_iter_next(GTK_TREE_MODEL(tree_model), &root_iter));
-		}
-		if(!found)
-			return;
-	}
-
-	GtkTreeIter iter;
-	gtk_tree_store_append(tree_model, &iter, &group_iter);
-	gtk_tree_store_set(tree_model, &iter,
-			COL_TITLE, f_line.c_str(),
-			COL_PATH, f_path.c_str(),
-			COL_TYPE, MEMBER,
-			-1);
-}
-
-bool BookView::get_list_iter(GtkTreeIter* iter, GtkTreeIter* parent, const std::string& groupname)
-{
-	GtkTreeModel* model = GTK_TREE_MODEL(tree_model);
-	if(!gtk_tree_model_iter_children(model, iter, parent))
-		return false;
-
-	do {
-		gchar* title = NULL;
-		gtk_tree_model_get(model, iter, COL_TITLE, &title, -1);
-		const bool matched = title && groupname == title;
-		g_free(title);
-		if(matched)
-			return true;
-	} while(gtk_tree_model_iter_next(model, iter));
-
-	return false;
-}
-
-gboolean BookView::on_button_press_event(double x, double y, guint button, int n_press)
-{
-	GtkTreePath* path = NULL;
-	GtkTreeViewColumn* tvc = NULL;
-	int cx, cy;
-	if(!gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(treeview), (int)x, (int)y,
-				&path, &tvc, &cx, &cy))
-		return FALSE;
-
-	GtkTreeIter iter;
-	GtkTreeModel* model = GTK_TREE_MODEL(tree_model);
-	if(!gtk_tree_model_get_iter(model, &iter, path)) {
-		gtk_tree_path_free(path);
-		return FALSE;
-	}
-
-	GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
-	gtk_tree_selection_select_iter(selection, &iter);
-
-	if (n_press >= 2 && button != 3) {
-		gint type = GROUP;
-		gchar* file = NULL;
-		gtk_tree_model_get(model, &iter, COL_TYPE, &type, COL_PATH, &file, -1);
-		if(GROUP != type){
-			DLOG("open file %s \n", file ? file : "");
-			if(file)
-				m_parent->open_file(file);
-		}
-		else {
-			if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(treeview), path))
-				gtk_tree_view_collapse_row(GTK_TREE_VIEW(treeview), path);
-			else{
-				gtk_tree_view_expand_row(GTK_TREE_VIEW(treeview), path, FALSE);
-				gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(treeview), path, NULL, FALSE, 0, 0);
-			}
-		}
-		g_free(file);
-	}
-
-	gtk_tree_path_free(path);
-	return FALSE;
+	(void)groupname;
+	append_row(f_line, f_path, BOOK_MEMBER, 1);
 }
 
 int BookView::load_book_dir(const char* Path)
+{
+	g_list_store_remove_all(tree_model);
+	char* base = g_path_get_basename(Path);
+	append_row(base ? base : "book", "", BOOK_GROUP, 0);
+	g_free(base);
+	return load_book_dir(Path, 1);
+}
+
+int BookView::load_book_dir(const char* Path, int depth)
 {
 	DIR *dirp;
 	struct dirent * node;
@@ -196,11 +165,12 @@ int BookView::load_book_dir(const char* Path)
 
 		stat(cPath, &pStat);
 		if(S_ISDIR(pStat.st_mode)){
-			GtkTreeIter iter;
-			add_group(&iter, basename((char*)Path), basename(cPath));
-			load_book_dir(cPath);
+			char* base = g_path_get_basename(cPath);
+			append_row(base ? base : node->d_name, "", BOOK_GROUP, depth);
+			g_free(base);
+			load_book_dir(cPath, depth + 1);
 		}else{
-			add_line(basename((char*)Path),node->d_name,cPath);
+			append_row(node->d_name, cPath, BOOK_MEMBER, depth);
 		}
 	}
 	closedir(dirp);

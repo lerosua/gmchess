@@ -42,7 +42,6 @@ class MainWindow
 		void on_draw_game();
 		void on_rue_game();
 		bool on_end_game(OVERSTATUS _over);
-		gboolean on_treeview_click(double x, double y, guint button, int n_press);
 		void set_comment(const std::string& f_comment);
 		void show_textview_engine_log(const std::string& f_text);
 		void textview_engine_log_clear();
@@ -89,7 +88,7 @@ class MainWindow
 		static void button_draw_cb(GtkButton* button, gpointer data);
 		static void button_rue_cb(GtkButton* button, gpointer data);
 		static void button_chanju_cb(GtkButton* button, gpointer data);
-		static void tree_button_cb(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
+		static void move_list_activate_cb(GtkListView* list, guint position, gpointer data);
 		static gboolean delete_event_cb(GtkWindow* window, gpointer data);
 		static void window_destroy_cb(GtkWidget* widget, gpointer data);
 		static void board_resize_cb(GtkDrawingArea* area, int width, int height, gpointer data);
@@ -114,8 +113,9 @@ class MainWindow
 		GtkWidget*			menubar;
 		GSimpleActionGroup*	action_group;
 		std::map<std::string, GtkWidget*> ui_widgets;
-		GtkTreeView*		m_treeview;
-		GtkListStore*		m_refTreeModel;
+		GtkListView*		m_treeview;
+		GListStore*			m_refTreeModel;
+		GtkSingleSelection*	m_move_selection;
 		BookView*			m_bookview;
 		GtkWidget*			buttonbox_war;
 		GtkTextView*		text_comment;
