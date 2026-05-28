@@ -27,3 +27,8 @@ install_data(
   'gmchess.png',
   install_dir: join_paths(datadir, 'pixmaps'),
  )
+
+install_subdir(
+  'icons',
+  install_dir: datadir,
+)
