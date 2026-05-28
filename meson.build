@@ -101,7 +101,7 @@ vapidir = join_paths(datadir, 'vala', 'vapi')
 # Dependencies
 gtkmm_req = '>= 3.24.0'
 
-gtkmm_dep = dependency('gtkmm-3.0', version: gtkmm_req)
+gtkmm_dep = dependency('gtkmm-3.0', version: gtkmm_req, required: false)
 
 libdl_dep = cpp.find_library('dl', required: true)
 if not libdl_dep.found()

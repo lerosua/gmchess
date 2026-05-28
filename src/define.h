@@ -17,6 +17,10 @@
  */
 
 #ifndef __DEFINE_HH_
+#define __DEFINE_HH_
+
+#include <cstdio>
+#include <ctime>
 
 
 #ifdef __DEBUG_D
@@ -75,4 +79,3 @@
 
 
 #endif
-

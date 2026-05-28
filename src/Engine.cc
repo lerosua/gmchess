@@ -909,7 +909,7 @@ int Engine::do_move(int mv)
 	/** 得到中文表示法怎么这么曲折呢*/
 	uint32_t iccs =move_to_iccs(mv);
 	uint32_t hanzi = iccs_to_hanzi(iccs);
-	Glib::ustring mv_line = hanzi_to_move_chinese(hanzi);
+	std::string mv_line = hanzi_to_move_chinese(hanzi);
 
 	DLOG(" src = %x dst = %x mv = %d\n chessboard[src]= %d , chessboard[dst] = %d,taken = %d\n",src,dst,mv,chessboard[src],chessboard[dst],eated);
 
@@ -1427,9 +1427,8 @@ uint32_t Engine::iccs_to_hanzi(uint32_t f_iccs)
 
 }
 
-Glib::ustring  Engine::hanzi_to_move_chinese(uint32_t f_hanzi)
+std::string Engine::hanzi_to_move_chinese(uint32_t f_hanzi)
 {
-	//Glib::ustring tmp_t;
 	union Hanzi c_hanzi;
 	c_hanzi.digit = f_hanzi;
 	if(c_hanzi.word[1]>='a'){
@@ -1451,67 +1450,67 @@ Glib::ustring  Engine::hanzi_to_move_chinese(uint32_t f_hanzi)
 
 }
 
-Glib::ustring Engine::digit_to_word(char digit)
+std::string Engine::digit_to_word(char digit)
 {
 	DLOG("digit = %c",digit);
 	if(black_player){
 		switch(digit){
 			case '1':
-				return Glib::ustring("1");
+				return std::string("1");
 				break;
 			case '2':
-				return Glib::ustring("2");
+				return std::string("2");
 				break;
 			case '3':
-				return Glib::ustring("3");
+				return std::string("3");
 				break;
 			case '4':
-				return Glib::ustring("4");
+				return std::string("4");
 				break;
 			case '5':
-				return Glib::ustring("5");
+				return std::string("5");
 				break;
 			case '6':
-				return Glib::ustring("6");
+				return std::string("6");
 				break;
 			case '7':
-				return Glib::ustring("7");
+				return std::string("7");
 				break;
 			case '8':
-				return Glib::ustring("8");
+				return std::string("8");
 				break;
 			case '9':
-				return Glib::ustring("9");
+				return std::string("9");
 				break;
 			case 'a':
-				return Glib::ustring("前");
+				return std::string("前");
 				break;
 			case 'b':
-				return Glib::ustring("后");
+				return std::string("后");
 				break;
 			case 'c':
-				return Glib::ustring("一");
+				return std::string("一");
 				break;
 			case 'd':
-				return Glib::ustring("二");
+				return std::string("二");
 				break;
 			case 'e':
-				return Glib::ustring("三");
+				return std::string("三");
 				break;
 			case 'f':
-				return Glib::ustring("四");
+				return std::string("四");
 				break;
 			case 'g':
-				return Glib::ustring("五");
+				return std::string("五");
 				break;
 			case 'q':
-				return Glib::ustring("前");
+				return std::string("前");
 				break;
 			case 'z':
-				return Glib::ustring("中");
+				return std::string("中");
 				break;
 			case 'h':
-				return Glib::ustring("后");
+				return std::string("后");
 				break;
 			default:
 				break;
@@ -1520,130 +1519,130 @@ Glib::ustring Engine::digit_to_word(char digit)
 	else{
 	switch(digit){
 		case '1':
-			return Glib::ustring("一");
+			return std::string("一");
 			break;
 		case '2':
-			return Glib::ustring("二");
+			return std::string("二");
 			break;
 		case '3':
-			return Glib::ustring("三");
+			return std::string("三");
 			break;
 		case '4':
-			return Glib::ustring("四");
+			return std::string("四");
 			break;
 		case '5':
-			return Glib::ustring("五");
+			return std::string("五");
 			break;
 		case '6':
-			return Glib::ustring("六");
+			return std::string("六");
 			break;
 		case '7':
-			return Glib::ustring("七");
+			return std::string("七");
 			break;
 		case '8':
-			return Glib::ustring("八");
+			return std::string("八");
 			break;
 		case '9':
-			return Glib::ustring("九");
+			return std::string("九");
 			break;
 		case 'a':
-			return Glib::ustring("前");
+			return std::string("前");
 			break;
 		case 'b':
-			return Glib::ustring("后");
+			return std::string("后");
 			break;
 		case 'c':
-			return Glib::ustring("一");
+			return std::string("一");
 			break;
 		case 'd':
-			return Glib::ustring("二");
+			return std::string("二");
 			break;
 		case 'e':
-			return Glib::ustring("三");
+			return std::string("三");
 			break;
 		case 'f':
-			return Glib::ustring("四");
+			return std::string("四");
 			break;
 		case 'g':
-			return Glib::ustring("五");
+			return std::string("五");
 			break;
 		case 'q':
-			return Glib::ustring("前");
+			return std::string("前");
 			break;
 		case 'z':
-			return Glib::ustring("中");
+			return std::string("中");
 			break;
 		case 'h':
-			return Glib::ustring("后");
+			return std::string("后");
 			break;
 		default:
 			break;
 		};
 	}
-	return Glib::ustring("NULL");
+	return std::string("NULL");
 
 }
-Glib::ustring Engine::action_to_word(char action)
+std::string Engine::action_to_word(char action)
 {
 	DLOG(" action = %c\n",action);
 	switch(action){
 		case '.':
-			return Glib::ustring("平");
+			return std::string("平");
 			break;
 		case '+':
-			return Glib::ustring("进");
+			return std::string("进");
 			break;
 		case '-':
-			return Glib::ustring("退");
+			return std::string("退");
 			break;
 		default:
 			break;
 	};
-	return Glib::ustring("NULL");
+	return std::string("NULL");
 }
-Glib::ustring Engine::code_to_word(char code)
+std::string Engine::code_to_word(char code)
 {
 	DLOG("code = %c\n",code);
 	switch(code){
 		case 'K':
-			return Glib::ustring("帅");
+			return std::string("帅");
 			break;
 		case 'A':
-			return Glib::ustring("仕");
+			return std::string("仕");
 			break;
 		case 'B':
-			return Glib::ustring("相");
+			return std::string("相");
 			break;
 		case 'N':
 		case 'n':
-			return Glib::ustring("马");
+			return std::string("马");
 			break;
 		case 'C':
 		case 'c':
-			return Glib::ustring("炮");
+			return std::string("炮");
 		case 'R':
 		case 'r':
-			return Glib::ustring("车");
+			return std::string("车");
 			break;
 		case 'P':
-			return Glib::ustring("兵");
+			return std::string("兵");
 			break;
 		case 'k':
-			return Glib::ustring("将");
+			return std::string("将");
 			break;
 		case 'a':
-			return Glib::ustring("士");
+			return std::string("士");
 			break;
 		case 'b':
-			return Glib::ustring("象");
+			return std::string("象");
 			break;
 		case 'p':
-			return Glib::ustring("卒");
+			return std::string("卒");
 			break;
 		default:
 			break;
 	};
-	return Glib::ustring("NULL");
+	return std::string("NULL");
 }
 uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 {
@@ -1672,7 +1671,7 @@ uint32_t Engine::hanzi_to_iccs(uint32_t f_hanzi)
 	else
 		num= 0;
 	*/
-	g_log("Engine",G_LOG_LEVEL_INFO,"num = %d\n",num);
+	DLOG("num = %d\n",num);
 
 	if(0 == cman_type ){
 		/** 处理帅将的源地址*/
@@ -2218,7 +2217,7 @@ void Engine::sync_board()
 	revchessboard[255]=0;
 }
 
-void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, bool rev)
+void Engine::gen_which_can_move(std::vector<ChessPoint>& points, int chess_, bool rev)
 {
 	int sx,sy;
 	get_xy_from_chess(chess_,sx,sy,rev);
@@ -2235,19 +2234,19 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 			int dst = get_dst_xy(sx+1,sy, rev);
 			int mv = get_move(src, dst);
 			if(logic_move(mv))
-				points.push_back(Gdk::Point(sx+1, sy));
+				points.push_back(ChessPoint(sx+1, sy));
 			dst = get_dst_xy(sx-1,sy, rev);
 			mv = get_move(src, dst);
 			if(logic_move(mv))
-				points.push_back(Gdk::Point(sx-1, sy));
+				points.push_back(ChessPoint(sx-1, sy));
 			dst = get_dst_xy(sx,sy+1, rev);
 			mv = get_move(src, dst);
 			if(logic_move(mv))
-				points.push_back(Gdk::Point(sx, sy+1));
+				points.push_back(ChessPoint(sx, sy+1));
 			dst = get_dst_xy(sx,sy-1, rev);
 			mv = get_move(src, dst);
 			if(logic_move(mv))
-				points.push_back(Gdk::Point(sx, sy-1));
+				points.push_back(ChessPoint(sx, sy-1));
 			}
 			break;
 		case RED_ADVISOR:
@@ -2256,19 +2255,19 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 				int dst = get_dst_xy(sx+1,sy+1, rev);
 				int mv = get_move(src, dst);
 				if(logic_move(mv))
-					points.push_back(Gdk::Point(sx+1, sy+1));
+					points.push_back(ChessPoint(sx+1, sy+1));
 				dst = get_dst_xy(sx+1,sy-1, rev);
 				mv = get_move(src, dst);
 				if(logic_move(mv))
-					points.push_back(Gdk::Point(sx+1, sy-1));
+					points.push_back(ChessPoint(sx+1, sy-1));
 				dst = get_dst_xy(sx-1,sy-1, rev);
 				mv = get_move(src, dst);
 				if(logic_move(mv))
-					points.push_back(Gdk::Point(sx-1, sy-1));
+					points.push_back(ChessPoint(sx-1, sy-1));
 				dst = get_dst_xy(sx-1,sy+1, rev);
 				mv = get_move(src, dst);
 				if(logic_move(mv))
-					points.push_back(Gdk::Point(sx-1, sy+1));
+					points.push_back(ChessPoint(sx-1, sy+1));
 			}
 			break;
 		case RED_BISHOP:
@@ -2277,19 +2276,19 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 				int dst = get_dst_xy(sx+2,sy+2,rev);
 				int mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+2,sy+2));
+						points.push_back(ChessPoint(sx+2,sy+2));
 				dst = get_dst_xy(sx+2, sy-2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+2,sy-2));
+						points.push_back(ChessPoint(sx+2,sy-2));
 				dst = get_dst_xy(sx-2, sy+2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-2,sy+2));
+						points.push_back(ChessPoint(sx-2,sy+2));
 				dst = get_dst_xy(sx-2, sy-2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-2,sy-2));
+						points.push_back(ChessPoint(sx-2,sy-2));
 			}
 			break;
 		case RED_KNIGHT:
@@ -2298,35 +2297,35 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 				int dst = get_dst_xy(sx+1,sy+2,rev);
 				int mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+1,sy+2));
+						points.push_back(ChessPoint(sx+1,sy+2));
 				dst = get_dst_xy(sx+1, sy-2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+1,sy-2));
+						points.push_back(ChessPoint(sx+1,sy-2));
 				dst = get_dst_xy(sx-1, sy-2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-1,sy-2));
+						points.push_back(ChessPoint(sx-1,sy-2));
 				dst = get_dst_xy(sx-1, sy+2, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-1,sy+2));
+						points.push_back(ChessPoint(sx-1,sy+2));
 				dst = get_dst_xy(sx-2, sy+1, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-2,sy+1));
+						points.push_back(ChessPoint(sx-2,sy+1));
 				dst = get_dst_xy(sx-2, sy-1, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx-2,sy-1));
+						points.push_back(ChessPoint(sx-2,sy-1));
 				dst = get_dst_xy(sx+2, sy+1, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+2,sy+1));
+						points.push_back(ChessPoint(sx+2,sy+1));
 				dst = get_dst_xy(sx+2, sy-1, rev);
 				mv = get_move(src,dst);
 				if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+2,sy-1));
+						points.push_back(ChessPoint(sx+2,sy-1));
 			}
 			break;
 		case RED_ROOK:
@@ -2338,11 +2337,11 @@ void Engine::gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, boo
 					int dst = get_dst_xy(sx,sy+i);
 					int mv = get_move(src,dst);
 					if(logic_move(mv))
-						points.push_back(Gdk::Point(sx,sy+i));
+						points.push_back(ChessPoint(sx,sy+i));
 					dst = get_dst_xy(sx+i, sy);
 					mv = get_move(src,dst);
 					if(logic_move(mv))
-						points.push_back(Gdk::Point(sx+i,sy));
+						points.push_back(ChessPoint(sx+i,sy));
 				}
 
 			}

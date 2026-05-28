@@ -815,11 +815,11 @@ void MainWindow::init_move_treeview()
 {
 	m_refTreeModel->clear();
 
-	const std::vector<Glib::ustring>&  move_chinese = board->get_move_chinese_snapshot();
-	std::vector<Glib::ustring>::const_iterator iter;
+	const std::vector<std::string>&  move_chinese = board->get_move_chinese_snapshot();
+	std::vector<std::string>::const_iterator iter;
 	iter = move_chinese.begin();
 	for(int i=1;iter != move_chinese.end(); iter++,i++)
-		add_step_line(i,*iter);
+		add_step_line(i,Glib::ustring(*iter));
 
 }
 

@@ -19,19 +19,19 @@
 #ifndef  PGNFILE_FILE_HEADER_INC
 #define  PGNFILE_FILE_HEADER_INC
 
-#include <gtkmm.h> 
+#include <string>
 #include <vector>
 
 typedef struct _board_info{
-		Glib::ustring event;
-		Glib::ustring date;
-		Glib::ustring site;
-		Glib::ustring red;
-		Glib::ustring black;
-		Glib::ustring result;
-		Glib::ustring ecco;
-		Glib::ustring opening;
-		Glib::ustring variation;
+		std::string event;
+		std::string date;
+		std::string site;
+		std::string red;
+		std::string black;
+		std::string result;
+		std::string ecco;
+		std::string opening;
+		std::string variation;
 }Board_info;
 class Engine;
 
@@ -39,12 +39,12 @@ class Pgnfile {
 	public:
 		Pgnfile(Engine& f_engine);
 		~Pgnfile();
-		char word_to_pos(const Glib::ustring& word);
-		char word_to_digit(const Glib::ustring& word);
-		char word_to_action(const Glib::ustring& word);
-		char word_to_code(const Glib::ustring& word);
+		char word_to_pos(const std::string& word);
+		char word_to_digit(const std::string& word);
+		char word_to_action(const std::string& word);
+		char word_to_code(const std::string& word);
 		int read(const std::string & filename);
-		bool get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name);
+		bool get_label(std::string& dst_str, const std::string& line_str, const std::string& name);
 		const Board_info& get_board_info(){ return board_info ;}
 
 	private:
@@ -56,4 +56,3 @@ class Pgnfile {
 
 
 #endif   /* ----- #ifndef PGNFILE_FILE_HEADER_INC  ----- */
-

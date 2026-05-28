@@ -523,13 +523,13 @@ void Board::draw_show_can_move()
 
 	if (selected_chessman < 0 )
 		return;
-	std::vector<Gdk::Point> points;
+	std::vector<ChessPoint> points;
 	m_engine.gen_which_can_move(points, selected_chessman, is_rev_board);
 
-	std::vector<Gdk::Point>::iterator iter = points.begin();
+	std::vector<ChessPoint>::iterator iter = points.begin();
 
 	for(;iter != points.end(); ++iter){
-		Gdk::Point p = get_coordinate(iter->get_x(), iter->get_y());
+		Gdk::Point p = get_coordinate(iter->x, iter->y);
 		draw_phonily_point(p);
 	}
 
@@ -747,7 +747,7 @@ int Board::try_move(int mv)
 		//m_engine.do_move(mv);
 		/** 将着法中文表示加到treeview中*/
 		/**  and the chinese moves to treeview */
-		Glib::ustring mv_chin = m_engine.get_chinese_last_move();
+		Glib::ustring mv_chin(m_engine.get_chinese_last_move());
 		int num = m_engine.how_step();
 		parent.add_step_line(num,mv_chin);
 		if(eat)

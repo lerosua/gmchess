@@ -20,7 +20,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <gtkmm.h>
+#include <glibmm.h>
 
 class Robot {
 	public:

@@ -21,7 +21,31 @@ Pgnfile::~Pgnfile()
 
 }
 
-char Pgnfile::word_to_pos(const Glib::ustring& word)
+static std::string next_utf8_char(const std::string& text, size_t& pos)
+{
+	if(pos >= text.size())
+		return std::string();
+
+	const unsigned char c = static_cast<unsigned char>(text[pos]);
+	size_t len = 1;
+	if((c & 0x80) == 0)
+		len = 1;
+	else if((c & 0xe0) == 0xc0)
+		len = 2;
+	else if((c & 0xf0) == 0xe0)
+		len = 3;
+	else if((c & 0xf8) == 0xf0)
+		len = 4;
+
+	if(pos + len > text.size())
+		len = text.size() - pos;
+
+	std::string out = text.substr(pos, len);
+	pos += len;
+	return out;
+}
+
+char Pgnfile::word_to_pos(const std::string& word)
 {
 	if(false){
 	}
@@ -39,7 +63,7 @@ char Pgnfile::word_to_pos(const Glib::ustring& word)
 		return -1;
 }
 
-char Pgnfile::word_to_digit(const Glib::ustring& word)
+char Pgnfile::word_to_digit(const std::string& word)
 {
 	if(false){
 	}
@@ -67,7 +91,7 @@ char Pgnfile::word_to_digit(const Glib::ustring& word)
 
 
 }
-char Pgnfile::word_to_action(const Glib::ustring& word)
+char Pgnfile::word_to_action(const std::string& word)
 {
 	if(false){
 	}
@@ -82,7 +106,7 @@ char Pgnfile::word_to_action(const Glib::ustring& word)
 }
 
 
-char Pgnfile::word_to_code(const Glib::ustring& word)
+char Pgnfile::word_to_code(const std::string& word)
 {
 	if(false){
 	}
@@ -115,7 +139,7 @@ char Pgnfile::word_to_code(const Glib::ustring& word)
 }
 
 
-bool Pgnfile::get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, const Glib::ustring& name)
+bool Pgnfile::get_label(std::string& dst_str, const std::string& line_str, const std::string& name)
 {
 
 	size_t pos = line_str.find(name);
@@ -124,7 +148,7 @@ bool Pgnfile::get_label(Glib::ustring& dst_str, const Glib::ustring& line_str, c
 	pos = line_str.find_first_of("\"");
 	if(pos == std::string::npos)
 		return false;
-	Glib::ustring tmp = line_str.substr(pos+1,std::string::npos);
+	std::string tmp = line_str.substr(pos+1,std::string::npos);
 	size_t end_pos = tmp.find_first_of("\"");
 	dst_str = tmp.substr(0,end_pos);
 
@@ -144,7 +168,7 @@ int Pgnfile::read(const std::string & filename)
 	m_engine.init_snapshot(start_fen);
 
 	std::string line;
-	Glib::ustring startFen;
+	std::string startFen;
 	bool comment=false;
 	std::string comment_str;
 	while(std::getline(file,line)){
@@ -206,22 +230,16 @@ int Pgnfile::read(const std::string & filename)
 			continue;
 		}
 
-		 Glib::ustring uline(line);
-		int i=0;
+		size_t i=0;
 		
 		do{
-			Glib::ustring word;
-			word.assign(1,uline[i]);
-			i++;
+			std::string word = next_utf8_char(line, i);
 			int c = word_to_code(word);
 			if(c == -1)
 				continue;
-			Glib::ustring word2;
-			Glib::ustring word3;
-			Glib::ustring word4;
-			word2.assign(1,uline[i++]);
-			word3.assign(1,uline[i++]);
-			word4.assign(1,uline[i++]);
+			std::string word2 = next_utf8_char(line, i);
+			std::string word3 = next_utf8_char(line, i);
+			std::string word4 = next_utf8_char(line, i);
 			std::cout << word<<" ";
 			std::cout << word2<<" ";
 			std::cout << word3<<" ";
@@ -250,11 +268,10 @@ int Pgnfile::read(const std::string & filename)
 			}
 
 
-		}while(i<uline.length());
+		}while(i<line.length());
 		
 	}
 
 	file.close();
 	return 0;
 }
-

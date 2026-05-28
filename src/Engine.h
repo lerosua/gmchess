@@ -21,11 +21,10 @@
 
 #include <stdio.h>
 #include "gmchess.h"
+#include "core_types.h"
 #include <vector>
 #include <string>
 #include <map>
-#include <glibmm.h>
-#include <gtkmm.h>
 
 
 /**
@@ -60,11 +59,11 @@ class Engine {
 		std::string get_current_snapshot(){ return current_fen_snapshots; }
 		/** 添加中文表达着法 */
 		/** add the chinese moves */
-		void add_move_chinese(Glib::ustring f_line){ move_chinese.push_back(f_line); };
+		void add_move_chinese(const std::string& f_line){ move_chinese.push_back(f_line); };
 		/** 返回中文着法表达示快照集*/
 		/** return the snapshot of chinese moves*/
-		const std::vector<Glib::ustring>& get_move_chinese_snapshot() {return move_chinese;};
-		const Glib::ustring& get_chinese_last_move(){ return move_chinese.back(); }
+		const std::vector<std::string>& get_move_chinese_snapshot() {return move_chinese;};
+		const std::string& get_chinese_last_move(){ return move_chinese.back(); }
 		
 		/**
 		 * @brief 棋盘数组生成Fen串 
@@ -189,10 +188,10 @@ class Engine {
 		uint32_t iccs_to_hanzi(uint32_t iccs);
 		uint32_t hanzi_to_iccs(uint32_t hanzi);
 
-		Glib::ustring hanzi_to_move_chinese(uint32_t hanzi);
-		Glib::ustring digit_to_word(char digit);
-		Glib::ustring action_to_word(char action);
-		Glib::ustring code_to_word(char code);
+		std::string hanzi_to_move_chinese(uint32_t hanzi);
+		std::string digit_to_word(char digit);
+		std::string action_to_word(char action);
+		std::string code_to_word(char code);
 
 		/** 
 		 * @brief 高级着法执行,被外部调用，本身调用do_move及logic_move
@@ -268,7 +267,7 @@ class Engine {
 		inline bool get_checkby(){ return m_checked;}
 
 		/**生成合法的步法着点集合*/
-		void gen_which_can_move(std::vector<Gdk::Point>& points, int chess_, bool rev);
+		void gen_which_can_move(std::vector<ChessPoint>& points, int chess_, bool rev);
 	private:
 		/**
 		 * @brief 从Fen串生成棋盘数组
@@ -300,7 +299,7 @@ class Engine {
 		std::vector<int> move_snapshots;
 		/** 着法的中文表达式*/
 		/**  save all chinese moves */
-		std::vector<Glib::ustring> move_chinese;
+		std::vector<std::string> move_chinese;
 		/** 着法的注释*/
 		/**  save all comment of moves */
 		std::map<int,std::string> move_comment;
@@ -318,4 +317,3 @@ class Engine {
 
 
 #endif   /* ----- #ifndef ENGINE_FILE_HEADER_INC  ----- */
-
