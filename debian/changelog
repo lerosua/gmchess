@@ -1,4 +1,4 @@
-gmchess (0.29.6.4) unstable; urgency=medium
+gmchess (0.40.1) unstable; urgency=medium
 
   * Add Debian packaging for Ubuntu deb builds.
   * Build against GTK4 with Meson.

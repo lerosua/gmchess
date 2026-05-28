@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gmchess 0.29.6.2\n"
+"Project-Id-Version: gmchess 0.40.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-29 20:47+0800\n"
 "PO-Revision-Date: 2018-01-29 20:47+0800\n"
