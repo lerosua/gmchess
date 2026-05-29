@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #ifdef _WIN32
 #include <windows.h>
 #else				/*  */
@@ -655,22 +656,44 @@ int Pgn2Pgn(const char *szFile, const char *szPgnFile,
  *  XQF=象棋演播室
  */
 enum { PGN,CCM, CHE, CHN, MXQ, XQF, ERR };
+static bool has_extension(const char *filename, const char *extension)
+{
+	const char *file_extension;
+
+	if (filename == NULL || extension == NULL) {
+		return false;
+	}
+
+	file_extension = strrchr(filename, '.');
+	if (file_extension == NULL) {
+		return false;
+	}
+
+	while (*file_extension != '\0' && *extension != '\0') {
+		if (tolower((unsigned char) *file_extension) !=
+		    tolower((unsigned char) *extension)) {
+			return false;
+		}
+		file_extension++;
+		extension++;
+	}
+
+	return *file_extension == '\0' && *extension == '\0';
+}
+
 int format(char *filename)
 {
-	if ((strstr(filename, ".pgn") != NULL)
-	     || strstr(filename, ".PGN") != NULL) {
+	if (has_extension(filename, ".pgn")) {
 		return PGN;
-	}else if ((strstr(filename, ".ccm") != NULL)
-	     || strstr(filename, ".CCM") != NULL) {
+	} else if (has_extension(filename, ".ccm")) {
 		return CCM;
-	} else if ((strstr(filename, ".che") != NULL)
-		    || strstr(filename, ".CHE") != NULL) {
+	} else if (has_extension(filename, ".che")) {
 		return CHE;
-	} else if ((strstr(filename, ".chn") != NULL)
-		    || strstr(filename, ".CHN")) {
+	} else if (has_extension(filename, ".chn")) {
 		return CHN;
-	} else if ((strstr(filename, ".xqf") != NULL)
-		    || strstr(filename, ".XQF")) {
+	} else if (has_extension(filename, ".mxq")) {
+		return MXQ;
+	} else if (has_extension(filename, ".xqf")) {
 		return XQF;
 	} else
 		return ERR;
@@ -768,5 +791,4 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
-
 
