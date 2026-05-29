@@ -7,6 +7,9 @@
 #include <string> 
 #include <locale.h> 
 #include <fstream> 
+#include <cerrno>
+#include <iconv.h>
+#include <vector>
 #include "gmchess.h" 
 #include "Pgnfile.h"
 #include "Engine.h"
@@ -43,6 +46,72 @@ static std::string next_utf8_char(const std::string& text, size_t& pos)
 	std::string out = text.substr(pos, len);
 	pos += len;
 	return out;
+}
+
+static bool is_valid_utf8(const std::string& text)
+{
+	size_t pos = 0;
+	while(pos < text.size()) {
+		const unsigned char c = static_cast<unsigned char>(text[pos]);
+		size_t len = 0;
+		if((c & 0x80) == 0)
+			len = 1;
+		else if((c & 0xe0) == 0xc0)
+			len = 2;
+		else if((c & 0xf0) == 0xe0)
+			len = 3;
+		else if((c & 0xf8) == 0xf0)
+			len = 4;
+		else
+			return false;
+
+		if(pos + len > text.size())
+			return false;
+		for(size_t i = 1; i < len; ++i) {
+			if((static_cast<unsigned char>(text[pos + i]) & 0xc0) != 0x80)
+				return false;
+		}
+		pos += len;
+	}
+	return true;
+}
+
+static std::string convert_encoding(const std::string& text, const char* from)
+{
+	if(text.empty())
+		return text;
+
+	iconv_t cd = iconv_open("UTF-8", from);
+	if(cd == (iconv_t)-1)
+		return std::string();
+
+	size_t in_left = text.size();
+	size_t out_left = text.size() * 4 + 8;
+	std::vector<char> out(out_left);
+	char* in = const_cast<char*>(text.data());
+	char* dst = out.data();
+	size_t result = iconv(cd, &in, &in_left, &dst, &out_left);
+	iconv_close(cd);
+
+	if(result == (size_t)-1 || in_left != 0)
+		return std::string();
+	return std::string(out.data(), dst - out.data());
+}
+
+static std::string ensure_utf8(const std::string& text)
+{
+	if(is_valid_utf8(text))
+		return text;
+
+	std::string converted = convert_encoding(text, "GB18030");
+	if(!converted.empty())
+		return converted;
+
+	converted = convert_encoding(text, "GBK");
+	if(!converted.empty())
+		return converted;
+
+	return text;
 }
 
 char Pgnfile::word_to_pos(const std::string& word)
@@ -172,6 +241,7 @@ int Pgnfile::read(const std::string & filename)
 	bool comment=false;
 	std::string comment_str;
 	while(std::getline(file,line)){
+		line = ensure_utf8(line);
 		size_t pos = line.find_first_of("[");
 		if(pos != std::string::npos){
 			get_label(board_info.event,line,"Event");

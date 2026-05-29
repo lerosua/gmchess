@@ -124,19 +124,15 @@ static void move_list_setup_cb(GtkSignalListItemFactory*, GtkListItem* item, gpo
 {
 	GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
 	GtkWidget* turn = gtk_label_new("");
-	GtkWidget* player = gtk_label_new("");
 	GtkWidget* move = gtk_label_new("");
 
 	gtk_widget_set_size_request(turn, 42, -1);
-	gtk_widget_set_size_request(player, 54, -1);
 	gtk_label_set_xalign(GTK_LABEL(turn), 0.0);
-	gtk_label_set_xalign(GTK_LABEL(player), 0.0);
 	gtk_label_set_xalign(GTK_LABEL(move), 0.0);
 	gtk_widget_set_hexpand(move, TRUE);
 	gtk_widget_set_margin_start(box, 8);
 	gtk_widget_set_margin_end(box, 8);
 	gtk_box_append(GTK_BOX(box), turn);
-	gtk_box_append(GTK_BOX(box), player);
 	gtk_box_append(GTK_BOX(box), move);
 	gtk_list_item_set_child(item, box);
 }
@@ -146,14 +142,15 @@ static void move_list_bind_cb(GtkSignalListItemFactory*, GtkListItem* item, gpoi
 	GObject* row = G_OBJECT(gtk_list_item_get_item(item));
 	GtkWidget* box = gtk_list_item_get_child(item);
 	GtkWidget* turn = gtk_widget_get_first_child(box);
-	GtkWidget* player = gtk_widget_get_next_sibling(turn);
-	GtkWidget* move = gtk_widget_get_next_sibling(player);
+	GtkWidget* move = gtk_widget_get_next_sibling(turn);
 	char turn_text[16];
+	char move_text[1024];
 
 	snprintf(turn_text, sizeof(turn_text), "%d", row_int(row, "step-bout"));
+	snprintf(move_text, sizeof(move_text), "%s    %s",
+			row_string(row, "player"), row_string(row, "step-line"));
 	gtk_label_set_text(GTK_LABEL(turn), turn_text);
-	gtk_label_set_text(GTK_LABEL(player), row_string(row, "player"));
-	gtk_label_set_text(GTK_LABEL(move), row_string(row, "step-line"));
+	gtk_label_set_text(GTK_LABEL(move), move_text);
 }
 
 struct DialogRunData {
@@ -592,16 +589,13 @@ void MainWindow::build_main_ui(GtkApplication* app)
 
 	GtkWidget* move_header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
 	GtkWidget* turn_header = gtk_label_new(_("Turn"));
-	GtkWidget* player_header = gtk_label_new("");
 	GtkWidget* move_header_label = gtk_label_new(_("Move"));
 	gtk_widget_set_size_request(turn_header, 42, -1);
-	gtk_widget_set_size_request(player_header, 54, -1);
 	gtk_label_set_xalign(GTK_LABEL(turn_header), 0.0);
 	gtk_label_set_xalign(GTK_LABEL(move_header_label), 0.0);
 	gtk_widget_set_margin_start(move_header, 8);
 	gtk_widget_set_margin_end(move_header, 8);
 	gtk_box_append(GTK_BOX(move_header), turn_header);
-	gtk_box_append(GTK_BOX(move_header), player_header);
 	gtk_box_append(GTK_BOX(move_header), move_header_label);
 	gtk_box_append(GTK_BOX(info_page), move_header);
 
