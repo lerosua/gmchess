@@ -808,6 +808,9 @@ int Board::open_file(const std::string& filename)
 	if(p_pgnfile->read(filename)<0)
 		return -1;
 	m_step = m_engine.how_step();
+	m_engine.get_snapshot(m_step);
+	std::string* str=m_engine.get_comment(m_step);
+	parent.set_comment(str != NULL ? *str : " ");
 	m_status = READ_STATUS ;
 
 	queue_draw();

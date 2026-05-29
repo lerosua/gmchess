@@ -559,7 +559,7 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	gtk_box_append(GTK_BOX(board_box), buttonbox_war);
 
 	m_notebook = GTK_NOTEBOOK(remember_widget("notebook", gtk_notebook_new()));
-	gtk_widget_set_hexpand(GTK_WIDGET(m_notebook), TRUE);
+	gtk_widget_set_size_request(GTK_WIDGET(m_notebook), 260, -1);
 	gtk_widget_set_vexpand(GTK_WIDGET(m_notebook), TRUE);
 	gtk_box_append(GTK_BOX(content), GTK_WIDGET(m_notebook));
 
@@ -568,6 +568,7 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	gtk_label_set_wrap(GTK_LABEL(info_label), TRUE);
 	gtk_box_append(GTK_BOX(info_page), info_label);
 	GtkWidget* scrolled = remember_widget("scrolledwindow", gtk_scrolled_window_new());
+	gtk_widget_set_size_request(scrolled, 240, 180);
 	gtk_widget_set_vexpand(scrolled, TRUE);
 	gtk_box_append(GTK_BOX(info_page), scrolled);
 
@@ -849,6 +850,7 @@ void MainWindow::show_treeview_step()
 	if(!m_refTreeModel || !m_move_selection)
 		return;
 
+	gtk_single_selection_set_selected(m_move_selection, GTK_INVALID_LIST_POSITION);
 	int current_step = board->get_step();
 	const guint count = g_list_model_get_n_items(G_LIST_MODEL(m_refTreeModel));
 	for(guint i = 0; i < count; ++i) {
@@ -878,8 +880,7 @@ void MainWindow::on_back_move()
 void MainWindow::on_first_move()
 {
 	board->first_move();
-	if(m_move_selection)
-		gtk_single_selection_set_selected(m_move_selection, 0);
+	show_treeview_step();
 }
 
 void MainWindow::on_last_move()
@@ -1021,12 +1022,16 @@ void MainWindow::open_file(const std::string& filename)
 	int out;
 	std::string::size_type const pos = filename.find(".pgn");
 	if(pos == std::string::npos) {
+		const char* converted_pgn = "/tmp/gmchess.pgn";
+		std::remove(converted_pgn);
 		std::string const convert_cmdline = "convert_pgn \"" + filename + "\"";
-		if(system(convert_cmdline.c_str()) < 0) {
+		if(system(convert_cmdline.c_str()) != 0) {
 			DLOG("convert pgn file error\n");
+			run_message_dialog(gobj(), "Error", GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+					_("the file maybe not right format for chess"));
 			return;
 		}
-		out = board->open_file("/tmp/gmchess.pgn");
+		out = board->open_file(converted_pgn);
 	}
 	else {
 		out = board->open_file(filename);
@@ -1199,6 +1204,7 @@ void MainWindow::init_move_treeview()
 			iter != move_chinese.end(); ++iter) {
 		add_step_line((int)(iter - move_chinese.begin()) + 1, *iter);
 	}
+	show_treeview_step();
 }
 
 void MainWindow::set_information()
