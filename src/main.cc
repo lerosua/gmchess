@@ -96,7 +96,7 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    GtkApplication* app = GTK_APPLICATION(adw_application_new("org.gmchess.GMChess", G_APPLICATION_DEFAULT_FLAGS));
+    GtkApplication* app = GTK_APPLICATION(adw_application_new(APPLICATION_ID, G_APPLICATION_DEFAULT_FLAGS));
     g_signal_connect(app, "activate", G_CALLBACK(activate_cb), &url);
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);

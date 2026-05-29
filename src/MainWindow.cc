@@ -1133,6 +1133,7 @@ void MainWindow::on_menu_about()
 	const gchar* authors[] = {
 		"lerosua@gmail.com ",
 		"wind(xihels@gmail.com)",
+		"yetist@gmail.com",
 		NULL
 	};
 	GtkWidget* about = gtk_about_dialog_new();
@@ -1142,7 +1143,7 @@ void MainWindow::on_menu_about()
 	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about), PACKAGE_VERSION);
 	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about), "https://lerosua.github.io");
 	gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(about),
-			"Copyright (c) 2009 - 2011 lerosua");
+			"Copyright (c) 2009 - 2026 lerosua");
 	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(about),
 			_("GMChess is a Chinese chess game written with GTK."));
 	gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(about), authors);

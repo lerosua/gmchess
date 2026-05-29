@@ -7,6 +7,7 @@ project('gmchess', 'cpp',
 
 package_name = meson.project_name()
 package_version = meson.project_version()
+app_id = 'org.gmchess.GMChess'
 
 soversion = 2
 
@@ -29,6 +30,7 @@ config_h.set_quoted('PACKAGE_STRING', package_string)
 config_h.set_quoted('PACKAGE_VERSION', package_version)
 config_h.set_quoted('GETTEXT_PACKAGE', package_name)
 config_h.set_quoted('VERSION', package_version)
+config_h.set_quoted('APPLICATION_ID', app_id)
 
 config_h.set_quoted('DATA_DIR', pkgdatadir)
 config_h.set_quoted('GMCHESS_LOCALEDIR', localedir)
