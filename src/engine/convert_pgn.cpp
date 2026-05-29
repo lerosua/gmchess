@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <vector>
 #ifdef _WIN32
 #include <windows.h>
 #else				/*  */
@@ -39,8 +40,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 static const int _ERROR_OPEN = -2;
 static const int _ERROR_CREATE = -1;
 static const int _OK = 0;
+static const int _ERROR_FORMAT = -4;
 static const int XQF2PGN_ERROR_OPEN = -3;
 static const int XQF2PGN_ERROR_FORMAT = -2;
+
+static const int CBR_HEADER_SIZE = 2214;
+static const int CBL_HEADER_SIZE = 576;
+static const int CBL_RECORD_SIZE = 4096;
 
 /** 中游象棋格式*/
 int Ccm2Pgn(const char *szCcmFile, const char *szPgnFile,
@@ -625,7 +631,7 @@ int Xqf2Pgn(const char *szXqfFile, const char *szPgnFile,
 
 /** 只是将大写的PGN后缀文件copy一下 */
 int Pgn2Pgn(const char *szFile, const char *szPgnFile,
-		    const EccoApiStruct & EccoApi)
+	     const EccoApiStruct & EccoApi)
 {
 	FILE * infp;
 	FILE * outfp;
@@ -648,6 +654,440 @@ int Pgn2Pgn(const char *szFile, const char *szPgnFile,
 
 }
 
+static uint32_t ReadLe32(const uint8_t *data)
+{
+	return (uint32_t) data[0] | ((uint32_t) data[1] << 8) |
+	    ((uint32_t) data[2] << 16) | ((uint32_t) data[3] << 24);
+}
+
+static uint16_t ReadLe16(const uint8_t *data)
+{
+	return (uint16_t) data[0] | ((uint16_t) data[1] << 8);
+}
+
+static bool ReadFileBytes(const char *filename, std::vector<uint8_t> &bytes)
+{
+	FILE *fp;
+	long size;
+
+	fp = fopen(filename, "rb");
+	if (fp == NULL) {
+		return false;
+	}
+	fseek(fp, 0, SEEK_END);
+	size = ftell(fp);
+	if (size < 0) {
+		fclose(fp);
+		return false;
+	}
+	fseek(fp, 0, SEEK_SET);
+	bytes.resize((size_t) size);
+	if (size > 0
+	    && fread(&bytes[0], 1, (size_t) size, fp) != (size_t) size) {
+		fclose(fp);
+		return false;
+	}
+	fclose(fp);
+	return true;
+}
+
+static std::string Utf16LeToGbk(const uint8_t *data, size_t len)
+{
+	size_t text_len = len;
+	CodeConverter converter("utf-16le", "gbk");
+
+	for (size_t i = 0; i + 1 < len; i += 2) {
+		if (data[i] == 0 && data[i + 1] == 0) {
+			text_len = i;
+			break;
+		}
+	}
+
+	if (text_len == 0) {
+		return std::string();
+	}
+	return converter.convert((const char *) data, text_len);
+}
+
+static void CopyPgnText(char *dest, const std::string &src)
+{
+	strncpy(dest, src.c_str(), MAX_STR_LEN - 1);
+	dest[MAX_STR_LEN - 1] = '\0';
+}
+
+static char *NewPgnComment(const std::string &comment)
+{
+	char *result;
+
+	if (comment.empty()) {
+		return NULL;
+	}
+
+	result = new char[comment.size() + 1];
+	strcpy(result, comment.c_str());
+	return result;
+}
+
+static int CbrPieceType(uint8_t piece)
+{
+	switch (piece & 0x0f) {
+	case 1:
+		return ROOK_FROM;
+	case 2:
+		return KNIGHT_FROM;
+	case 3:
+		return BISHOP_FROM;
+	case 4:
+		return ADVISOR_FROM;
+	case 5:
+		return KING_FROM;
+	case 6:
+		return CANNON_FROM;
+	case 7:
+		return PAWN_FROM;
+	default:
+		return -1;
+	}
+}
+
+static bool CbrBoardToPosition(const uint8_t *boards, uint16_t move_side,
+			       PositionStruct &pos)
+{
+	int next_piece[2][7] = {
+		{ ROOK_FROM, KNIGHT_FROM, BISHOP_FROM, ADVISOR_FROM,
+		  KING_FROM, CANNON_FROM, PAWN_FROM },
+		{ ROOK_FROM, KNIGHT_FROM, BISHOP_FROM, ADVISOR_FROM,
+		  KING_FROM, CANNON_FROM, PAWN_FROM },
+	};
+	int last_piece[7] = {
+		ROOK_TO, KNIGHT_TO, BISHOP_TO, ADVISOR_TO,
+		KING_FROM, CANNON_TO, PAWN_TO
+	};
+
+	pos.ClearBoard();
+
+	for (int y = 0; y < 10; y++) {
+		for (int x = 0; x < 9; x++) {
+			uint8_t piece = boards[y * 9 + x];
+			int side;
+			int type;
+			int piece_index;
+
+			if ((piece & 0xf0) == 0x10) {
+				side = 0;
+			} else if ((piece & 0xf0) == 0x20) {
+				side = 1;
+			} else {
+				continue;
+			}
+
+			type = CbrPieceType(piece);
+			if (type < 0) {
+				continue;
+			}
+
+			int type_index = (piece & 0x0f) - 1;
+			piece_index = next_piece[side][type_index];
+			if (piece_index > last_piece[type_index]) {
+				return false;
+			}
+
+			pos.AddPiece(COORD_XY(x + FILE_LEFT, y + RANK_TOP),
+				     SIDE_TAG(side) + piece_index);
+			next_piece[side][type_index]++;
+		}
+	}
+
+	if (move_side != 1) {
+		pos.ChangeSide();
+	}
+	pos.SetIrrev();
+	return true;
+}
+
+static int CbrSquare(uint8_t pos)
+{
+	int x = pos % 9;
+	int y = pos / 9;
+
+	if (pos >= 90) {
+		return 0;
+	}
+	return COORD_XY(x + FILE_LEFT, y + RANK_TOP);
+}
+
+static bool CbrReadStep(const uint8_t *data, size_t len, size_t &offset,
+			PgnFileStruct &pgn, PositionStruct &pos,
+			bool keep_mainline)
+{
+	uint8_t step_mark;
+	uint8_t step_from;
+	uint8_t step_to;
+	uint32_t comment_len = 0;
+	std::string comment;
+	PositionStruct before_move;
+	int mv, nStatus;
+
+	if (offset + 4 > len) {
+		return true;
+	}
+
+	step_mark = data[offset];
+	step_from = data[offset + 2];
+	step_to = data[offset + 3];
+	offset += 4;
+
+	if (step_mark == 0 && data[offset - 3] == 0 && step_from == 0
+	    && step_to == 0) {
+		return true;
+	}
+
+	if ((step_mark & 0x04) != 0) {
+		if (offset + 4 > len) {
+			return false;
+		}
+		comment_len = ReadLe32(data + offset);
+		offset += 4;
+		if (offset + comment_len > len) {
+			return false;
+		}
+		comment = Utf16LeToGbk(data + offset, comment_len);
+		offset += comment_len;
+	}
+
+	before_move = pos;
+	mv = MOVE(CbrSquare(step_from), CbrSquare(step_to));
+	if (mv == 0) {
+		return false;
+	}
+
+	if (pos.ucpcSquares[SRC(mv)] >= SIDE_TAG(1)) {
+		if (pos.sdPlayer == 0) {
+			pos.ChangeSide();
+		}
+	} else if (pos.ucpcSquares[SRC(mv)] >= SIDE_TAG(0)) {
+		if (pos.sdPlayer == 1) {
+			pos.ChangeSide();
+		}
+	} else {
+		return false;
+	}
+
+	if (!TryMove(pos, nStatus, mv)) {
+		return false;
+	}
+	if (pos.nMoveNum == MAX_MOVE_NUM) {
+		pos.SetIrrev();
+	}
+
+	if (keep_mainline && pgn.nMaxMove < MAX_MOVE_LEN - 1) {
+		pgn.nMaxMove++;
+		pgn.wmvMoveTable[pgn.nMaxMove] = mv;
+		pgn.szCommentTable[pgn.nMaxMove] = NewPgnComment(comment);
+	}
+
+	if ((step_mark & 0x01) == 0) {
+		if (!CbrReadStep(data, len, offset, pgn, pos, keep_mainline)) {
+			return false;
+		}
+	}
+
+	if ((step_mark & 0x02) != 0) {
+		if (!CbrReadStep(data, len, offset, pgn, before_move, false)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+static bool ParseCbrBuffer(const uint8_t *data, size_t len, PgnFileStruct &pgn)
+{
+	PositionStruct pos;
+	size_t offset = CBR_HEADER_SIZE;
+
+	if (len < CBR_HEADER_SIZE
+	    || memcmp(data, "CCBridge Record", 15) != 0) {
+		return false;
+	}
+
+	pgn.Reset();
+	CopyPgnText(pgn.szEvent, Utf16LeToGbk(data + 180, 128));
+	if (pgn.szEvent[0] == '\0') {
+		CopyPgnText(pgn.szEvent, Utf16LeToGbk(data + 692, 64));
+	}
+	CopyPgnText(pgn.szRound, Utf16LeToGbk(data + 180, 128));
+	CopyPgnText(pgn.szRed, Utf16LeToGbk(data + 1076, 64));
+	CopyPgnText(pgn.szBlack, Utf16LeToGbk(data + 1300, 64));
+	pgn.nResult = data[2076] <= 3 ? data[2076] : 0;
+
+	if (!CbrBoardToPosition(data + 2120, ReadLe16(data + 2116), pos)) {
+		return false;
+	}
+	pgn.posStart = pos;
+
+	if (offset + 4 <= len) {
+		uint32_t initial_comment_flag = ReadLe32(data + offset);
+		offset += 4;
+		if (initial_comment_flag != 0) {
+			uint32_t comment_len;
+			if (offset + 4 > len) {
+				return false;
+			}
+			comment_len = ReadLe32(data + offset);
+			offset += 4;
+			if (offset + comment_len > len) {
+				return false;
+			}
+			pgn.szCommentTable[0] =
+			    NewPgnComment(Utf16LeToGbk(data + offset,
+						       comment_len));
+			offset += comment_len;
+		}
+	}
+
+	if (offset < len) {
+		return CbrReadStep(data, len, offset, pgn, pos, true);
+	}
+	return true;
+}
+
+int Cbr2Pgn(const char *szCbrFile, const char *szPgnFile,
+	     const EccoApiStruct & EccoApi)
+{
+	std::vector<uint8_t> bytes;
+	PgnFileStruct pgn;
+
+	if (!ReadFileBytes(szCbrFile, bytes)) {
+		return _ERROR_OPEN;
+	}
+	if (bytes.empty() || !ParseCbrBuffer(&bytes[0], bytes.size(), pgn)) {
+		return _ERROR_FORMAT;
+	}
+	return (pgn.Write(szPgnFile) ? _OK : _ERROR_CREATE);
+}
+
+static int CblDataOffset(int book_count)
+{
+	if (book_count <= 128) {
+		return 101952;
+	} else if (book_count <= 256) {
+		return 137280;
+	} else if (book_count <= 384) {
+		return 151080;
+	} else if (book_count <= 512) {
+		return 207936;
+	}
+	return 349248;
+}
+
+static bool AppendFile(FILE *outfp, const char *filename)
+{
+	FILE *infp = fopen(filename, "rb");
+	char buffer[4096];
+	size_t read_size;
+
+	if (infp == NULL) {
+		return false;
+	}
+	while ((read_size = fread(buffer, 1, sizeof(buffer), infp)) > 0) {
+		fwrite(buffer, 1, read_size, outfp);
+	}
+	fclose(infp);
+	return true;
+}
+
+static size_t FindBytes(const std::vector<uint8_t> &bytes, const char *needle,
+			size_t start)
+{
+	size_t needle_len = strlen(needle);
+
+	if (needle_len == 0 || start >= bytes.size()
+	    || bytes.size() - start < needle_len) {
+		return bytes.size();
+	}
+
+	for (size_t i = start; i <= bytes.size() - needle_len; i++) {
+		if (memcmp(&bytes[i], needle, needle_len) == 0) {
+			return i;
+		}
+	}
+	return bytes.size();
+}
+
+int Cbl2Pgn(const char *szCblFile, const char *szPgnFile,
+	     const EccoApiStruct & EccoApi)
+{
+	std::vector<uint8_t> bytes;
+	const uint8_t *records;
+	size_t record_offset;
+	int book_count;
+	int converted = 0;
+	FILE *outfp;
+	const char *tmp_pgn = "/tmp/gmchess-cbr-record.pgn";
+
+	if (!ReadFileBytes(szCblFile, bytes)) {
+		return _ERROR_OPEN;
+	}
+
+	if (bytes.size() >= 8 && memcmp(&bytes[0], "CCBridge", 8) == 0
+	    && (bytes.size() < 16
+		|| memcmp(&bytes[0], "CCBridgeLibrary", 15) != 0)) {
+		return _ERROR_FORMAT;
+	}
+
+	if (bytes.size() < CBL_HEADER_SIZE
+	    || memcmp(&bytes[0], "CCBridgeLibrary", 15) != 0) {
+		return _ERROR_FORMAT;
+	}
+
+	book_count = (int) ReadLe32(&bytes[60]);
+	record_offset = (size_t) CblDataOffset(book_count);
+	if (record_offset >= bytes.size()) {
+		return _ERROR_FORMAT;
+	}
+	record_offset = FindBytes(bytes, "CCBridge Record", record_offset);
+	if (record_offset >= bytes.size()) {
+		return _ERROR_FORMAT;
+	}
+
+	records = &bytes[record_offset];
+	outfp = fopen(szPgnFile, "wb");
+	if (outfp == NULL) {
+		return _ERROR_CREATE;
+	}
+
+	for (size_t pos = 0; record_offset + pos + CBR_HEADER_SIZE <= bytes.size();
+	     pos += CBL_RECORD_SIZE) {
+		PgnFileStruct pgn;
+		const uint8_t *record = records + pos;
+
+		if (memcmp(record, "CCBridge Record", 15) != 0) {
+			continue;
+		}
+		if (!ParseCbrBuffer(record,
+				    MIN((size_t) CBL_RECORD_SIZE,
+					bytes.size() - record_offset - pos),
+				    pgn)) {
+			continue;
+		}
+		if (!pgn.Write(tmp_pgn) || !AppendFile(outfp, tmp_pgn)) {
+			fclose(outfp);
+			remove(tmp_pgn);
+			return _ERROR_CREATE;
+		}
+		fprintf(outfp, "\r\n\r\n");
+		converted++;
+		if (converted >= book_count) {
+			break;
+		}
+	}
+
+	fclose(outfp);
+	remove(tmp_pgn);
+	return converted > 0 ? _OK : _ERROR_FORMAT;
+}
+
 /** 
  *  CCM=中国游戏中心象棋
  *  CHE=QQ象棋
@@ -655,7 +1095,7 @@ int Pgn2Pgn(const char *szFile, const char *szPgnFile,
  *  MXQ=弈天象棋
  *  XQF=象棋演播室
  */
-enum { PGN,CCM, CHE, CHN, MXQ, XQF, ERR };
+enum { PGN,CCM, CHE, CHN, MXQ, XQF, CBR, CBL, ERR };
 static bool has_extension(const char *filename, const char *extension)
 {
 	const char *file_extension;
@@ -695,6 +1135,10 @@ int format(char *filename)
 		return MXQ;
 	} else if (has_extension(filename, ".xqf")) {
 		return XQF;
+	} else if (has_extension(filename, ".cbr")) {
+		return CBR;
+	} else if (has_extension(filename, ".cbl")) {
+		return CBL;
 	} else
 		return ERR;
 }
@@ -735,7 +1179,7 @@ int main(int argc, char **argv)
 	if (argc < 2) {
 		printf("=== PGN Converter ===\n");
 		printf("Usage: pgnconvert File [PGN-File]\n");
-		printf("It support [.ccm|.che|.chn|.mxq|.xqf] \n");
+		printf("It support [.ccm|.che|.chn|.mxq|.xqf|.cbr|.cbl] \n");
 		return 0;
 	}
 	switch (format(argv[1])) {
@@ -757,6 +1201,12 @@ int main(int argc, char **argv)
 	case XQF:
 		fun = Xqf2Pgn;
 		break;
+	case CBR:
+		fun = Cbr2Pgn;
+		break;
+	case CBL:
+		fun = Cbl2Pgn;
+		break;
 	case ERR:
 		printf("file not support\n");
 		return -1;
@@ -775,6 +1225,10 @@ int main(int argc, char **argv)
 	case _ERROR_CREATE:
 		printf("File Creation Error!\n");
 		break;
+	case _ERROR_FORMAT:
+		printf("%s: File Format Error!\n", argv[1]);
+		return -1;
+		break;
 	case _OK:
 		printf("File convert finish\n");
 
@@ -791,4 +1245,3 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
-

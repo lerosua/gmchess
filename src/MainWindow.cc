@@ -235,6 +235,8 @@ static std::string run_file_chooser(GtkWindow* parent, const char* title,
 			{ "CHN", "*.chn", "*.CHN" },
 			{ "MXQ", "*.mxq", "*.MXQ" },
 			{ "XQF", "*.xqf", "*.XQF" },
+			{ "CBR", "*.cbr", "*.CBR" },
+			{ "CBL", "*.cbl", "*.CBL" },
 		};
 		for(size_t i = 0; i < G_N_ELEMENTS(specs); ++i) {
 			GtkFileFilter* filter = create_file_filter(specs[i][0], specs[i][1], specs[i][2]);
