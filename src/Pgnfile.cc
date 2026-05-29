@@ -67,23 +67,23 @@ char Pgnfile::word_to_digit(const std::string& word)
 {
 	if(false){
 	}
-	else if(word == "一" || word == "1")
+	else if(word == "一" || word == "1" || word == "１")
 		return '1';
-	else if(word == "二" || word == "2")
+	else if(word == "二" || word == "2" || word == "２")
 		return '2';
-	else if(word == "三" || word == "3")
+	else if(word == "三" || word == "3" || word == "３")
 		return '3';
-	else if(word == "四" || word == "4")
+	else if(word == "四" || word == "4" || word == "４")
 		return '4';
-	else if(word == "五" || word == "5")
+	else if(word == "五" || word == "5" || word == "５")
 		return '5';
-	else if(word == "六" || word == "6")
+	else if(word == "六" || word == "6" || word == "６")
 		return '6';
-	else if(word == "七" || word == "7")
+	else if(word == "七" || word == "7" || word == "７")
 		return '7';
-	else if(word == "八" || word == "8")
+	else if(word == "八" || word == "8" || word == "８")
 		return '8';
-	else if(word == "九" || word == "9")
+	else if(word == "九" || word == "9" || word == "９")
 		return '9';
 	else
 		return -1;
