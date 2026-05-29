@@ -26,6 +26,7 @@
 #include <vector>
 
 const int border_width = 32;
+const int border_height = 46;
 
 #define PLACE_LEFT 0x01
 #define PLACE_RIGHT 0x02
@@ -131,7 +132,7 @@ Board::Board(MainWindow& win)
 	for(int i = 0; i < 18; ++i)
 		chessman_images[i] = NULL;
 
-	gtk_widget_set_size_request(area, 221, 277);
+	gtk_widget_set_size_request(area, 221, 305);
 	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(area), draw_cb, this, NULL);
 
 	GtkGesture* click = gtk_gesture_click_new();
@@ -293,7 +294,7 @@ void Board::configure_board(int _width)
 void Board::get_grid_size(int& width, int& height)
 {
 	width = (gtk_widget_get_width(area) - border_width * 2) / 8;
-	height = (gtk_widget_get_height(area) - border_width * 2) / 9;
+	height = (gtk_widget_get_height(area) - border_height * 2) / 9;
 }
 
 BoardPixel Board::get_coordinate(int pos_x, int pos_y)
@@ -302,7 +303,7 @@ BoardPixel Board::get_coordinate(int pos_x, int pos_y)
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 	pos_x = pos_x * grid_width + border_width;
-	pos_y = pos_y * grid_height + border_width;
+	pos_y = pos_y * grid_height + border_height;
 	return BoardPixel(pos_x, pos_y);
 }
 
@@ -316,7 +317,7 @@ BoardPixel Board::get_position(int pos_x, int pos_y)
 		return BoardPixel(-1, -1);
 
 	int x = (pos_x - border_width + grid_width / 2) / grid_width;
-	int y = (pos_y - border_width + grid_height / 2) / grid_height;
+	int y = (pos_y - border_height + grid_height / 2) / grid_height;
 	if(x < 0 || x > 8 || y < 0 || y > 9)
 		return BoardPixel(-1, -1);
 
@@ -467,6 +468,27 @@ void Board::draw_bg()
 	cairo_set_line_width(active_cr, 1.0);
 	draw_palace (active_cr, 4, 1);
 	draw_palace (active_cr, 4, 8);
+
+	cairo_select_font_face(active_cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+			CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(active_cr, is_small_board ? 13.0 : 15.0);
+	for(int i = 0; i < 9; ++i) {
+		char text[2] = { static_cast<char>('1' + i), '\0' };
+		BoardPixel top = get_coordinate(i, 0);
+		BoardPixel bottom = get_coordinate(i, 9);
+		cairo_text_extents_t extents;
+
+		cairo_text_extents(active_cr, text, &extents);
+		cairo_move_to(active_cr, top.x - extents.width / 2.0,
+				top.y - chessman_width / 2.0 - 4.0);
+		cairo_show_text(active_cr, text);
+
+		text[0] = static_cast<char>('9' - i);
+		cairo_text_extents(active_cr, text, &extents);
+		cairo_move_to(active_cr, bottom.x - extents.width / 2.0,
+				bottom.y + chessman_width / 2.0 + 14.0);
+		cairo_show_text(active_cr, text);
+	}
 	cairo_restore(active_cr);
 }
 
@@ -1082,11 +1104,11 @@ void Board::set_board_size(BOARDSIZE sizemode)
 	switch(sizemode){
 		case BIG_BOARD:
 			is_small_board=false;
-			gtk_widget_set_size_request(area, 521, 577);
+			gtk_widget_set_size_request(area, 521, 605);
 			break;
 		case SMALL_BOARD:
 			is_small_board=true;
-			gtk_widget_set_size_request(area, 221, 277);
+			gtk_widget_set_size_request(area, 221, 305);
 			break;
 		default:
 			g_warn_if_reached();

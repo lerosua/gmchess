@@ -122,18 +122,38 @@ static GMenu* overflow_menu_new()
 
 static void move_list_setup_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
 {
-	GtkWidget* label = gtk_label_new("");
-	gtk_label_set_xalign(GTK_LABEL(label), 0.0);
-	gtk_widget_set_margin_start(label, 6);
-	gtk_widget_set_margin_end(label, 6);
-	gtk_list_item_set_child(item, label);
+	GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+	GtkWidget* turn = gtk_label_new("");
+	GtkWidget* player = gtk_label_new("");
+	GtkWidget* move = gtk_label_new("");
+
+	gtk_widget_set_size_request(turn, 42, -1);
+	gtk_widget_set_size_request(player, 54, -1);
+	gtk_label_set_xalign(GTK_LABEL(turn), 0.0);
+	gtk_label_set_xalign(GTK_LABEL(player), 0.0);
+	gtk_label_set_xalign(GTK_LABEL(move), 0.0);
+	gtk_widget_set_hexpand(move, TRUE);
+	gtk_widget_set_margin_start(box, 8);
+	gtk_widget_set_margin_end(box, 8);
+	gtk_box_append(GTK_BOX(box), turn);
+	gtk_box_append(GTK_BOX(box), player);
+	gtk_box_append(GTK_BOX(box), move);
+	gtk_list_item_set_child(item, box);
 }
 
 static void move_list_bind_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
 {
 	GObject* row = G_OBJECT(gtk_list_item_get_item(item));
-	GtkWidget* label = gtk_list_item_get_child(item);
-	gtk_label_set_text(GTK_LABEL(label), row_string(row, "display"));
+	GtkWidget* box = gtk_list_item_get_child(item);
+	GtkWidget* turn = gtk_widget_get_first_child(box);
+	GtkWidget* player = gtk_widget_get_next_sibling(turn);
+	GtkWidget* move = gtk_widget_get_next_sibling(player);
+	char turn_text[16];
+
+	snprintf(turn_text, sizeof(turn_text), "%d", row_int(row, "step-bout"));
+	gtk_label_set_text(GTK_LABEL(turn), turn_text);
+	gtk_label_set_text(GTK_LABEL(player), row_string(row, "player"));
+	gtk_label_set_text(GTK_LABEL(move), row_string(row, "step-line"));
 }
 
 struct DialogRunData {
@@ -566,13 +586,32 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	GtkWidget* info_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 	GtkWidget* info_label = remember_widget("info_label", gtk_label_new(_("Information")));
 	gtk_label_set_wrap(GTK_LABEL(info_label), TRUE);
+	gtk_widget_set_size_request(info_label, -1, 120);
+	gtk_widget_set_valign(info_label, GTK_ALIGN_START);
 	gtk_box_append(GTK_BOX(info_page), info_label);
+
+	GtkWidget* move_header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+	GtkWidget* turn_header = gtk_label_new(_("Turn"));
+	GtkWidget* player_header = gtk_label_new("");
+	GtkWidget* move_header_label = gtk_label_new(_("Move"));
+	gtk_widget_set_size_request(turn_header, 42, -1);
+	gtk_widget_set_size_request(player_header, 54, -1);
+	gtk_label_set_xalign(GTK_LABEL(turn_header), 0.0);
+	gtk_label_set_xalign(GTK_LABEL(move_header_label), 0.0);
+	gtk_widget_set_margin_start(move_header, 8);
+	gtk_widget_set_margin_end(move_header, 8);
+	gtk_box_append(GTK_BOX(move_header), turn_header);
+	gtk_box_append(GTK_BOX(move_header), player_header);
+	gtk_box_append(GTK_BOX(move_header), move_header_label);
+	gtk_box_append(GTK_BOX(info_page), move_header);
+
 	GtkWidget* scrolled = remember_widget("scrolledwindow", gtk_scrolled_window_new());
-	gtk_widget_set_size_request(scrolled, 240, 180);
-	gtk_widget_set_vexpand(scrolled, TRUE);
+	gtk_widget_set_size_request(scrolled, 240, 170);
+	gtk_widget_set_vexpand(scrolled, FALSE);
 	gtk_box_append(GTK_BOX(info_page), scrolled);
 
 	GtkWidget* move_buttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+	gtk_widget_set_halign(move_buttons, GTK_ALIGN_CENTER);
 	btn_chanjue = GTK_BUTTON(remember_widget("button_chanju", gtk_button_new_from_icon_name("go-jump")));
 	btn_start = GTK_BUTTON(remember_widget("button_start", gtk_button_new_from_icon_name("go-first")));
 	btn_prev = GTK_BUTTON(remember_widget("button_prev", gtk_button_new_from_icon_name("go-previous")));
@@ -584,6 +623,11 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_next));
 	gtk_box_append(GTK_BOX(move_buttons), GTK_WIDGET(btn_end));
 	gtk_box_append(GTK_BOX(info_page), move_buttons);
+
+	GtkWidget* comment_label = gtk_label_new(NULL);
+	gtk_label_set_markup(GTK_LABEL(comment_label), _("<b>Comment</b>"));
+	gtk_widget_set_margin_top(comment_label, 4);
+	gtk_box_append(GTK_BOX(info_page), comment_label);
 
 	text_comment = GTK_TEXT_VIEW(remember_widget("textview_comment", gtk_text_view_new()));
 	GtkWidget* comment_scroll = gtk_scrolled_window_new();
