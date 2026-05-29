@@ -18,6 +18,7 @@
 #include "gmchess.h"
 #include "paths.h"
 
+#include <adwaita.h>
 #include <glib/gi18n.h>
 #include <cstdio>
 #include <cstdlib>
@@ -60,6 +61,45 @@ static const char* row_string(GObject* row, const char* key)
 {
 	const char* value = static_cast<const char*>(g_object_get_data(row, key));
 	return value ? value : "";
+}
+
+static GtkWidget* action_button_new(const char* icon_name, const char* tooltip,
+		const char* action_name)
+{
+	GtkWidget* button = gtk_button_new_from_icon_name(icon_name);
+	gtk_widget_set_tooltip_text(button, tooltip);
+	gtk_widget_add_css_class(button, "flat");
+	gtk_actionable_set_action_name(GTK_ACTIONABLE(button), action_name);
+	return button;
+}
+
+static GMenu* overflow_menu_new()
+{
+	GMenu* menu = g_menu_new();
+
+	GMenu* file_section = g_menu_new();
+	g_menu_append(file_section, _("Open file"), "win.open");
+	g_menu_append(file_section, _("Save as"), "win.save");
+	g_menu_append(file_section, _("Save Board"), "win.save-board");
+	g_menu_append_section(menu, NULL, G_MENU_MODEL(file_section));
+	g_object_unref(file_section);
+
+	GMenu* game_section = g_menu_new();
+	g_menu_append(game_section, _("_Fight to AI"), "win.fight-ai");
+	g_menu_append(game_section, _("Free Play"), "win.free-play");
+	g_menu_append(game_section, _("_Switch colour"), "win.switch-colour");
+	g_menu_append_section(menu, NULL, G_MENU_MODEL(game_section));
+	g_object_unref(game_section);
+
+	GMenu* app_section = g_menu_new();
+	g_menu_append(app_section, _("_Preferences"), "win.preferences");
+	g_menu_append(app_section, _("_Help"), "win.help");
+	g_menu_append(app_section, _("_About"), "win.about");
+	g_menu_append(app_section, _("_Quit"), "win.quit");
+	g_menu_append_section(menu, NULL, G_MENU_MODEL(app_section));
+	g_object_unref(app_section);
+
+	return menu;
 }
 
 static void move_list_setup_cb(GtkSignalListItemFactory*, GtkListItem* item, gpointer)
@@ -221,7 +261,6 @@ MainWindow::MainWindow(GtkApplication* app)
 	: board(NULL)
 	, ui_xml(NULL)
 	, window(NULL)
-	, menubar(NULL)
 	, action_group(NULL)
 	, m_treeview(NULL)
 	, m_refTreeModel(NULL)
@@ -274,8 +313,6 @@ MainWindow::MainWindow(GtkApplication* app)
 		g_error_free(error);
 
 	init_ui_manager();
-	GtkWidget* menu_tool_box = builder_widget("box_menu_toolbar");
-	gtk_box_append(GTK_BOX(menu_tool_box), menubar);
 
 	init_move_treeview();
 
@@ -366,16 +403,48 @@ GtkWidget* MainWindow::builder_widget(const char* name)
 
 void MainWindow::build_main_ui(GtkApplication* app)
 {
-	window = gtk_window_new();
-	if(app)
-		gtk_window_set_application(GTK_WINDOW(window), app);
+	window = app ? adw_application_window_new(app) : adw_window_new();
 	gtk_window_set_default_size(GTK_WINDOW(window), 900, 620);
 
-	GtkWidget* main_box = remember_widget("main_window", gtk_box_new(GTK_ORIENTATION_VERTICAL, 4));
-	gtk_window_set_child(GTK_WINDOW(window), main_box);
+	GtkWidget* toolbar_view = adw_toolbar_view_new();
+	if(ADW_IS_APPLICATION_WINDOW(window))
+		adw_application_window_set_content(ADW_APPLICATION_WINDOW(window), toolbar_view);
+	else
+		adw_window_set_content(ADW_WINDOW(window), toolbar_view);
 
-	GtkWidget* menu_box = remember_widget("box_menu_toolbar", gtk_box_new(GTK_ORIENTATION_VERTICAL, 0));
-	gtk_box_append(GTK_BOX(main_box), menu_box);
+	GtkWidget* header_bar = adw_header_bar_new();
+	GtkWidget* title = adw_window_title_new(_("GMChess"), NULL);
+	adw_header_bar_set_title_widget(ADW_HEADER_BAR(header_bar), title);
+	adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(toolbar_view), header_bar);
+
+	GtkWidget* open_button = action_button_new("document-open-symbolic",
+			_("Open file"), "win.open");
+	GtkWidget* save_button = action_button_new("document-save-symbolic",
+			_("Save as"), "win.save");
+	GtkWidget* save_board_button = action_button_new("image-x-generic-symbolic",
+			_("Save Board"), "win.save-board");
+	adw_header_bar_pack_start(ADW_HEADER_BAR(header_bar), open_button);
+	adw_header_bar_pack_start(ADW_HEADER_BAR(header_bar), save_button);
+	adw_header_bar_pack_start(ADW_HEADER_BAR(header_bar), save_board_button);
+
+	GtkWidget* fight_ai_button = action_button_new("applications-games-symbolic",
+			_("_Fight to AI"), "win.fight-ai");
+	GtkWidget* free_play_button = action_button_new("media-playback-start-symbolic",
+			_("Free Play"), "win.free-play");
+	adw_header_bar_pack_end(ADW_HEADER_BAR(header_bar), free_play_button);
+	adw_header_bar_pack_end(ADW_HEADER_BAR(header_bar), fight_ai_button);
+
+	GtkWidget* menu_button = gtk_menu_button_new();
+	gtk_menu_button_set_icon_name(GTK_MENU_BUTTON(menu_button), "open-menu-symbolic");
+	gtk_widget_set_tooltip_text(menu_button, _("Menu"));
+	gtk_widget_add_css_class(menu_button, "flat");
+	GMenu* overflow_menu = overflow_menu_new();
+	gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(menu_button), G_MENU_MODEL(overflow_menu));
+	g_object_unref(overflow_menu);
+	adw_header_bar_pack_end(ADW_HEADER_BAR(header_bar), menu_button);
+
+	GtkWidget* main_box = remember_widget("main_window", gtk_box_new(GTK_ORIENTATION_VERTICAL, 4));
+	adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(toolbar_view), main_box);
 
 	GtkWidget* content = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_widget_set_vexpand(content, TRUE);
@@ -808,36 +877,6 @@ void MainWindow::init_ui_manager()
 	action_group = g_simple_action_group_new();
 	g_action_map_add_action_entries(G_ACTION_MAP(action_group), entries, G_N_ELEMENTS(entries), this);
 	gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
-
-	GMenu* root = g_menu_new();
-	GMenu* file_menu = g_menu_new();
-	g_menu_append(file_menu, _("Open file"), "win.open");
-	g_menu_append(file_menu, _("Save as"), "win.save");
-	g_menu_append(file_menu, _("Save Board"), "win.save-board");
-	g_menu_append(file_menu, _("_Quit"), "win.quit");
-	g_menu_append_submenu(root, _("_File"), G_MENU_MODEL(file_menu));
-	g_object_unref(file_menu);
-
-	GMenu* view_menu = g_menu_new();
-	g_menu_append(view_menu, _("_Switch colour"), "win.switch-colour");
-	g_menu_append(view_menu, _("_Preferences"), "win.preferences");
-	g_menu_append_submenu(root, _("_View"), G_MENU_MODEL(view_menu));
-	g_object_unref(view_menu);
-
-	GMenu* game_menu = g_menu_new();
-	g_menu_append(game_menu, _("_Fight to AI"), "win.fight-ai");
-	g_menu_append(game_menu, _("Free Play"), "win.free-play");
-	g_menu_append_submenu(root, _("_Game"), G_MENU_MODEL(game_menu));
-	g_object_unref(game_menu);
-
-	GMenu* help_menu = g_menu_new();
-	g_menu_append(help_menu, _("_Help"), "win.help");
-	g_menu_append(help_menu, _("_About"), "win.about");
-	g_menu_append_submenu(root, _("_Help"), G_MENU_MODEL(help_menu));
-	g_object_unref(help_menu);
-
-	menubar = gtk_popover_menu_bar_new_from_model(G_MENU_MODEL(root));
-	g_object_unref(root);
 }
 
 void MainWindow::on_menu_save_board_to_png()

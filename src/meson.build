@@ -27,17 +27,17 @@ gmchess_sources = [
 	'MainWindow.cc',
   ]
 
-if gtk_dep.found()
+if gtk_dep.found() and adw_dep.found()
   executable('gmchess',
     gmchess_sources,
     include_directories : [
       include_directories('.'),
       include_directories('..'),
       ],
-    dependencies : [gtk_dep, libiconv_dep],
+    dependencies : [gtk_dep, adw_dep, libiconv_dep],
     link_with : gmchess_core,
     install: true,
   )
 else
-  message('gtk4 not found; building core and engine targets only')
+  message('gtk4 or libadwaita-1 not found; building core and engine targets only')
 endif

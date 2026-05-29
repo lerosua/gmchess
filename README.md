@@ -9,7 +9,7 @@ application artwork.
 ## Current Status
 
 - Version: `0.40.1`
-- UI toolkit: GTK4
+- UI toolkit: GTK4 + libadwaita
 - Build system: Meson + Ninja
 - Packaging: Debian/Ubuntu `.deb` support is included
 - Gameplay: human-versus-engine play, free play, and game-record handling
@@ -26,7 +26,7 @@ dialog and file-selection APIs where applicable.
 Install the build dependencies on Ubuntu/Debian:
 
 ```sh
-sudo apt install build-essential meson ninja-build pkg-config gettext libgtk-4-dev
+sudo apt install build-essential meson ninja-build pkg-config gettext libgtk-4-dev libadwaita-1-dev
 ```
 
 Build the project:

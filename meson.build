@@ -100,8 +100,10 @@ vapidir = join_paths(datadir, 'vala', 'vapi')
 
 # Dependencies
 gtk_req = '>= 4.0.0'
+adw_req = '>= 1.0.0'
 
 gtk_dep = dependency('gtk4', version: gtk_req, required: false)
+adw_dep = dependency('libadwaita-1', version: adw_req, required: false)
 
 libdl_dep = cpp.find_library('dl', required: true)
 if not libdl_dep.found()

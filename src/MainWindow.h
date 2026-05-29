@@ -110,7 +110,6 @@ class MainWindow
 		Board*				board;
 		GtkBuilder*			ui_xml;
 		GtkWidget*			window;
-		GtkWidget*			menubar;
 		GSimpleActionGroup*	action_group;
 		std::map<std::string, GtkWidget*> ui_widgets;
 		GtkListView*		m_treeview;
