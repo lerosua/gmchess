@@ -1,4 +1,5 @@
 src/MainWindow.cc
+src/ConfWindow.cc
 src/Board.cc
 src/Engine.cc
 src/Pgnfile.cc

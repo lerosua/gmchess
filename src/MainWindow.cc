@@ -73,6 +73,24 @@ static GtkWidget* action_button_new(const char* icon_name, const char* tooltip,
 	return button;
 }
 
+static GtkWidget* gameplay_button_new(const char* icon_name, const char* label_text)
+{
+	GtkWidget* button = gtk_button_new();
+	GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+	GtkWidget* icon = gtk_image_new_from_icon_name(icon_name);
+	GtkWidget* label = gtk_label_new_with_mnemonic(label_text);
+
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
+	gtk_widget_set_valign(icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_valign(label, GTK_ALIGN_CENTER);
+	gtk_box_append(GTK_BOX(box), icon);
+	gtk_box_append(GTK_BOX(box), label);
+	gtk_button_set_child(GTK_BUTTON(button), box);
+	gtk_widget_set_tooltip_text(button, label_text);
+
+	return button;
+}
+
 static GMenu* overflow_menu_new()
 {
 	GMenu* menu = g_menu_new();
@@ -518,11 +536,20 @@ void MainWindow::build_main_ui(GtkApplication* app)
 	gtk_widget_set_vexpand(board_box, TRUE);
 	gtk_box_append(GTK_BOX(content), board_box);
 
-	buttonbox_war = remember_widget("hbuttonbox_war", gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4));
-	btn_begin = GTK_BUTTON(remember_widget("button_begin", gtk_button_new_with_mnemonic(_("Start"))));
-	btn_lose = GTK_BUTTON(remember_widget("button_lose", gtk_button_new_with_mnemonic(_("Lost"))));
-	btn_draw = GTK_BUTTON(remember_widget("button_draw", gtk_button_new_with_mnemonic(_("Draw"))));
-	btn_rue = GTK_BUTTON(remember_widget("button_rue", gtk_button_new_with_mnemonic(_("Rue"))));
+	buttonbox_war = remember_widget("hbuttonbox_war", gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
+	gtk_widget_set_halign(buttonbox_war, GTK_ALIGN_CENTER);
+	gtk_widget_set_margin_top(buttonbox_war, 4);
+	gtk_widget_set_margin_bottom(buttonbox_war, 6);
+	gtk_widget_add_css_class(buttonbox_war, "linked");
+	btn_begin = GTK_BUTTON(remember_widget("button_begin",
+				gameplay_button_new("media-playback-start-symbolic", _("Start"))));
+	btn_lose = GTK_BUTTON(remember_widget("button_lose",
+				gameplay_button_new("process-stop-symbolic", _("Lost"))));
+	btn_draw = GTK_BUTTON(remember_widget("button_draw",
+				gameplay_button_new("emblem-ok-symbolic", _("Draw"))));
+	btn_rue = GTK_BUTTON(remember_widget("button_rue",
+				gameplay_button_new("edit-undo-symbolic", _("Rue"))));
+	gtk_widget_add_css_class(GTK_WIDGET(btn_begin), "suggested-action");
 	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_begin));
 	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_lose));
 	gtk_box_append(GTK_BOX(buttonbox_war), GTK_WIDGET(btn_draw));
